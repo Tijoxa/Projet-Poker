@@ -143,7 +143,7 @@ class Game:
         """
         Vérifie que c'est une fin de tour d'enchère
         """
-        if len(self.dans_le_coup) > 1:
+        if sum([int(not conn.player.all_in) for conn in self.dans_le_coup]) > 1:
             for conn in self.dans_le_coup:
                 if not conn.player.all_in:
                     if conn.player.mise < self.mise or not conn.player.bet_once:
