@@ -52,7 +52,7 @@ def quinte(main:list):
     valeurs = [i.value for i in main]
     valeurs.sort() 
     if valeurs == [2, 3, 4, 5, 14]:
-        valeurs = [1, 2, 3, 4, 5] # L'As peut être le premier élément de la plus petite suite
+        valeurs = [1, 2, 3, 4, 5] # l'as peut être le premier élément de la plus petite suite
     minimal = valeurs[0]
     if valeurs == [(minimal + i) for i in range(5)]:
         valeurs.reverse()
@@ -119,7 +119,7 @@ def hauteur(main:list):
     return valeurs
 
 
-def combinaison(main:list): # TODO: gérer les cas de comparaison plus complexes (voir https://github.com/msaindon/deuces)
+def combinaison(main:list):
     """
     Prend une main (liste de 5 cartes (instances de cards.Card)) en entrée et retourne la meilleure combinaison
     """

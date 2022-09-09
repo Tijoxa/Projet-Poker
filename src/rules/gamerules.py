@@ -100,14 +100,14 @@ class Game:
             if conn not in self.dans_le_coup or conn.player.all_in:
                 continue
             for all_conn in self.in_game:
-                info = self.info(conn, all_conn) #string contenant toutes les infos à envoyer aux joueurs
+                info = self.info(conn, all_conn) # string contenant toutes les infos à envoyer aux joueurs
                 all_conn.send(info)
             action = conn.receive()
             self.acted(conn, action)
             conn.player.acted(self, action)
-            if first == started: #on vient de faire un tour complet
+            if first == started: # on vient de faire un tour complet
                 for conn in self.dans_le_coup:
-                    if conn.player.all_in and conn.player.side_pot == 0: #calcul du side_pot
+                    if conn.player.all_in and conn.player.side_pot == 0: # calcul du side_pot
                         conn.player.side_pot = self.pot
                         for conn2 in self.dans_le_coup:
                             conn.player.side_pot += min(conn.player.mise, conn2.player.mise)      
@@ -198,13 +198,13 @@ def abattage(main:list, board:list) -> tuple:
     """
     Fonction prenant les 2 cartes dans la main d'un joueur et les 5 cartes du board et renvoie la meilleure main de 5 cartes possibles
     """
-    hands_of_five = combinations(board + main, 5) # on prend toutes les combianisons de 5 cartes possibles
+    hands_of_five = combinations(board + main, 5) # on prend toutes les combinaisons de 5 cartes possibles
     list_combi = []
     for hand in hands_of_five:
-        combi = combinaison.combinaison(hand) # quelle est la combinaison rattaché à cette main
+        combi = combinaison.combinaison(hand) # quelle est la combinaison rattachée à cette main
         list_combi.append(combi) 
     best_combi = max(list_combi) # une relation d'ordre a été définie et permet de prendre la meilleure combinaison
-    best_main = combi.main # on retourne la main ayant produit la melleure combinaison
+    best_main = combi.main # on retourne la main ayant produit la meilleure combinaison
     return best_main, best_combi
 
 def winner(conns:list, board:list):

@@ -69,6 +69,13 @@ class Naive(AI):
             choix = f"RELANCE {value}" 
         return choix       
 
+class PatrickCruel(AI):
+    def __init__(self, id):
+        """
+        Pas n'importe quelle IA
+        """
+        super().__init__(id)
+        self.pseudo = "Patrick Cruel"
 
 def ai(type, id):
     """
