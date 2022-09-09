@@ -83,7 +83,7 @@ class Game:
             conn.player.main.append(self.deck.draw())
             print(f"{conn.id}\t{conn.player.main}\t{conn.player.money}")
         money_everywhere = sum([conn.player.money for conn in self.in_game]) + sum([conn.player.mise for conn in self.in_game])
-        if money_everywhere != 4 * self.player_starting_money: raise ValueError("De l'argent a disparu!")
+        if money_everywhere != len(self.in_game) * self.player_starting_money: raise ValueError("De l'argent a disparu!")
 
     def enchere(self, first:int):
         """
