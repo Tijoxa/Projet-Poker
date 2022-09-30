@@ -10,3 +10,7 @@
     <li> Un protocole de communication entre clients et serveur </li>
 </ol>
 Pour que le projet puisse fonctionner sur Linux, Windows et Mac, le langage et les bibliothèques utilisés seront (à peu près) libres. </p>
+
+
+# Ressources 
+Le lien vers le dossier de stockage des fichiers annexes (Cahier des charges, planning & ressources éducatives) sont accessibles à l'aide du lien suivant (https://drive.google.com/drive/folders/1wyqECV4-QQn1gJoVZwRgfn_wUfKAfKLP?usp=sharing).
