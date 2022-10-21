@@ -11,7 +11,8 @@ class Client:
 
     """
     def __init__(self) -> None:
-        
+        self.id = id
+        self.pseudo = pseudo
     
     def receive(self, server, data_size):
         received_encoded = server.recv(data_size)
