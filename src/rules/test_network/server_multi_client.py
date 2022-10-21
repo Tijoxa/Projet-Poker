@@ -46,8 +46,6 @@ class ClientThread(threading.Thread):
 
 
 
-
-
 class server:
     """
     Cette classe permet le stockage des informations communes du serveur.

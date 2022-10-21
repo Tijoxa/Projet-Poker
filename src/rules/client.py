@@ -1,3 +1,5 @@
+import socket
+
 class Client:
     """
     Le client est grossièrement le joueur. Le code comprendra les actions suivantes :
@@ -9,4 +11,13 @@ class Client:
 
     """
     def __init__(self) -> None:
-        pass
+        
+    
+    def receive(self, server, data_size):
+        received_encoded = server.recv(data_size)
+        received = received_encoded.decode("utf8")
+        self.manage(received)
+    
+    def send(self, server, data):
+        data_encoded = data.encode("utf8")
+        server.sendall(data_encoded)
