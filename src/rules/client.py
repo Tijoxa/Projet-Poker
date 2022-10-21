@@ -10,12 +10,12 @@ class Client:
     - raise (relancer: première relance : le double; après : relance d'au moins la différence en plus)
 
     """
-    def __init__(self, id, pseudo, server) -> None:
-        self.id = id
+    def __init__(self, pseudo, server) -> None:
+        self.id = None
         self.pseudo = pseudo
         self.server = server
     
-    def receive(self, data_size):
+    def receive(self, data_size = 1024):
         received_encoded = self.server.recv(data_size)
         received = received_encoded.decode("utf8")
         self.manage(received)
@@ -23,6 +23,23 @@ class Client:
     def send(self, data):
         data_encoded = data.encode("utf8")
         self.server.sendall(data_encoded)
+    
+    def manage(self, received):
+        """
+        received est le message denvoyé par le serveur. Cette méthode indique le comportement à suivre
+        """
+        print(received)
+        if received == "waiting for pseudo...":
+            self.send(self.pseudo)
+            return
+        if received.startswith("ID:"):
+            self.id = received[3:]
+        if received == "waiting for message...":
+            self.send(input("\t>"))
+        if received == "close":
+            server.close()
+            quit()
+        
     
     def suivre(self):
         self.send("SUIVRE")
@@ -50,13 +67,13 @@ class Client:
         self.send("CHECK")
         return True
     
+
         
-if __name__ == "main":
-    host, port = ('x.x.x.X', 5566) # cette ip doit être l'ip publique de l'ordinateur sur lequel tourne le serveur, le port doit être en accord avec celui du serveur
+if __name__ == "__main__":
+    host, port = ('localhost', 5566) # cette ip doit être l'ip publique de l'ordinateur sur lequel tourne le serveur, le port doit être en accord avec celui du serveur
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.connect((host, port))
-    id = "000"
     pseudo = "Didier Lime"
-    client = Client(id, pseudo)
+    client = Client(pseudo, server)
     while True:
         client.receive()

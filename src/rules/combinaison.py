@@ -84,6 +84,10 @@ def compteur(main):
     return count
 
 def combinaison(main):
+    """
+    Prend une main en entrée et retourne la meilleure combinaison
+    """
+
     QUINTE = quinte(main)
     FLUSH = flush(main)
     if quinte_flush(QUINTE, FLUSH):
