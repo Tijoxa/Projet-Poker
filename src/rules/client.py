@@ -8,5 +8,7 @@ class Client:
     - raise (relancer: première relance : le double; après : relance d'au moins la différence en plus)
 
     """
-    def __init__(self) -> None:
-        pass
+    def __init__(self, id, pseudo) -> None:
+        self.id = id
+        self.pseudo = pseudo
+
