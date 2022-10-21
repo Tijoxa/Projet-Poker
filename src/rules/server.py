@@ -34,9 +34,11 @@ class ClientThread(threading.Thread):
         try:
             self.send("ping")
         except:
-            "no ping"
+            print("no ping")
             ClientThread.nb_players -= 1
             self.server.remove(self)
+            return False
+        return True
 
 
 
@@ -72,14 +74,17 @@ class server():
     
     
     #  faire les règles du jeu et tout
-    #  Cette vertsion est là pour tester le bon fonctionnement du chacun son tour
+    #  Cette version est là pour tester le bon fonctionnement du chacun son tour
     #  Les clients envoient leur message chacun leur tour
     def initialisation(self) -> None:
         while True:
             for client in self.conns:
                 print(client.id, client.pseudo)
                 client.send("waiting for message...")
-                print(client.receive())
+                received = client.receive()
+                print(f"{client.pseudo}: {received}")
+                if received == "QUIT":
+                    return
 
     def close(self):
         for client in self.conns:

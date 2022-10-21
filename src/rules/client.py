@@ -73,7 +73,7 @@ if __name__ == "__main__":
     host, port = ('localhost', 5566) # cette ip doit être l'ip publique de l'ordinateur sur lequel tourne le serveur, le port doit être en accord avec celui du serveur
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.connect((host, port))
-    pseudo = "Didier Lime"
+    pseudo = input("pseudo: ")
     client = Client(pseudo, server)
     while True:
         client.receive()
