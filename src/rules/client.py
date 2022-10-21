@@ -59,4 +59,4 @@ if __name__ == "main":
     pseudo = "Didier Lime"
     client = Client(id, pseudo)
     while True:
-        client.receive
+        client.receive()
