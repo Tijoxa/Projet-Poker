@@ -1,16 +1,19 @@
 import socket
 import threading
+from itertools import count
 
-class Server:
+class Server(threading.Thread):
     """
     Le serveur va s'occuper d'une grande partie du déroulement du jeu. Il s'occupera de la désignation de qui doit jouer parmis les clients.
     Il définira de plus le jeu de cartes, et les différentes parties du jeu (pre-flop, flop, turn et river).
     """
-    def __init__(self, nb_players) -> None:
-        assert 1 < nb_players < 11, "Impossible de démarrer le jeu"
-        self.nb_players = nb_players
 
-    def run(self) -> None:
+    nb_players = 0
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    def run(self, count=count()) -> None:
         pass
 
     # faire les règles du jeu et tout
