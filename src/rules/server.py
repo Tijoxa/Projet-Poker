@@ -1,5 +1,6 @@
 import socket
 import threading
+import player
 from itertools import count
 
 class ClientThread(threading.Thread):
@@ -11,6 +12,9 @@ class ClientThread(threading.Thread):
     nb_players = 0
 
     def __init__(self, server, conn, adress) -> None:
+        """
+        Recupération des informations chez le client et inititalisation du Thread
+        """
         super().__init__()
         self.server = server
         self.adress = adress
@@ -19,18 +23,29 @@ class ClientThread(threading.Thread):
         self.send("waiting for pseudo...")
         self.pseudo = self.receive()
         self.id = ClientThread.nb_players
+        self.player = player.player.new_player()
         self.send(f"ID:{self.id}")
 
 
     def send(self, data):
+        """
+        Envoie des datas au client
+        """
         data_encoded = data.encode("utf8")
         self.conn.sendall(data_encoded)
     
     def receive(self, datasize = 1024):
+        """
+        recoit des données du client
+        """
         data_encoded = self.conn.recv(datasize)
         return data_encoded.decode("utf8")
     
     def ping(self):
+        """
+        ping le client.
+        Renvoie vrai si le client est toujours connecté
+        """
         try:
             self.send("ping")
         except:
@@ -88,6 +103,9 @@ class server():
                     return
 
     def close(self):
+        """
+        Permet de fermer le serveur
+        """
         for client in self.conns:
             client.send("close")
             client.conn.close()

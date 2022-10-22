@@ -1,8 +1,8 @@
 import random
 
-symbols = ["A", 2,3,4,5,6,7,8,9,10,"J","Q", "K", "A"]
-colors = ["H", "S", "D", "C"]
-terminal_color = {"H": "\033[31m", "S": "\033[34m", "D": "\033[33m", "C": "\033[32m"}
+symbols = ["A", 2,3,4,5,6,7,8,9,10,"J","Q", "K", "A"] # liste des symboles
+colors = ["H", "S", "D", "C"] # H = Hearts ; S = Spades ; D = Diamond ; C = Clubs
+terminal_color = {"H": "\033[31m", "S": "\033[34m", "D": "\033[33m", "C": "\033[32m"} 
 
 class card:
 
@@ -27,6 +27,9 @@ class card:
 
 
     def __init__(self, symbol, couleur):
+        """
+        crée une carte à partir d'un symbole et d'une couleur
+        """
         self.value = self.symbols_to_value(symbol)
         if couleur in colors:
             self.color = couleur
@@ -38,10 +41,16 @@ class card:
         print(terminal_color[self.color], end = "")
         print(f"{str(self.value_to_symbols(self.value))}{self.color}",end = "")
         print("\033[39m", end = "\t")
-        return ""
+        return f"{str(self.value_to_symbols(self.value))}{self.color}"
 
-paquet = []
-for symbol in symbols[1:]:
-    for color in colors:
-        paquet.append(card(symbol, color))
-random.shuffle(paquet)
+
+def deck():
+    """
+    Renvoie un paquet de 52 cartes
+    """
+    paquet = []
+    for symbol in symbols[1:]:
+        for color in colors:
+            paquet.append(card(symbol, color))
+    random.shuffle(paquet)
+    return paquet

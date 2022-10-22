@@ -11,16 +11,30 @@ class Client:
 
     """
     def __init__(self, pseudo, server) -> None:
-        self.id = None
-        self.pseudo = pseudo
-        self.server = server
+        """
+        création du client
+        ====paramètres====
+        pseudo: le pseudo du joueur qui sera affiché en jeu
+        server: le server auquel le client est connecté
+        ====Output====
+        un client connecté au serveur
+        """
+        self.id = None # l'id sera donnée par le serveur pour s'assurer que chaque client en ait une différente
+        self.pseudo = pseudo # le pseudo peut être choisi par le joueur
+        self.server = server # le serveur auquel le client s'est connecté'
     
     def receive(self, data_size = 1024):
+        """
+        Permet de recevoir les messages du serveur
+        """
         received_encoded = self.server.recv(data_size)
         received = received_encoded.decode("utf8")
-        self.manage(received)
+        self.manage(received) # manage indique le comportement à prendre selon le message reçu.
     
     def send(self, data):
+        """
+        Envoie le message data au serveur
+        """
         data_encoded = data.encode("utf8")
         self.server.sendall(data_encoded)
     
@@ -68,6 +82,7 @@ class Client:
         return True
     
     def run(self):
+        # boucle principale de réception
         while True:
             client.receive()
 
