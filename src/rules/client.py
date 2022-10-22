@@ -67,6 +67,9 @@ class Client:
         self.send("CHECK")
         return True
     
+    def run(self):
+        while True:
+            client.receive()
 
         
 if __name__ == "__main__":
@@ -75,5 +78,4 @@ if __name__ == "__main__":
     server.connect((host, port))
     pseudo = input("pseudo: ")
     client = Client(pseudo, server)
-    while True:
-        client.receive()
+    client.run()

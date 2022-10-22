@@ -38,7 +38,8 @@ class ClientThread(threading.Thread):
             ClientThread.nb_players -= 1
             self.server.remove(self)
             return False
-        return True
+        finally:
+            return True
 
 
 
