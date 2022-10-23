@@ -43,14 +43,34 @@ class card:
         print("\033[39m", end = "\t")
         return f"{str(self.value_to_symbols(self.value))}{self.color}"
 
+        def __str__(self):
+            return f"{str(self.value_to_symbols(self.value))}{self.color}"
 
-def deck():
-    """
-    Renvoie un paquet de 52 cartes
-    """
-    paquet = []
-    for symbol in symbols[1:]:
-        for color in colors:
-            paquet.append(card(symbol, color))
-    random.shuffle(paquet)
-    return paquet
+
+class Deck:
+    def __init__(self):
+        """
+        Renvoie un paquet de 52 cartes
+        """
+        self.paquet = []
+        self.drawn = []
+        for symbol in symbols[1:]:
+            for color in colors:
+                self.paquet.append(card(symbol, color))
+        random.shuffle(self.paquet)
+    
+    def draw(self):
+        drawn = self.paquet[0]
+        self.drawn.append(drawn)
+        self.paquet = self.paquet[1:]
+        return drawn
+    
+    def burn(self):
+        burned = self.paquet[0]
+        self.drawn.append(burned)
+        self.paquet = self.paquet[1:]
+    
+    def re_shuffle(self):
+        self.paquet = self.paquet + self.drawn
+        self.drawn = []
+        random.shuffle(self.paquet)

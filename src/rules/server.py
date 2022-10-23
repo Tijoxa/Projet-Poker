@@ -2,6 +2,8 @@ import socket
 import threading
 import player
 from itertools import count
+import cards
+import rules
 
 class ClientThread(threading.Thread):
     """
@@ -23,7 +25,7 @@ class ClientThread(threading.Thread):
         self.send("waiting for pseudo...")
         self.pseudo = self.receive()
         self.id = ClientThread.nb_players
-        self.player = player.player.new_player()
+        self.player = player.Player.new_player()
         self.send(f"ID:{self.id}")
 
 
@@ -44,7 +46,7 @@ class ClientThread(threading.Thread):
     def ping(self):
         """
         ping le client.
-        Renvoie vrai si le client est toujours connecté
+        Renvoie vrai si le client est toujours connectéc
         """
         try:
             self.send("ping")
@@ -90,9 +92,40 @@ class server():
     
     
     #  faire les règles du jeu et tout
-    #  Cette version est là pour tester le bon fonctionnement du chacun son tour
-    #  Les clients envoient leur message chacun leur tour
-    def initialisation(self) -> None:
+
+    def test(self) -> None:
+        """
+        Cette fonction temporaire permet de présenter la structure générale de jeu et de tester quelques techniques.
+        """
+        deck = cards.Deck()
+        # Distribution des cartes
+        for client in self.conns:
+            client.player.main = [deck.draw()]    
+        for client in self.conns:
+            client.player.main.append(deck.draw())
+            client.send(f"Votre main : {client.player.main}")
+        board = []
+        rules.pre_flop() # premier tour d'enchère
+        for i in range(3):
+            board.append(deck.draw())
+        rules.flop() # deuxième tour d'enchère
+        deck.burn()
+        board.append(deck.draw()) 
+        rules.turn() # troisième tour d'enchère
+        deck.burn()
+        board.append(deck.draw())
+        rules.river() # dernier tour d'enchère
+        winning_order = rules.winner(self.conns, board) # joueurs dans leur ordre de victoire
+        turn_winner = winning_order[0][0] # le gagnant de cette passe
+        pseudo_winner = turn_winner.pseudo
+        for client in self.conns:
+            client.send(str(board))
+            if client == turn_winner:
+                client.send(f"You won!\nwith {winning_order[0][1]}")
+            else:
+                client.send(f"{pseudo_winner} won\nwith {winning_order[0][1]}")
+
+        # messages tour par tour
         while True:
             for client in self.conns:
                 print(client.id, client.pseudo)

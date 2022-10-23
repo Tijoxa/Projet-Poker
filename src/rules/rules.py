@@ -15,3 +15,24 @@ def abattage(main, board):
     best_main = combi.main # on retourne la main ayant produit la melleure combinaison
     return best_main, best_combi
 
+def pre_flop():
+    pass
+
+def flop():
+    pass
+
+def turn():
+    pass
+
+def river():
+    pass
+
+def winner(players, board):
+    combis = []
+    for player in players:
+        combis.append((player, abattage(player.player.main, board)[1]))
+    combis.sort(key = (lambda x: x[1]), reverse = True)
+    return combis
+    
+    
+    

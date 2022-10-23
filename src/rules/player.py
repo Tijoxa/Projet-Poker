@@ -6,8 +6,9 @@ class Player:
     """
 
     def __init__(self):
+        self.main = None
         pass
 
     @classmethod
     def new_player(cls):
-        return player()
+        return Player()
