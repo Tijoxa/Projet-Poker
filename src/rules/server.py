@@ -74,7 +74,7 @@ class server():
         self.awaited = awaited
         print("serveur prêt")
         self.get_players()
-        self.initialisation()
+        self.test()
         self.close()
     
     def get_players(self):
