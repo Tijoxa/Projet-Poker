@@ -43,8 +43,8 @@ class card:
         print("\033[39m", end = "\t")
         return f"{str(self.value_to_symbols(self.value))}{self.color}"
 
-        def __str__(self):
-            return f"{str(self.value_to_symbols(self.value))}{self.color}"
+    def __str__(self):
+        return f"{str(self.value_to_symbols(self.value))}{self.color}"
 
 
 class Deck:

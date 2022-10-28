@@ -51,8 +51,10 @@ class Client:
         if received == "waiting for message...":
             self.send(input("\t>"))
         if received == "close":
-            server.close()
+            self.close()
             quit()
+        if received.endswith("Que faire?"):
+            self.client_input()            
         
     
     def suivre(self):
@@ -85,6 +87,32 @@ class Client:
         # boucle principale de réception
         while True:
             client.receive()
+    
+    def client_input(self):
+        while True:
+            print("Vos possibilités sont:")
+            print("SUIVRE\tCOUCHER\tMISE\tRELANCE\tCHECK")
+            input = input("\t>")
+            if input.startswith("SUIVRE"):
+                self.suivre()
+                return
+            if input.startswith("COUCHER"):
+                self.coucher()
+                return
+            if input.startswith("MISE"):
+                value = int(input[5:])
+                if self.mise(value, 0, 8000):
+                    return
+            if input.startswith("RELANCE"):
+                value = int(input[8:])
+                if self.relance(value, 0, 8000):
+                    return               
+            if input.startswith("CHECK"):
+                self.check()
+
+
+
+
 
         
 if __name__ == "__main__":

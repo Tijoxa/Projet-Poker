@@ -1,8 +1,6 @@
 import socket
 import threading
 import player
-from itertools import count
-import cards
 import rules
 
 class ClientThread(threading.Thread):
@@ -74,7 +72,8 @@ class server():
         self.awaited = awaited
         print("serveur prêt")
         self.get_players()
-        self.test()
+        self.game = rules.Game(2, self.conns)
+        self.game.play()
         self.close()
     
     def get_players(self):
@@ -90,41 +89,12 @@ class server():
             for client in self.conns: client.ping()
         
     
-    
     #  faire les règles du jeu et tout
 
     def test(self) -> None:
         """
         Cette fonction temporaire permet de présenter la structure générale de jeu et de tester quelques techniques.
         """
-        deck = cards.Deck()
-        # Distribution des cartes
-        for client in self.conns:
-            client.player.main = [deck.draw()]    
-        for client in self.conns:
-            client.player.main.append(deck.draw())
-            client.send(f"Votre main : {client.player.main}")
-        board = []
-        rules.pre_flop() # premier tour d'enchère
-        for i in range(3):
-            board.append(deck.draw())
-        rules.flop() # deuxième tour d'enchère
-        deck.burn()
-        board.append(deck.draw()) 
-        rules.turn() # troisième tour d'enchère
-        deck.burn()
-        board.append(deck.draw())
-        rules.river() # dernier tour d'enchère
-        winning_order = rules.winner(self.conns, board) # joueurs dans leur ordre de victoire
-        turn_winner = winning_order[0][0] # le gagnant de cette passe
-        pseudo_winner = turn_winner.pseudo
-        for client in self.conns:
-            client.send(str(board))
-            if client == turn_winner:
-                client.send(f"You won!\nwith {winning_order[0][1]}")
-            else:
-                client.send(f"{pseudo_winner} won\nwith {winning_order[0][1]}")
-
         # messages tour par tour
         while True:
             for client in self.conns:

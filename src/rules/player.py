@@ -7,7 +7,25 @@ class Player:
 
     def __init__(self):
         self.main = None
-        pass
+        self.money = 0
+        self.mise = 0
+        self.bet_once = False
+
+    def acted(self, game, action):
+        self.bet_once = True
+        if action == "CHECK" or action == "COUCHER":
+            return
+        if action == "SUIVRE":
+            self.money -= (game.mise - self.mise)
+            self.mise = game.mise
+        if action.starswith("MISE"):
+            self.mise = int(action[5:])
+            self.money -= self.mise
+        if action.startswith("RELANCE"):
+            relance = int(action[8:])
+            self.money -= (relance - self.mise)
+            self.mise = relance
+
 
     @classmethod
     def new_player(cls):
