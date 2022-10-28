@@ -1,3 +1,5 @@
+from rules import Game
+
 class Player:
     """
     Cette classe représente un joueur du point de vue ludique
@@ -11,22 +13,21 @@ class Player:
         self.mise = 0
         self.bet_once = False
 
-    def acted(self, game, action):
+    def acted(self, game:"Game", action:str):
         self.bet_once = True
         if action == "CHECK" or action == "COUCHER":
             return
         if action == "SUIVRE":
-            self.money -= (game.mise - self.mise)
+            self.money -= game.mise - self.mise
             self.mise = game.mise
-        if action.starswith("MISE"):
+        if action.startswith("MISE"):
             self.mise = int(action[5:])
             self.money -= self.mise
         if action.startswith("RELANCE"):
             relance = int(action[8:])
-            self.money -= (relance - self.mise)
+            self.money -= relance - self.mise
             self.mise = relance
 
-
     @classmethod
-    def new_player(cls):
+    def new_player(cls) -> "Player":
         return Player()

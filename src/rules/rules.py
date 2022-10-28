@@ -1,9 +1,13 @@
-import combinaison
-import cards
 from itertools import combinations
 
+import combinaison
+from cards import Deck
+
+#TODO: check les "...".player."..." s'il ne faut pas les remplacer par "..."."..." (lignes 37, 39, 57, 59, 60, 64, 70, 74, etc.)
+#TODO: renommer le script pour éviter les conflits avec le nom du fichier
+
 class Game:
-    def __init__(self, blinde, conns):
+    def __init__(self, blinde:float, conns:list):
         self.pot = 0
         self.petite_blinde = blinde
         self.grosse_blinde = blinde * 2
@@ -17,9 +21,9 @@ class Game:
             self.coup()
     
     def coup(self):
-        self.deck = cards.Deck()
+        self.deck = Deck()
         dealer = self.in_game[0]
-        self.dans_le_coup = [player for player in self.in_game]
+        self.dans_le_coup = self.in_game
         if len(self.in_game) == 2: # cas face à face
             petite = dealer
             petite_index = 0
@@ -29,14 +33,14 @@ class Game:
             petite = self.in_game[1]
             petite_index = 1
             grosse = self.in_game[2]
-            under = 0 if len(self.game.in_game) == 3 else 3
+            under = 0 if len(self.in_game) == 3 else 3
         petite.send(f"PETITE : {self.petite_blinde}")
-        petite.player.money -= max(0, petite.player.money - self.game.petite_blinde)
-        grosse.send(f"GROSSE : {self.game.grosse_blinde}")
-        grosse.player.money -= max(0, grosse.player.money - self.game.grosse_blinde)
+        petite.player.money -= max(0, petite.player.money - self.petite_blinde)
+        grosse.send(f"GROSSE : {self.grosse_blinde}")
+        grosse.player.money -= max(0, grosse.player.money - self.grosse_blinde)
         self.dealing()
         self.enchere(under)
-        for i in range(3):
+        for _ in range(3):
             self.board.append(self.deck.draw())
         self.enchere(petite_index)
         self.deck.burn()
@@ -50,13 +54,13 @@ class Game:
         
 
     def dealing(self):
-        for playing in self.game.in_game:
-            playing.player.main = [self.deck.draw()]    
-        for playing in self.game.in_game:
+        for playing in self.in_game:
+            playing.player.main = [self.deck.draw()]
+        for playing in self.in_game:
             playing.player.main.append(self.deck.draw())
             playing.send(f"Votre main : {playing.player.main}")
 
-    def enchere(self, first):
+    def enchere(self, first:int):
         for player in self.in_game:
             player.player.bet_once = False
         while not self.fin_d_enchere():
@@ -64,7 +68,7 @@ class Game:
             first = (first + 1)%(len(self.in_game))
             if player not in self.dans_le_coup:
                 continue
-            info = f"Le Board: {self.board}\nVotre main : {player.player.main}\nMise atendue: {self.mise}\nVotre mise: {player.player.mise}\nVotre argent: {player.player.money}\nQue faire?" #string contenant toutes les infos à envoyer au joueur
+            info = f"Le Board: {self.board}\nVotre main : {player.player.main}\nMise atendue: {self.mise}\nVotre mise: {player.player.mise}\nVotre argent: {player.player.money}\nQue faire ?" #string contenant toutes les infos à envoyer au joueur
             player.send(info)
             action = player.receive()
             self.acted(player, action)
@@ -75,11 +79,11 @@ class Game:
             
     
     def acted(self, player, action):
-        if action == "SUIVRE" or action == "CHECK":
+        if action == "SUIVRE" or "CHECK":
             return
         if action == "COUCHER":
             self.dans_le_coup.remove(player)
-            return 
+            return
         if action.starswith("MISE"):
             self.mise += int(action[5:])
         if action.startswith("RELANCE"):
@@ -87,7 +91,7 @@ class Game:
 
     def fin_d_enchere(self):
         for player in self.dans_le_coup:
-            if player.mise <= self.mise and player.player.bet_once:
+            if player.mise <= self.mise and player.bet_once:
                 return False
         return True
 
@@ -108,7 +112,7 @@ class Game:
 
 
 
-def abattage(main, board):
+def abattage(main:list, board:list) -> tuple:
     """
     Fonction prenant les 2 cartes dans la main d'un joueur et les 5 cartes du board et renvoie la meilleure main de 5 cartes possibles
     """
@@ -121,7 +125,7 @@ def abattage(main, board):
     best_main = combi.main # on retourne la main ayant produit la melleure combinaison
     return best_main, best_combi
 
-def winner(players, board):
+def winner(players:list, board:list):
     combis = []
     for player in players:
         combis.append((player, abattage(player.player.main, board)[1]))

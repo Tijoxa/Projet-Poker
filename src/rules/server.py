@@ -1,7 +1,8 @@
 import socket
 import threading
+
 import player
-import rules
+from rules import Game
 
 class ClientThread(threading.Thread):
     """
@@ -41,10 +42,10 @@ class ClientThread(threading.Thread):
         data_encoded = self.conn.recv(datasize)
         return data_encoded.decode("utf8")
     
-    def ping(self):
+    def ping(self) -> bool:
         """
         ping le client.
-        Renvoie vrai si le client est toujours connectéc
+        Renvoie True si le client est toujours connecté
         """
         try:
             self.send("ping")
@@ -58,11 +59,11 @@ class ClientThread(threading.Thread):
 
 
 
-class server():
-    def __init__(self, adresse, awaited):
+class Server():
+    def __init__(self, adresse:tuple, awaited:int):
         """
         Initialise le serveur
-        adress : couple (host, adresse) utilisé par le bind
+        adress: couple (host, adresse) utilisé par le bind
         awaited: int correspond au nombre de joueurs attendus
         """
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -72,7 +73,7 @@ class server():
         self.awaited = awaited
         print("serveur prêt")
         self.get_players()
-        self.game = rules.Game(2, self.conns)
+        self.game = Game(2, self.conns)
         self.game.play()
         self.close()
     
@@ -81,17 +82,14 @@ class server():
         Récupère des joueurs jusqu'à en avoir autant qu'attendu
         """
         while ClientThread.nb_players < self.awaited:
-            self.socket.listen() # ecoute pour les connections
-            conn, addr = self.socket.accept() #le client connecté et son adresse
-            self.conns.append(ClientThread(self, conn,addr)) # création du Thread
-            print("client connecté!")
+            self.socket.listen() # écoute pour les connections
+            conn, addr = self.socket.accept() # le client connecté et son adresse
+            self.conns.append(ClientThread(self, conn, addr)) # création du Thread
+            print("client connecté !")
             self.conns[-1].start()
             for client in self.conns: client.ping()
-        
-    
-    #  faire les règles du jeu et tout
 
-    def test(self) -> None:
+    def test(self):
         """
         Cette fonction temporaire permet de présenter la structure générale de jeu et de tester quelques techniques.
         """
@@ -118,4 +116,4 @@ class server():
 
 if __name__ == "__main__":
     host, port = ('', 5566) # le 5566 a été paramétré par port forward sur ma machine pour être ouvert au réseau extérieur (pour le faire fonctionner chez vous il faut ouvrir le port 5566 sur les paramètres du routeur) 
-    server((host, port), 2)
+    Server((host, port), 2)
