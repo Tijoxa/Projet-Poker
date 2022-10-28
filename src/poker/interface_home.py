@@ -8,9 +8,15 @@ class GUI_homepage:
         pg.init()
         #create the window :
         self.homepage = pg.display.set_mode([640, 480])
+        pg.display.set_caption('Poker')
+        
+        #background :
+        my_bg=pg.image.load('backgrounds/poker_background.jpg')
+        self.bg = pg.transform.scale(my_bg, (640, 480))
         
         #create name entry box :
-        self.input_name = InputBox(100, 400, 300, 32,'name')
+        self.input_name = InputBox(100, 400, 300, 32,'name',
+                                   centered=True)
         
     def mainloop(self):
         clock = pg.time.Clock()
@@ -25,10 +31,7 @@ class GUI_homepage:
                 for box in input_boxes:
                     box.handle_event(event)
 
-            for box in input_boxes:
-                box.update()
-
-            self.homepage.fill((30, 30, 30))
+            self.homepage.blit(self.bg,(0,0))
             for box in input_boxes:
                 box.draw(self.homepage)
 

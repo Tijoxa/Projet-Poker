@@ -4,14 +4,16 @@ from pygame.locals import *
 
 class InputBox:
     def __init__(self, x, y, w, h, text='',
-                 color_active = 'dodgerblue2',
-                 color_inactive = 'lightskyblue3'):
+                 color_active = 'orange',
+                 color_inactive = 'red',
+                 centered=False):
         self.COLOR_INACTIVE = pg.Color(color_active)
         self.COLOR_ACTIVE = pg.Color(color_inactive)
+        self.color = self.COLOR_INACTIVE
+        self.centered = centered
         self.FONT = pg.font.Font(None, 32)
         self.rect = pg.Rect(x, y, w, h)
         self.ow = w # save original width for update
-        self.color = self.COLOR_INACTIVE
         self.text = text
         self.txt_surface = self.FONT.render(text, True, self.color)
         self.active = False
@@ -38,13 +40,18 @@ class InputBox:
                 # Re-render the text.
                 self.txt_surface = self.FONT.render(self.text, True, self.color)
 
-    def update(self):
-        # Resize the box if the text is too long.
-        self.rect.w = max(self.ow, self.txt_surface.get_width()+10)
-
     def draw(self, screen):
+        text_w = self.txt_surface.get_width()
+        # Resize the box if the text is too long.
+        self.rect.w = max(self.ow, text_w +10)
         # Blit the text.
-        screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
+        if self.centered:
+            screen.blit(self.txt_surface, 
+                        (self.rect.x+(self.rect.w-text_w)//2, 
+                         self.rect.y+5))
+        else:
+            screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
+            
         # Blit the rect.
         pg.draw.rect(screen, self.color, self.rect, 2)
 
