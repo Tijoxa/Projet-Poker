@@ -55,3 +55,59 @@ class InputBox:
         # Blit the rect.
         pg.draw.rect(screen, self.color, self.rect, 2)
 
+class Button():
+    # INITIALIZATION OF BUTTON COMPONENTS LIKE POSITION OF BUTTON,
+    # COLOR OF BUTTON, FONT COLOR OF BUTTON, FONT SIZE, TEXT INSIDE THE BUTTON
+    def __init__(self, x, y, sx, sy, bcolour,
+                 fbcolour, font, fcolour, text):
+        # ORIGIN_X COORDINATE OF BUTTON
+        self.x = x
+        # ORIGIN_Y COORDINATE OF BUTTON
+        self.y = y
+        # LAST_X COORDINATE OF BUTTON
+        self.sx = sx
+        # LAST_Y COORDINATE OF BUTTON
+        self.sy = sy
+        # FONT SIZE FOR THE TEXT IN A BUTTON
+        self.fontsize = 25
+        # BUTTON COLOUR
+        self.bcolour = bcolour
+        # RECTANGLE COLOR USED TO DRAW THE BUTTON
+        self.fbcolour = fbcolour
+        # BUTTON FONT COLOR
+        self.fcolour = fcolour
+        # TEXT IN A BUTTON
+        self.text = text
+        # CURRENT IS OFF
+        self.CurrentState = False
+        # FONT OBJECT FROM THE SYSTEM FONTS
+        self.buttonf = pg.font.SysFont(font, self.fontsize)
+        # COLLIDER FOR THE CLICK CHECKING
+        self.rect = pg.Rect(x, y, sx, sy)
+
+ 
+    # DRAW THE BUTTON
+    def showButton(self, display):
+        pg.draw.rect(display, self.fbcolour,
+                     (self.x, self.y,
+                     self.sx, self.sy))
+        # RENDER THE FONT OBJECT FROM THE STSTEM FONTS
+        textsurface = self.buttonf.render(self.text,
+                                          False, self.fcolour)
+ 
+        # THIS LINE WILL DRAW THE SURF ONTO THE SCREEN
+        display.blit(textsurface,
+                     ((self.x + (self.sx/2) -
+                       (self.fontsize/2)*(len(self.text)/2) + 10
+                       , (self.y + (self.sy/2) -
+                           (self.fontsize/2)-4))))
+ 
+    def handle_event(self, event):
+        if event.type == pg.MOUSEBUTTONDOWN:
+            # If the user clicked on the input_box rect.
+            if self.rect.collidepoint(event.pos):
+                # Toggle the active variable.
+                self.CurrentState = True
+            else:
+                self.active = False
+        
