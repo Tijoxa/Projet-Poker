@@ -1,8 +1,8 @@
 import socket
 import threading
 
-import player
-from rules import Game
+import player_cls
+from gamerules import Game
 
 class ClientThread(threading.Thread):
     """
@@ -24,7 +24,7 @@ class ClientThread(threading.Thread):
         self.send("waiting for pseudo...")
         self.pseudo = self.receive()
         self.id = ClientThread.nb_players
-        self.player = player.Player.new_player()
+        self.player = player_cls.Player.new_player()
         self.send(f"ID:{self.id}")
 
 

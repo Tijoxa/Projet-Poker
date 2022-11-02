@@ -15,9 +15,9 @@ Hauteur
 
 
 
-def quinte_flush(quinte:bool, flush:bool) -> bool:
+def quinte_flush(quinte, flush):
     if quinte and flush:
-        return True
+        return quinte
 
 def carre(count:dict):
     keys = list(count.keys())
@@ -33,14 +33,15 @@ def carre(count:dict):
     if flag: return detail
     else: return False
 
-def full(brelan:bool, paire:bool) -> bool:
-    return brelan and paire
+def full(brelan, paire):
+    if brelan and paire:
+        return brelan
 
 def flush(main:list):
     couleur = main[0].color
     for carte in main:
         if carte.color != couleur:
-            return 0
+            return False
     valeurs = [i.value for i in main]
     valeurs.sort(reverse = True)
     return valeurs
@@ -72,7 +73,7 @@ def brelan(count:dict):
     else: return False
 
 def paires(count:dict) -> tuple(bool, bool):
-    flag = 0
+    flag = False
     for key in count:
         if count[key] == 2:
             if flag > 0:
@@ -80,8 +81,8 @@ def paires(count:dict) -> tuple(bool, bool):
             flag = key
     return (flag, False)
 
-def double_paire(paires:list, main:list) -> list:
-    if 0 in paires:
+def double_paire(paires:tuple(bool, bool), main:list) -> list:
+    if False in paires:
         return 0
     detail = [max(paires) for _ in range(2)]
     detail += [min(paires) for _ in range(2)]
@@ -116,9 +117,9 @@ def hauteur(main:list):
     return valeurs
 
 
-def combinaison(main:list): # TODO: préciser la nature précise de la liste main, gérer les cas de comparaison plus complexes (voir https://github.com/msaindon/deuces)
+def combinaison(main:list): # TODO: gérer les cas de comparaison plus complexes (voir https://github.com/msaindon/deuces)
     """
-    Prend une main (liste de 5 tuples (color, value)) en entrée et retourne la meilleure combinaison
+    Prend une main (liste de 5 cartes (instances de cards.Card)) en entrée et retourne la meilleure combinaison
     """
 
     QUINTE = quinte(main)
