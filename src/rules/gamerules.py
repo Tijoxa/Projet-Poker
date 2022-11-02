@@ -94,7 +94,12 @@ class Game:
     
     def acted(self, conn, action):
         """
-        
+        Régit le cmportement du serveur après l'action d'un joueur
+        Paramètres:
+        -----------
+        -  self: la partie
+        -  conn: le joueur représenté par le client connecté
+        -  action: l'action du joueur
         """
         if action == "SUIVRE" or action == "CHECK":
             return
@@ -107,12 +112,19 @@ class Game:
             self.mise += int(action[5:])
 
     def fin_d_enchere(self):
-        for conn in self.dans_le_coup:
-            if conn.player.mise < self.mise and not conn.player.bet_once:
-                return False
+        """
+        Vérifie que c'est une fin de tour d'enchère
+        """
+        if len(self.dans_le_coup) > 1:
+            for conn in self.dans_le_coup:
+                if conn.player.mise < self.mise and not conn.player.bet_once:
+                    return False
         return True
 
     def fin_de_coup(self):
+        """
+        Met fin au coup en en déterminant le vainqueur final.
+        """
         winning_order = winner(self.dans_le_coup, self.board)
         turn_winner = winning_order[0][0] # le gagnant de cette passe
         pseudo_winner = turn_winner.pseudo
