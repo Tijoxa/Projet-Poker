@@ -52,12 +52,12 @@ class Client:
             self.send(input("\t>"))
         if received == "close":
             self.close()
-            quit()
-        if received.endswith("Que faire?"):
-            self.client_input()            
+            quit()         
         if received.startswith("###"):
-            self.client_input(self.traitement_info(received))
-        
+            info, me = self.traitement_info(received)
+            if me["isPlaying"]:
+                self.client_input(info, me)
+
     def traitement_info(self, info):
         info.split("###")
         info[0] = info[0].split("##")
@@ -114,8 +114,7 @@ class Client:
         while True:
             client.receive()
     
-    def client_input(self, infos):
-        info, me = infos
+    def client_input(self, info, me):
         while True:
             case = 0
             print("Vos possibilités sont:")

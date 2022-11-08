@@ -82,8 +82,9 @@ class Game:
             first = (first + 1)%(len(self.in_game))
             if conn not in self.dans_le_coup:
                 continue
-            info = self.info(conn) #string contenant toutes les infos à envoyer au joueur
-            conn.send(info)
+            for all_conn in self.in_game:
+                info = self.info(conn, all_conn) #string contenant toutes les infos à envoyer aux joueurs
+                all_conn.send(info)
             action = conn.receive()
             self.acted(conn, action)
             conn.player.acted(self, action)
@@ -128,7 +129,7 @@ class Game:
         winning_order = winner(self.dans_le_coup, self.board)
         turn_winner = winning_order[0][0] # le gagnant de cette passe
         pseudo_winner = turn_winner.pseudo
-        for conn in self.conns:
+        for conn in self.server.conns:
             if conn == turn_winner:
                 conn.send(f"You won!\nwith {winning_order[0][1]}")
                 conn.player.money += self.pot
@@ -138,12 +139,17 @@ class Game:
                     conn.send("Malheureusement vous n'avez plus d'argent")
                     self.in_game.remove(conn)
     
-    def info(self, playingConn):
+    def info(self, playingConn, target):
+        """
+        Fonction générant l'ensemble des informations à envoyer au client
+        playingConn: le conn dont c'est le tour de jouer
+        target: le conn auquel info sera envoyé
+        """
         res = f"{len(self.in_game)}##"
         players = "##".join(["#".join([conn.id, conn.pseudo, str(conn.player.money), str(conn.player.mise), str(int(conn.isAI)), str(int(self.in_game[0] == conn)), str(int(playingConn == conn))]) for conn in self.in_game])
         res += players
         res += f"###{len(self.board)}##"
-        res += "##".join([str(carte) for carte in playingConn.player.main]) + "##"
+        res += "##".join([str(carte) for carte in target.player.main]) + "##"
         res += "##".join([str(carte) for carte in self.board])
         res += f"###{self.mise}"
         res += f"###{self.pot}"
