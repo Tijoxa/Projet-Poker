@@ -10,12 +10,13 @@ class GUI_homepage:
         self.homepage = pg.display.set_mode([640, 480])
         pg.display.set_caption('Poker')
         
-        #background :
+        #background : https://www.casino-saint-julien.com/les-differents-types-de-poker/
         my_bg=pg.image.load('backgrounds/poker_background.jpg')
         self.bg = pg.transform.scale(my_bg, (640, 480))
         
         #create name entry box :
-        self.input_name = InputBox(100, 400, 300, 32,'name',
+        self.input_name = InputBox(100, 400, 300, 32,
+                                   text='name',
                                    centered=True)
         
     def mainloop(self):
@@ -40,15 +41,17 @@ class GUI_homepage:
             self.homepage.blit(self.bg,(0,0))
             for box in input_boxes:
                 box.draw(self.homepage)
+            
             for button in input_buttons : 
-                button.showButton(self.homepage)
-
+                button.draw(self.homepage)
+                
+            
             if input_button1.CurrentState:
                 input_button1.CurrentState = False
                 pg.quit()
                 return "WAITING"
-
             pg.display.flip()
             clock.tick(30)
         pg.quit()
         return ""
+

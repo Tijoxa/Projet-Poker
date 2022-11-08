@@ -11,7 +11,7 @@ class GUI_waiting:
         self.waiting = pg.display.set_mode([640, 480])
         pg.display.set_caption("Salle d'attente")
         
-        #background :
+        #background : 
         my_bg=pg.image.load('backgrounds/poker_background.jpg')
         self.bg = pg.transform.scale(my_bg, (640, 480))
 
@@ -37,7 +37,7 @@ class GUI_waiting:
 
             self.waiting.blit(self.bg,(0,0))
             for button in input_buttons : 
-                button.showButton(self.waiting)
+                button.draw(self.waiting)
 
             if input_button1.CurrentState:
                 input_button1.CurrentState = False
