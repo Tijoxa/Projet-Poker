@@ -20,6 +20,7 @@ class ClientThread(threading.Thread):
         self.server = server
         self.adress = adress
         self.conn = conn
+        self.isAI = False
         ClientThread.nb_players += 1
         self.send("waiting for pseudo...")
         self.pseudo = self.receive()

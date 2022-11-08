@@ -55,8 +55,18 @@ class Client:
             quit()
         if received.endswith("Que faire?"):
             self.client_input()            
+        if received.startswith("###"):
+            self.client_input(self.traitement_info(received))
         
-    
+    def traitement_info(self, info):
+        info.split("###")
+        info[0] = info[0].split("##")
+        info[1] = info[1].split("##")
+        for i in range(1, len(info[0])):
+            info[0][i] = info[0][i].split("#")  
+        
+
+
     def suivre(self):
         self.send("SUIVRE")
         return True
