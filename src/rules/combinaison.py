@@ -72,7 +72,7 @@ def brelan(count:dict):
     if flag: return detail
     else: return False
 
-def paires(count:dict) -> tuple(bool, bool):
+def paires(count:dict):
     flag = False
     for key in count:
         if count[key] == 2:
@@ -81,7 +81,7 @@ def paires(count:dict) -> tuple(bool, bool):
             flag = key
     return (flag, False)
 
-def double_paire(paires:tuple(bool, bool), main:list) -> list:
+def double_paire(paires, main:list) -> list:
     if False in paires:
         return 0
     detail = [max(paires) for _ in range(2)]

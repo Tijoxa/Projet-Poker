@@ -5,7 +5,7 @@ from cards import Deck
 
 
 class Game:
-    def __init__(self, blinde:float, conns:list):
+    def __init__(self, blinde:float, conns:list, server):
         """
         Met en place les varaibales communes pour le jeu.
         """
@@ -15,6 +15,7 @@ class Game:
         self.in_game = [conn for conn in conns] # liste des joueurs en lice
         self.dans_le_coup = [] # liste des joueurs encore dans le coup
         self.board = []
+        self.server = server
         self.mise = 0
 
     def play(self):
@@ -43,9 +44,12 @@ class Game:
             grosse = self.in_game[2]
             under = 0 if len(self.in_game) == 3 else 3
         petite.send(f"PETITE : {self.petite_blinde}")
-        petite.player.money -= max(0, petite.player.money - self.petite_blinde)
+        petite.player.mise = min(self.petite_blinde, petite.player.money)
+        petite.player.money -= petite.player.mise
         grosse.send(f"GROSSE : {self.grosse_blinde}")
-        grosse.player.money -= max(0, grosse.player.money - self.grosse_blinde)
+        grosse.player.mise = min(self.grosse_blinde, grosse.player.money)
+        grosse.player.money -= grosse.player.mise
+        self.mise = max(petite.player.mise, grosse.player.mise)
         self.dealing()
         self.enchere(under)
         for _ in range(3):
@@ -56,6 +60,7 @@ class Game:
         self.enchere(petite_index)
         self.deck.burn()
         self.board.append(self.deck.draw())
+        self.enchere(petite_index)
         self.fin_de_coup()
         if dealer in self.in_game:
             self.in_game = self.in_game[1:] + [self.in_game[0]]
@@ -91,6 +96,7 @@ class Game:
         for conn in self.in_game:
             self.pot += conn.player.mise
             conn.player.mise = 0
+            self.mise = 0
             
     
     def acted(self, conn, action):
@@ -107,7 +113,7 @@ class Game:
         if action == "COUCHER":
             self.dans_le_coup.remove(conn)
             return
-        if action.starswith("MISE"):
+        if action.startswith("MISE"):
             self.mise += int(action[5:])
         if action.startswith("RELANCE"):
             self.mise += int(action[5:])
@@ -118,7 +124,7 @@ class Game:
         """
         if len(self.dans_le_coup) > 1:
             for conn in self.dans_le_coup:
-                if conn.player.mise < self.mise and not conn.player.bet_once:
+                if conn.player.mise < self.mise or not conn.player.bet_once:
                     return False
         return True
 
@@ -145,14 +151,11 @@ class Game:
         playingConn: le conn dont c'est le tour de jouer
         target: le conn auquel info sera envoyé
         """
-        res = f"{len(self.in_game)}##"
-        players = "##".join(["#".join([conn.id, conn.pseudo, str(conn.player.money), str(conn.player.mise), str(int(conn.isAI)), str(int(self.in_game[0] == conn)), str(int(playingConn == conn))]) for conn in self.in_game])
-        res += players
-        res += f"###{len(self.board)}##"
-        res += "##".join([str(carte) for carte in target.player.main]) + "##"
-        res += "##".join([str(carte) for carte in self.board])
-        res += f"###{self.mise}"
-        res += f"###{self.pot}"
+        players = "##".join(["#".join([str(conn.id), conn.pseudo, str(conn.player.money), str(conn.player.mise), str(int(conn.isAI)), str(int(self.in_game[0] == conn)), str(int(playingConn == conn))]) for conn in self.in_game])
+        cards = "##".join([str(carte) for carte in target.player.main])
+        if len(self.board) > 0:
+            cards += "##" + "##".join([str(carte) for carte in self.board])
+        res = f"###{players}###{cards}###{self.mise}###{self.pot}"
         return res
 
 

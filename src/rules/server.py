@@ -43,6 +43,12 @@ class ClientThread(threading.Thread):
         data_encoded = self.conn.recv(datasize)
         return data_encoded.decode("utf8")
     
+    def waiting_receive(self, datasize = 1024):
+        data_encoded = ""
+        while data_encoded == "":
+            data_encoded = self.conn.recv(datasize)
+        return data_encoded.decode("utf8")
+
     def ping(self) -> bool:
         """
         ping le client.
@@ -74,7 +80,7 @@ class Server():
         self.awaited = awaited
         print("serveur prêt")
         self.get_players()
-        self.game = Game(2, self.conns)
+        self.game = Game(2, self.conns, self)
         self.game.play()
         self.close()
     
@@ -117,4 +123,4 @@ class Server():
 
 if __name__ == "__main__":
     host, port = ('', 5566) # le 5566 a été paramétré par port forward sur ma machine pour être ouvert au réseau extérieur (pour le faire fonctionner chez vous il faut ouvrir le port 5566 sur les paramètres du routeur) 
-    Server((host, port), 2)
+    Server((host, port), 3)

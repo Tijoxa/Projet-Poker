@@ -1,4 +1,4 @@
-from rules import Game
+from gamerules import Game
 
 class Player:
     """
@@ -9,7 +9,7 @@ class Player:
 
     def __init__(self):
         self.main = None
-        self.money = 0
+        self.money = 500
         self.mise = 0
         self.bet_once = False
 

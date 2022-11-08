@@ -59,12 +59,13 @@ class Client:
                 self.client_input(info, me)
 
     def traitement_info(self, info):
-        info.split("###")
+        info = info[3:]
+        info = info.split("###")
         info[0] = info[0].split("##")
         info[1] = info[1].split("##")
-        for i in range(1, len(info[0])):
+        for i in range(len(info[0])):
             info[0][i] = info[0][i].split("#")
-        for i in range(1, len(info[0])):
+        for i in range(len(info[0])):
             info[0][i] = {
                 "id": info[0][i][0], 
                 "pseudo": info[0][i][1], 
@@ -73,12 +74,12 @@ class Client:
                 "isAI": bool(int(info[0][i][4])), 
                 "isDealer": bool(int(info[0][i][5])), 
                 "isPlaying": bool(int(info[0][i][6]))}
-        res = {"players": info[0], "main": info[1][:2], "board": info[1][2:], "mise": int(info[3]), "pot": int(info[4])}
+        res = {"players": info[0], "main": info[1][:2], "board": info[1][2:], "mise": int(info[2]), "pot": int(info[3])}
         me = None
         for player in res["players"]:
             if player["id"] == self.id:
                 me = player
-                return res, me
+        return res, me
 
 
 
@@ -126,26 +127,27 @@ class Client:
                 print("COUCHER\tRELANCE\tCHECK")
             else:
                 case = 3
-                print("SUIVRE\tCOUCHER\tMISE\tRELANCE")
-            input = input("\t>")
-            if input.startswith("COUCHER"):
+                print("SUIVRE\tCOUCHER\tRELANCE")
+            choice = input("\t>")
+            if choice.startswith("COUCHER"):
                 self.coucher()
                 return
             if case == 1:
-                if input.startswith("MISE"):
-                    value = int(input[5:])
+                if choice.startswith("MISE"):
+                    value = int(choice[5:])
                     if self.mise(value, 1, me["money"]):
                         return
             if case == 1 or case == 2:
-                if input.startswith("CHECK"):
+                if choice.startswith("CHECK"):
                     self.check()
+                    return
             if case == 2 or case == 3:
-                if input.startswith("RELANCE"):
-                    value = int(input[8:])
+                if choice.startswith("RELANCE"):
+                    value = int(choice[8:])
                     if self.relance(value, info["mise"] * 2, me["money"]):
                         return      
             if case == 3:
-                if input.startswith("SUIVRE"):
+                if choice.startswith("SUIVRE"):
                     self.suivre()
                     return         
             print("input incorrect")
