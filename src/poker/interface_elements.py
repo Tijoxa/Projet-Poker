@@ -95,13 +95,11 @@ class Button():
     # COLOR OF BUTTON, FONT COLOR OF BUTTON, FONT SIZE, TEXT INSIDE THE BUTTON
     def __init__(self, x, y, sx, sy, bcolour,
                  fbcolour, font, fcolour, text):
-        # ORIGIN_X COORDINATE OF BUTTON
+        # origin coordinates :
         self.x = x
-        # ORIGIN_Y COORDINATE OF BUTTON
         self.y = y
-        # LAST_X COORDINATE OF BUTTON
+        # last coordinates :
         self.sx = sx
-        # LAST_Y COORDINATE OF BUTTON
         self.sy = sy
         # FONT SIZE FOR THE TEXT IN A BUTTON
         self.fontsize = 25
