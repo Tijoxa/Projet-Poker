@@ -3,18 +3,53 @@ from pygame.locals import *
 
 
 class InputBox:
-    def __init__(self, x, y, w, h, text='',
-                 color_active = 'orange',
+    """class Input Box to modelize an entry text box"""
+    def __init__(self, x, y, w = 200, h = 32, 
+                 text='', textSize=None, textType = None,
+                 color_active = 'black',
                  color_inactive = 'red',
                  centered=False):
-        self.COLOR_INACTIVE = pg.Color(color_active)
-        self.COLOR_ACTIVE = pg.Color(color_inactive)
-        self.color = self.COLOR_INACTIVE
-        self.centered = centered
-        self.FONT = pg.font.Font(None, 32)
-        self.rect = pg.Rect(x, y, w, h)
+        """
+        initialization of an entry text box
+
+        Parameters
+        ----------
+        x : int
+            first coordinate pixel.
+        y : int
+            second coordinate pixel.
+        w : int, optional
+            wildth. The default is 200.
+        h : int, optional
+            height. The default is 32.
+        text : string, optional
+            initial text to show. The default is ''.
+        textSize : int, optional
+            size of the text, The default if the Box height
+        textType : string, otional
+            type of text, The default is system default
+        color_active : string, optional
+            color of the box if active. The default is 'black'.
+        color_inactive : string, optional
+            color of the box if inactive. The default is 'red'.
+        centered : boolean, optional
+            If True, the text is displayed in the center of the box. 
+            The default is False.
+
+        Returns
+        -------
+        None.
+
+        """
         self.ow = w # save original width for update
         self.text = text
+        self.COLOR_ACTIVE = pg.Color(color_active)
+        self.COLOR_INACTIVE = pg.Color(color_inactive)
+        self.color = self.COLOR_INACTIVE
+        self.centered = centered
+        self.FONT = pg.font.SysFont(textType, 
+                                    size=h if textSize is None else textSize)
+        self.rect = pg.Rect(x, y, w, h)
         self.txt_surface = self.FONT.render(text, True, self.color)
         self.active = False
 
@@ -60,13 +95,11 @@ class Button():
     # COLOR OF BUTTON, FONT COLOR OF BUTTON, FONT SIZE, TEXT INSIDE THE BUTTON
     def __init__(self, x, y, sx, sy, bcolour,
                  fbcolour, font, fcolour, text):
-        # ORIGIN_X COORDINATE OF BUTTON
+        # origin coordinates :
         self.x = x
-        # ORIGIN_Y COORDINATE OF BUTTON
         self.y = y
-        # LAST_X COORDINATE OF BUTTON
+        # last coordinates :
         self.sx = sx
-        # LAST_Y COORDINATE OF BUTTON
         self.sy = sy
         # FONT SIZE FOR THE TEXT IN A BUTTON
         self.fontsize = 25
@@ -86,8 +119,17 @@ class Button():
         self.rect = pg.Rect(x, y, sx, sy)
 
  
+    def handle_event(self, event):
+        if event.type == pg.MOUSEBUTTONDOWN:
+            # If the user clicked on the input_box rect.
+            if self.rect.collidepoint(event.pos):
+                # Toggle the active variable.
+                self.CurrentState = True
+            else:
+                self.active = False
+                
     # DRAW THE BUTTON
-    def showButton(self, display):
+    def draw(self, display):
         pg.draw.rect(display, self.fbcolour,
                      (self.x, self.y,
                      self.sx, self.sy))
@@ -102,12 +144,5 @@ class Button():
                        , (self.y + (self.sy/2) -
                            (self.fontsize/2)-4))))
  
-    def handle_event(self, event):
-        if event.type == pg.MOUSEBUTTONDOWN:
-            # If the user clicked on the input_box rect.
-            if self.rect.collidepoint(event.pos):
-                # Toggle the active variable.
-                self.CurrentState = True
-            else:
-                self.active = False
+
         
