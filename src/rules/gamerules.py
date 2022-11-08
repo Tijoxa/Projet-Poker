@@ -140,7 +140,7 @@ class Game:
     
     def info(self, playingConn):
         res = f"{len(self.in_game)}##"
-        players = "##".join(["#".join([conn.pseudo, str(conn.player.money), str(conn.player.mise), str(int(conn.isAI)), str(int(self.in_game[0] == conn)), str(int(playingConn == conn))]) for conn in self.in_game])
+        players = "##".join(["#".join([conn.id, conn.pseudo, str(conn.player.money), str(conn.player.mise), str(int(conn.isAI)), str(int(self.in_game[0] == conn)), str(int(playingConn == conn))]) for conn in self.in_game])
         res += players
         res += f"###{len(self.board)}##"
         res += "##".join([str(carte) for carte in playingConn.player.main]) + "##"

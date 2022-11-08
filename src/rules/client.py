@@ -63,8 +63,24 @@ class Client:
         info[0] = info[0].split("##")
         info[1] = info[1].split("##")
         for i in range(1, len(info[0])):
-            info[0][i] = info[0][i].split("#")  
-        
+            info[0][i] = info[0][i].split("#")
+        for i in range(1, len(info[0])):
+            info[0][i] = {
+                "id": info[0][i][0], 
+                "pseudo": info[0][i][1], 
+                "money": int(info[0][i][2]), 
+                "mise": int(info[0][i][3]), 
+                "isAI": bool(int(info[0][i][4])), 
+                "isDealer": bool(int(info[0][i][5])), 
+                "isPlaying": bool(int(info[0][i][6]))}
+        res = {"players": info[0], "main": info[1][:2], "board": info[1][2:], "mise": int(info[3]), "pot": int(info[4])}
+        me = None
+        for player in res["players"]:
+            if player["id"] == self.id:
+                me = player
+                return res, me
+
+
 
 
     def suivre(self):
@@ -98,27 +114,42 @@ class Client:
         while True:
             client.receive()
     
-    def client_input(self):
+    def client_input(self, infos):
+        info, me = infos
         while True:
+            case = 0
             print("Vos possibilités sont:")
-            print("SUIVRE\tCOUCHER\tMISE\tRELANCE\tCHECK")
+            if info["mise"] == 0:
+                case = 1
+                print("COUCHER\tMISE\tCHECK")
+            elif me["mise"] == info["mise"]:
+                case = 2
+                print("COUCHER\tRELANCE\tCHECK")
+            else:
+                case = 3
+                print("SUIVRE\tCOUCHER\tMISE\tRELANCE")
             input = input("\t>")
-            if input.startswith("SUIVRE"):
-                self.suivre()
-                return
             if input.startswith("COUCHER"):
                 self.coucher()
                 return
-            if input.startswith("MISE"):
-                value = int(input[5:])
-                if self.mise(value, 0, 8000):
-                    return
-            if input.startswith("RELANCE"):
-                value = int(input[8:])
-                if self.relance(value, 0, 8000):
-                    return               
-            if input.startswith("CHECK"):
-                self.check()
+            if case == 1:
+                if input.startswith("MISE"):
+                    value = int(input[5:])
+                    if self.mise(value, 1, me["money"]):
+                        return
+            if case == 1 or case == 2:
+                if input.startswith("CHECK"):
+                    self.check()
+            if case == 2 or case == 3:
+                if input.startswith("RELANCE"):
+                    value = int(input[8:])
+                    if self.relance(value, info["mise"] * 2, me["money"]):
+                        return      
+            if case == 3:
+                if input.startswith("SUIVRE"):
+                    self.suivre()
+                    return         
+            print("input incorrect")
 
 
 
