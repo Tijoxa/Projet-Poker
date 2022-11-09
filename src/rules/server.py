@@ -2,13 +2,10 @@ import socket
 import threading
 
 import player_cls
+import Intelligence
 from gamerules import Game
 
 class ClientThread(threading.Thread):
-    """
-    Le serveur va s'occuper d'une grande partie du déroulement du jeu. Il s'occupera de la désignation de qui doit jouer parmis les clients.
-    Il définira de plus le jeu de cartes, et les différentes parties du jeu (pre-flop, flop, turn et river).
-    """
 
     nb_players = 0
 
@@ -42,12 +39,6 @@ class ClientThread(threading.Thread):
         """
         data_encoded = self.conn.recv(datasize)
         return data_encoded.decode("utf8")
-    
-    def waiting_receive(self, datasize = 1024):
-        data_encoded = ""
-        while data_encoded == "":
-            data_encoded = self.conn.recv(datasize)
-        return data_encoded.decode("utf8")
 
     def ping(self) -> bool:
         """
@@ -63,6 +54,34 @@ class ClientThread(threading.Thread):
             return False
         finally:
             return True
+
+class AIThread(threading.Thread):
+
+    nb_IA = 0
+
+    def __init__(self, server, ai):
+        super().__init__()
+        self.server = server
+        self.id = 10 + AIThread.nb_IA
+        self.ai = Intelligence.AI(ai, self)
+        self.isAI = True
+        self.pseudo = self.ai.pseudo
+        AIThread.nb_IA += 1
+        self.player = player_cls.Player.new_player()
+    
+    def send(self, data):
+        """
+        La seule information utile à l'ia est l'état de la partie, représenté par info
+        """
+        if data.startswith("###"):
+            self.ai.get_info(data)
+    
+    def receive(self, datasize = 1024):
+        return self.ai.decision()
+    
+    def ping():
+        return True # l'IA état liée au serveur elle ne peut pas être déconnectée
+
 
 
 

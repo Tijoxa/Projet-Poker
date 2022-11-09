@@ -74,7 +74,6 @@ class Game:
             conn.player.main = [self.deck.draw()]
         for conn in self.in_game:
             conn.player.main.append(self.deck.draw())
-            conn.send(f"Votre main : {conn.player.main}")
 
     def enchere(self, first:int):
         """
@@ -155,7 +154,7 @@ class Game:
         cards = "##".join([str(carte) for carte in target.player.main])
         if len(self.board) > 0:
             cards += "##" + "##".join([str(carte) for carte in self.board])
-        res = f"###{players}###{cards}###{self.mise}###{self.pot}"
+        res = f"###{players}###{cards}###{self.mise}###{self.pot}###{self.petite_blinde}"
         return res
 
 

@@ -74,7 +74,7 @@ class Client:
                 "isAI": bool(int(info[0][i][4])), 
                 "isDealer": bool(int(info[0][i][5])), 
                 "isPlaying": bool(int(info[0][i][6]))}
-        res = {"players": info[0], "main": info[1][:2], "board": info[1][2:], "mise": int(info[2]), "pot": int(info[3])}
+        res = {"players": info[0], "main": info[1][:2], "board": info[1][2:], "mise": int(info[2]), "pot": int(info[3]), "blinde": int(info[4])}
         me = None
         for player in res["players"]:
             if player["id"] == self.id:
@@ -135,7 +135,7 @@ class Client:
             if case == 1:
                 if choice.startswith("MISE"):
                     value = int(choice[5:])
-                    if self.mise(value, 1, me["money"]):
+                    if self.mise(value, min(info["blinde"], me["money"]), me["money"]):
                         return
             if case == 1 or case == 2:
                 if choice.startswith("CHECK"):
