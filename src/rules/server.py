@@ -62,11 +62,11 @@ class AIThread(threading.Thread):
     def __init__(self, server, ai):
         super().__init__()
         self.server = server
+        AIThread.nb_IA += 1
         self.id = 10 + AIThread.nb_IA
-        self.ai = Intelligence.AI(ai, self)
+        self.ai = Intelligence.AI(ai, self.id)
         self.isAI = True
         self.pseudo = self.ai.pseudo
-        AIThread.nb_IA += 1
         self.player = player_cls.Player.new_player()
     
     def send(self, data):

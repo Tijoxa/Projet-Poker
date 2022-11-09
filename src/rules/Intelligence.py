@@ -1,10 +1,9 @@
-import random
+from random import randint
 
 class AI:
 
-    def __init__(self, AIT):
-        self.AIT = AIT # AI Thread associé à cette instance
-        self.id = self.AIT.id
+    def __init__(self, id):
+        self.id = id
         self.info = None
         self.me = None
 
@@ -33,8 +32,8 @@ class AI:
 
 class Naive(AI):
 
-    def __init__(self, AIT):
-        super().__init__(AIT)
+    def __init__(self, id):
+        super().__init__(id)
         self.pseudo = "Aleatoire"
     
     def decision(self):
@@ -62,6 +61,6 @@ class Naive(AI):
 
 
 
-def AI(type, AIT):
+def AI(type, id):
     if type == "naive":
-        return Naive(AIT)
+        return Naive(id)
