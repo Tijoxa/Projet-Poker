@@ -12,14 +12,17 @@ class Player:
         self.money = 500
         self.mise = 0
         self.bet_once = False
+        self.all_in = False
+        self.side_pot = 0 # valeur maximale à laquelle peut prétendre un joueur qui est dans le coup mais à tapis
 
     def acted(self, game:"Game", action:str):
         self.bet_once = True
         if action == "CHECK" or action == "COUCHER":
             return
         if action == "SUIVRE":
-            self.money -= game.mise - self.mise
-            self.mise = game.mise
+            paye = min(self.money, (game.mise - self.mise))
+            self.money -= paye
+            self.mise += paye
         if action.startswith("MISE"):
             self.mise = int(action[5:])
             self.money -= self.mise
@@ -27,6 +30,8 @@ class Player:
             relance = int(action[8:])
             self.money -= relance - self.mise
             self.mise = relance
+        if self.money <= 0 and not self.all_in:
+            self.all_in = True
 
     @classmethod
     def new_player(cls) -> "Player":

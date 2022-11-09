@@ -79,12 +79,13 @@ class Game:
         """
         Gère un tour d'enchères
         """
+        started = first # player qui a commencé l'enchère
         for conn in self.in_game:
             conn.player.bet_once = False
         while not self.fin_d_enchere():
             conn = self.in_game[first]
             first = (first + 1)%(len(self.in_game))
-            if conn not in self.dans_le_coup:
+            if conn not in self.dans_le_coup or conn.player.all_in:
                 continue
             for all_conn in self.in_game:
                 info = self.info(conn, all_conn) #string contenant toutes les infos à envoyer aux joueurs
@@ -92,6 +93,12 @@ class Game:
             action = conn.receive()
             self.acted(conn, action)
             conn.player.acted(self, action)
+            if first == started: #on vient de faire un tour complet
+                for conn in self.dans_le_coup:
+                    if conn.player.all_in and conn.player.side_pot == 0: #calcul du side_pot
+                        conn.player.side_pot = self.pot
+                        for conn2 in self.dans_le_coup:
+                            conn.player.side_pot += min(conn.player.mise, conn2.player.mise)
         for conn in self.in_game:
             self.pot += conn.player.mise
             conn.player.mise = 0
@@ -113,9 +120,9 @@ class Game:
             self.dans_le_coup.remove(conn)
             return
         if action.startswith("MISE"):
-            self.mise += int(action[5:])
+            self.mise = int(action[5:])
         if action.startswith("RELANCE"):
-            self.mise += int(action[5:])
+            self.mise = int(action[8:])
 
     def fin_d_enchere(self):
         """
@@ -133,16 +140,27 @@ class Game:
         """
         winning_order = winner(self.dans_le_coup, self.board)
         turn_winner = winning_order[0][0] # le gagnant de cette passe
-        pseudo_winner = turn_winner.pseudo
-        for conn in self.server.conns:
-            if conn == turn_winner:
-                conn.send(f"You won!\nwith {winning_order[0][1]}")
-                conn.player.money += self.pot
+        for conn in self.dans_le_coup:
+            if conn.player.side_pot == 0:
+                conn.player.side_pot = self.pot
+        for i in range(len(winning_order)):
+            conn = winning_order[i][0]
+            hand = winning_order[i][1]
+            if self.pot > 0:
+                gain = min(self.pot, conn.player.side_pot)
+                conn.send(f"You won {gain}!\nwith {hand}")
+                for conn2 in self.in_game:
+                    if conn2 == conn: continue
+                    conn2.send(f"{conn.pseudo} won {gain} \nwith {hand}")
+                conn.player.money += gain
+                self.pot -= gain
             else:
-                conn.send(f"{pseudo_winner} won\nwith {winning_order[0][1]}")
                 if conn.player.money == 0:
                     conn.send("Malheureusement vous n'avez plus d'argent")
                     self.in_game.remove(conn)
+        for conn in self.in_game:
+            self.all_in = False
+            self.side_pot = 0
     
     def info(self, playingConn, target):
         """
@@ -154,7 +172,7 @@ class Game:
         cards = "##".join([str(carte) for carte in target.player.main])
         if len(self.board) > 0:
             cards += "##" + "##".join([str(carte) for carte in self.board])
-        res = f"###{players}###{cards}###{self.mise}###{self.pot}"
+        res = f"###{players}###{cards}###{self.mise}###{self.pot}###{self.petite_blinde}"
         return res
 
 
