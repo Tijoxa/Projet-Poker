@@ -158,9 +158,9 @@ class Game:
                 if conn.player.money == 0:
                     conn.send("Malheureusement vous n'avez plus d'argent")
                     self.in_game.remove(conn)
-            for conn in self.in_game:
-                self.all_in = False
-                self.side_pot = False
+        for conn in self.in_game:
+            self.all_in = False
+            self.side_pot = False
     
     def info(self, playingConn, target):
         """
