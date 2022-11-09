@@ -148,4 +148,4 @@ class Server():
 
 if __name__ == "__main__":
     host, port = ('', 5566) # le 5566 a été paramétré par port forward sur ma machine pour être ouvert au réseau extérieur (pour le faire fonctionner chez vous il faut ouvrir le port 5566 sur les paramètres du routeur) 
-    Server((host, port), 1, 2)
+    Server((host, port), 0, 6)

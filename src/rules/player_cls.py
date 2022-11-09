@@ -18,8 +18,9 @@ class Player:
         if action == "CHECK" or action == "COUCHER":
             return
         if action == "SUIVRE":
-            self.money -= game.mise - self.mise
-            self.mise = game.mise
+            paye = min(self.money, (game.mise - self.mise))
+            self.money -= paye
+            self.mise += paye
         if action.startswith("MISE"):
             self.mise = int(action[5:])
             self.money -= self.mise

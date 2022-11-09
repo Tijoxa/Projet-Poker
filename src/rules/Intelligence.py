@@ -8,7 +8,7 @@ class AI:
         self.me = None
 
     def get_info(self, info):
-        print("info")
+        #print(info)
         info = info[3:]
         info = info.split("###")
         info[0] = info[0].split("##")

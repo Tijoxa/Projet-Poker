@@ -113,9 +113,9 @@ class Game:
             self.dans_le_coup.remove(conn)
             return
         if action.startswith("MISE"):
-            self.mise += int(action[5:])
+            self.mise = int(action[5:])
         if action.startswith("RELANCE"):
-            self.mise += int(action[8:])
+            self.mise = int(action[8:])
 
     def fin_d_enchere(self):
         """
