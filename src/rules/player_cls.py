@@ -9,9 +9,11 @@ class Player:
 
     def __init__(self):
         self.main = None
-        self.money = 500
+        self.money = 50
         self.mise = 0
         self.bet_once = False
+        self.all_in = False
+        self.side_pot = 0 # valeur maximale à laquelle peut prétendre un joueur qui est dans le coup mais à tapis
 
     def acted(self, game:"Game", action:str):
         self.bet_once = True
@@ -28,6 +30,8 @@ class Player:
             relance = int(action[8:])
             self.money -= relance - self.mise
             self.mise = relance
+        if self.money <= 0 and not self.all_in:
+            self.all_in = True
 
     @classmethod
     def new_player(cls) -> "Player":

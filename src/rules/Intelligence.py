@@ -8,7 +8,6 @@ class AI:
         self.me = None
 
     def get_info(self, info):
-        #print(info)
         info = info[3:]
         info = info.split("###")
         info[0] = info[0].split("##")
@@ -49,7 +48,7 @@ class Naive(AI):
         if choix == "MISE":
             mini_value = min(self.info["blinde"], self.me["money"])
             maxi_value = max(mini_value, round(0.1 * self.me["money"]))
-            value = randint(1, maxi_value)
+            value = randint(mini_value, maxi_value)
             choix = f"MISE {value}"
         if choix == "RELANCE":
             mini_value = self.info["mise"] * 2
