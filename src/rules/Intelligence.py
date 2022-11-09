@@ -3,11 +3,12 @@ from random import randint
 class AI:
 
     def __init__(self, id):
-        self.id = id
+        self.id = str(id)
         self.info = None
         self.me = None
 
     def get_info(self, info):
+        print("info")
         info = info[3:]
         info = info.split("###")
         info[0] = info[0].split("##")
@@ -38,12 +39,12 @@ class Naive(AI):
     
     def decision(self):
         if self.info["mise"] == 0:
-            possible = ["COUCHER", "MISE", "CHECK"]
+            possible = ["CHECK", "MISE"]
         elif self.me["mise"] == self.info["mise"]:
-            possible = ["COUCHER", "RELANCE", "CHECK"]
+            possible = ["CHECK", "RELANCE"]
         else:
-            possible = ["SUIVRE", "COUCHER", "RELANCE"]
-        choix = randint(0,2)
+            possible = ["COUCHER", "SUIVRE", "RELANCE"]
+        choix = randint(0,len(possible) - 1)
         choix = possible[choix]
         if choix == "MISE":
             mini_value = min(self.info["blinde"], self.me["money"])

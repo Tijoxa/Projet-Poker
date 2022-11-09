@@ -115,7 +115,7 @@ class Game:
         if action.startswith("MISE"):
             self.mise += int(action[5:])
         if action.startswith("RELANCE"):
-            self.mise += int(action[5:])
+            self.mise += int(action[8:])
 
     def fin_d_enchere(self):
         """

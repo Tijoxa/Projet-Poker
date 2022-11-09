@@ -86,17 +86,19 @@ class AIThread(threading.Thread):
 
 
 class Server():
-    def __init__(self, adresse:tuple, awaited:int):
+    def __init__(self, adresse:tuple, awaited:int, ias:int):
         """
         Initialise le serveur
         adress: couple (host, adresse) utilisé par le bind
         awaited: int correspond au nombre de joueurs attendus
+        ias: int correspondant au nombre d'IA à ajouter
         """
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.waiting = False # lorsque plusieurs clients sont connectés au serveur ils peuvent chercher à envoyer plusieurs messages en même temps, waiting perùet de les gérer dans leur ordre d'arrivée.
         self.socket.bind(adresse)
         self.conns = [] # liste des différents clients
         self.awaited = awaited
+        self.ias = ias
         print("serveur prêt")
         self.get_players()
         self.game = Game(2, self.conns, self)
@@ -114,6 +116,10 @@ class Server():
             print("client connecté !")
             self.conns[-1].start()
             for client in self.conns: client.ping()
+        for _ in range(self.ias):
+            self.conns.append(AIThread(self, "naive"))
+            print("IA connectée !")
+            self.conns[-1].start()
 
     def test(self):
         """
@@ -142,4 +148,4 @@ class Server():
 
 if __name__ == "__main__":
     host, port = ('', 5566) # le 5566 a été paramétré par port forward sur ma machine pour être ouvert au réseau extérieur (pour le faire fonctionner chez vous il faut ouvrir le port 5566 sur les paramètres du routeur) 
-    Server((host, port), 3)
+    Server((host, port), 1, 2)
