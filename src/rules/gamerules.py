@@ -74,7 +74,6 @@ class Game:
             conn.player.main = [self.deck.draw()]
         for conn in self.in_game:
             conn.player.main.append(self.deck.draw())
-            conn.send(f"Votre main : {conn.player.main}")
 
     def enchere(self, first:int):
         """
