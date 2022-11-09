@@ -38,12 +38,6 @@ class ClientThread(threading.Thread):
         """
         data_encoded = self.conn.recv(datasize)
         return data_encoded.decode("utf8")
-    
-    def waiting_receive(self, datasize = 1024):
-        data_encoded = ""
-        while data_encoded == "":
-            data_encoded = self.conn.recv(datasize)
-        return data_encoded.decode("utf8")
 
     def ping(self) -> bool:
         """
