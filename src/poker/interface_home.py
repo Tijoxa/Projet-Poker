@@ -7,15 +7,15 @@ class GUI_homepage:
     def __init__(self):
         pg.init()
         #create the window :
-        self.homepage = pg.display.set_mode([640, 480])
+        self.homepage = pg.display.set_mode([960, 720])
         pg.display.set_caption('Welcome in Centrale Poker')
         
         #background : https://www.casino-saint-julien.com/les-differents-types-de-poker/
         my_bg=pg.image.load('backgrounds/poker_background.jpg')
-        self.bg = pg.transform.scale(my_bg, (640, 480))
+        self.bg = pg.transform.scale(my_bg, (960, 720))
         
         #create name entry box :
-        self.input_name = InputBox(100, 400, 300, 32,
+        self.input_name = InputBox(150, 600, 450, 48,
                                    text='name',
                                    centered=True)
         
