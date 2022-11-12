@@ -18,15 +18,15 @@ class GUI_waiting:
         
     def mainloop(self):
         clock = pg.time.Clock()
-        input_button1 = Button(20, 30, 200, 50, (255, 250, 250),
+        input_quit = Button(20, 30, 200, 50, (255, 250, 250),
                      (255, 0, 0), "TimesNewRoman",
                      (255, 255, 255), "Quitter la salle")
 
-        input_button2 = Button(500, 500, 200, 50, (255, 250, 250),
+        input_play = Button(500, 500, 200, 50, (255, 250, 250),
                      (255, 0, 0), "TimesNewRoman",
                      (255, 255, 255), "Lancer la partie !")
 
-        input_buttons = [input_button1,input_button2]
+        input_buttons = [input_quit,input_play]
         done = False
 
         while not done:
@@ -44,13 +44,13 @@ class GUI_waiting:
             for button in input_buttons : 
                 button.draw(self.waiting)
 
-            if input_button1.CurrentState:
-                input_button1.CurrentState = False
+            if input_quit.CurrentState:
+                input_quit.CurrentState = False
                 pg.quit()
                 return "HOME"
 
-            if input_button2.CurrentState:
-                input_button2.CurrentState = False
+            if input_play.CurrentState:
+                input_play.CurrentState = False
                 pg.quit()
                 return "PLAY"
 

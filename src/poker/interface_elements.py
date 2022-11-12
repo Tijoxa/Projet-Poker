@@ -93,8 +93,9 @@ class InputBox:
 class Button():
     # INITIALIZATION OF BUTTON COMPONENTS LIKE POSITION OF BUTTON,
     # COLOR OF BUTTON, FONT COLOR OF BUTTON, FONT SIZE, TEXT INSIDE THE BUTTON
-    def __init__(self, x, y, sx, sy, bcolour,
-                 fbcolour, font, fcolour, text):
+    def __init__(self, x, y, sx, sy, 
+                 bcolour, fbcolour, 
+                 textType, textColour, text = "..."):
         # origin coordinates :
         self.x = x
         self.y = y
@@ -108,13 +109,13 @@ class Button():
         # RECTANGLE COLOR USED TO DRAW THE BUTTON
         self.fbcolour = fbcolour
         # BUTTON FONT COLOR
-        self.fcolour = fcolour
+        self.fcolour = textColour
         # TEXT IN A BUTTON
         self.text = text
         # CURRENT IS OFF
         self.CurrentState = False
         # FONT OBJECT FROM THE SYSTEM FONTS
-        self.buttonf = pg.font.SysFont(font, self.fontsize)
+        self.buttonf = pg.font.SysFont(textType, self.fontsize)
         # COLLIDER FOR THE CLICK CHECKING
         self.rect = pg.Rect(x, y, sx, sy)
 
@@ -130,9 +131,7 @@ class Button():
                 
     # DRAW THE BUTTON
     def draw(self, display):
-        pg.draw.rect(display, self.fbcolour,
-                     (self.x, self.y,
-                     self.sx, self.sy))
+        pg.draw.rect(display, self.fbcolour, self.rect)
         # RENDER THE FONT OBJECT FROM THE STSTEM FONTS
         textsurface = self.buttonf.render(self.text,
                                           False, self.fcolour)
