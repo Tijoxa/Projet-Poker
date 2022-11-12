@@ -50,5 +50,3 @@ class GUI_playRoom:
         pg.quit()
         return ""
 
-gui=GUI_playRoom()
-gui.mainloop()

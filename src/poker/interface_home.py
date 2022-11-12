@@ -8,7 +8,7 @@ class GUI_homepage:
         pg.init()
         #create the window :
         self.homepage = pg.display.set_mode([960, 720])
-        pg.display.set_caption('Welcome in Centrale Poker')
+        pg.display.set_caption('Welcome to Centrale Poker')
         
         #background : https://www.casino-saint-julien.com/les-differents-types-de-poker/
         my_bg=pg.image.load('backgrounds/poker_background.jpg')

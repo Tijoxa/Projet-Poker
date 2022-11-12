@@ -21,7 +21,12 @@ class GUI_waiting:
         input_button1 = Button(20, 30, 200, 50, (255, 250, 250),
                      (255, 0, 0), "TimesNewRoman",
                      (255, 255, 255), "Quitter la salle")
-        input_buttons = [input_button1]
+
+        input_button2 = Button(500, 500, 200, 50, (255, 250, 250),
+                     (255, 0, 0), "TimesNewRoman",
+                     (255, 255, 255), "Lancer la partie !")
+
+        input_buttons = [input_button1,input_button2]
         done = False
 
         while not done:
@@ -43,6 +48,11 @@ class GUI_waiting:
                 input_button1.CurrentState = False
                 pg.quit()
                 return "HOME"
+
+            if input_button2.CurrentState:
+                input_button2.CurrentState = False
+                pg.quit()
+                return "PLAY"
 
             pg.display.flip()
             clock.tick(30)
