@@ -33,6 +33,7 @@ class Game:
         self.deck = Deck()
         dealer = self.in_game[0]
         self.dans_le_coup = self.in_game.copy()
+        self.board = []
         if len(self.in_game) == 2: # cas face à face
             petite = dealer
             petite_index = 0
@@ -114,6 +115,8 @@ class Game:
         -  conn: le joueur représenté par le client connecté
         -  action: l'action du joueur
         """
+        for all_conn in self.in_game: # on indique aux autres joueurs l'action réalisée
+            all_conn.send(f"{conn.id}:\t{action}")
         if action == "SUIVRE" or action == "CHECK":
             return
         if action == "COUCHER":

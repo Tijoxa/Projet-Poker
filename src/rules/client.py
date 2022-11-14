@@ -55,6 +55,7 @@ class Client:
             quit()         
         if received.startswith("###"):
             info, me = self.traitement_info(received)
+            self.show_info(info, me)
             if me["isPlaying"]:
                 self.client_input(info, me)
 
@@ -81,6 +82,17 @@ class Client:
                 me = player
         return res, me
 
+    def show_info(self, info, me):
+        if me is not None:
+            res = f"{me['pseudo']}, vous avez {me['money']}$ \n A ce tour d'enchère, vous avez misé {me['mise']}$\n"
+            res += f"Votre main:\t{info['main'][0]}\t{info['main'][1]}\n"
+            for player in info["players"]:
+                res += f"\t{player['pseudo']} possède {player['money']}$, a misé {player['mise']}$\n"
+            res += f"Les cartes au centre de la table: {info['board']}, la mise sur laquelle il faut s'aligner est {info['mise']}\nLe pot vaut {info['pot']}"
+            if me['isPlaying']:
+                res += '\nA vous de jouer!'
+            print(res)
+            
 
 
 

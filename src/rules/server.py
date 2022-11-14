@@ -1,5 +1,6 @@
 import socket
 import threading
+from time import sleep
 
 import player_cls
 import Intelligence
@@ -30,6 +31,7 @@ class ClientThread(threading.Thread):
         """
         Envoie des datas au client
         """
+        sleep(0.1) # on s'assure que deux messages ne soient pas envoyés en même temps ce qui pourrait faire planter un socket
         data_encoded = data.encode("utf8")
         self.conn.sendall(data_encoded)
     
