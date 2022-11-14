@@ -94,7 +94,7 @@ class Button():
     # INITIALIZATION OF BUTTON COMPONENTS LIKE POSITION OF BUTTON,
     # COLOR OF BUTTON, FONT COLOR OF BUTTON, FONT SIZE, TEXT INSIDE THE BUTTON
     def __init__(self, x, y, sx, sy, 
-                 bcolour, fbcolour, 
+                 colour_mouse_on, colour_mouse_not_on, 
                  textType, textColour, text = "..."):
         # origin coordinates :
         self.x = x
@@ -104,10 +104,11 @@ class Button():
         self.sy = sy
         # FONT SIZE FOR THE TEXT IN A BUTTON
         self.fontsize = 25
-        # BUTTON COLOUR
-        self.bcolour = bcolour
+        # Colours possible deponding on mouse position :
+        self.COLOR_INACTIVE = colour_mouse_not_on
+        self.COLOR_ACTIVE = colour_mouse_on
         # RECTANGLE COLOR USED TO DRAW THE BUTTON
-        self.fbcolour = fbcolour
+        self.fbcolour = colour_mouse_not_on
         # BUTTON FONT COLOR
         self.fcolour = textColour
         # TEXT IN A BUTTON
@@ -121,6 +122,11 @@ class Button():
 
  
     def handle_event(self, event):
+        #change color if mouse on button : 
+        if self.rect.collidepoint(pg.mouse.get_pos()):
+            self.fbcolour=(0,0,0)
+        else:
+            self.fbcolour = self.COLOR_INACTIVE
         if event.type == pg.MOUSEBUTTONDOWN:
             # If the user clicked on the input_box rect.
             if self.rect.collidepoint(event.pos):
