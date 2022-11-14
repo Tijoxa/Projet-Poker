@@ -160,7 +160,7 @@ class Game:
                     self.in_game.remove(conn)
         for conn in self.in_game:
             self.all_in = False
-            self.side_pot = False
+            self.side_pot = 0
     
     def info(self, playingConn, target):
         """

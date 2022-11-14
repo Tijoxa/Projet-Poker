@@ -4,29 +4,25 @@ from pygame.locals import *
 from interface_elements import *
 
 
-class GUI_waiting:
+class GUI_playRoom:
     def __init__(self):
         pg.init()
         #create the window :
-        self.waiting = pg.display.set_mode([960, 720])
-        pg.display.set_caption("Salle d'attente")
+        self.waiting = pg.display.set_mode([1920, 980])
+        pg.display.set_caption("Centrale Poker ")
         
-        #background : 
-        my_bg=pg.image.load('backgrounds/poker_background.jpg')
-        self.bg = pg.transform.scale(my_bg, (960, 720))
+        #background : image temporaire 
+        # TODO : modifier l'image pour la rendre plus jolie
+        my_bg=pg.image.load('backgrounds/table_gimp_image.png')
+        self.bg = pg.transform.scale(my_bg, (1920, 980))
 
         
     def mainloop(self):
         clock = pg.time.Clock()
         input_quit = Button(20, 30, 200, 50, (255, 250, 250),
                      (255, 0, 0), "TimesNewRoman",
-                     (255, 255, 255), "Quitter la salle")
-
-        input_play = Button(500, 500, 200, 50, (255, 250, 250),
-                     (255, 0, 0), "TimesNewRoman",
-                     (255, 255, 255), "Lancer la partie !")
-
-        input_buttons = [input_quit,input_play]
+                     (255, 255, 255), "Quitter")
+        input_buttons = [input_quit]
         done = False
 
         while not done:
@@ -49,12 +45,8 @@ class GUI_waiting:
                 pg.quit()
                 return "HOME"
 
-            if input_play.CurrentState:
-                input_play.CurrentState = False
-                pg.quit()
-                return "PLAY"
-
             pg.display.flip()
             clock.tick(30)
         pg.quit()
         return ""
+
