@@ -8,12 +8,12 @@ class GUI_waiting:
     def __init__(self):
         pg.init()
         #create the window :
-        self.waiting = pg.display.set_mode([720, 500])
+        self.waiting = pg.display.set_mode([1023, 510])
         pg.display.set_caption("Salle d'attente")
         
         #background : 
-        my_bg=pg.image.load('backgrounds/poker_background.jpg')
-        self.bg = pg.transform.scale(my_bg, (720, 500))
+        my_bg=pg.image.load('backgrounds/waiting_background.png')
+        self.bg = pg.transform.scale(my_bg, (1023, 510))
 
         
     def mainloop(self):
@@ -22,7 +22,7 @@ class GUI_waiting:
                      (255, 0, 0), "TimesNewRoman",
                      (255, 255, 255), "Quitter la salle")
 
-        input_play = Button(350, 200, 200, 50, (255, 250, 250),
+        input_play = Button(800, 30, 200, 50, (255, 250, 250),
                      (255, 0, 0), "TimesNewRoman",
                      (255, 255, 255), "Lancer la partie !")
 
