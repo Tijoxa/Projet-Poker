@@ -3,8 +3,6 @@ from interface_home import GUI_homepage
 from interface_playRoom import GUI_playRoom
 import ctypes
 
-#pour afficher les fenètres en HD 1080x1920 (1.5x plus grand que le 720p)
-ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
 if __name__ == "__main__":
     gui = GUI_homepage()

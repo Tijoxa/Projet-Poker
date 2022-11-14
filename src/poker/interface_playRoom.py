@@ -8,13 +8,13 @@ class GUI_playRoom:
     def __init__(self):
         pg.init()
         #create the window :
-        self.waiting = pg.display.set_mode([1920, 980])
+        self.waiting = pg.display.set_mode([1280, 650])
         pg.display.set_caption("Centrale Poker ")
         
         #background : image temporaire 
         # TODO : modifier l'image pour la rendre plus jolie
         my_bg=pg.image.load('backgrounds/table_gimp_image.png')
-        self.bg = pg.transform.scale(my_bg, (1920, 980))
+        self.bg = pg.transform.scale(my_bg, (1280, 650))
 
         
     def mainloop(self):
