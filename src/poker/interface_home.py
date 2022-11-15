@@ -20,9 +20,7 @@ class GUI_homepage:
                                    centered=True)
         
         #create playstart button :
-        self.play_button = Button(200, 150, 125, 50, (255, 250, 250),
-                                 (255, 0, 0), "TimesNewRoman",
-                                 (255, 255, 255), "Jouer !")
+        self.play_button = Button(200, 150, 125, 50, text= "Jouer !")
         
     def mainloop(self):
         clock = pg.time.Clock()
@@ -31,6 +29,7 @@ class GUI_homepage:
         done = False
 
         while not done:
+            self.homepage.blit(self.bg,(0,0))
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     done = True
@@ -38,15 +37,12 @@ class GUI_homepage:
                     box.handle_event(event)
                 for button in input_buttons :
                     button.handle_event(event)
-
-            self.homepage.blit(self.bg,(0,0))
             
             for box in input_boxes:
                 box.draw(self.homepage)
             for button in input_buttons : 
                 button.draw(self.homepage)
                 
-            
             if self.play_button.CurrentState:
                 self.play_button.CurrentState = False
                 pg.quit()

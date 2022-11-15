@@ -18,13 +18,9 @@ class GUI_waiting:
         
     def mainloop(self):
         clock = pg.time.Clock()
-        input_quit = Button(20, 30, 200, 50, (255, 250, 250),
-                     (255, 0, 0), "TimesNewRoman",
-                     (255, 255, 255), "Quitter la salle")
+        input_quit = Button(20, 30, 200, 50, text = "Quitter la salle")
 
-        input_play = Button(800, 30, 200, 50, (255, 250, 250),
-                     (255, 0, 0), "TimesNewRoman",
-                     (255, 255, 255), "Lancer la partie !")
+        input_play = Button(800, 30, 200, 50, text = "Lancer la partie !")
 
         input_buttons = [input_quit,input_play]
         done = False

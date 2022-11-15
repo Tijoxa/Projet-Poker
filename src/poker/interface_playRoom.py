@@ -19,9 +19,7 @@ class GUI_playRoom:
         
     def mainloop(self):
         clock = pg.time.Clock()
-        input_quit = Button(20, 30, 200, 50, (255, 250, 250),
-                     (255, 0, 0), "TimesNewRoman",
-                     (255, 255, 255), "Quitter")
+        input_quit = Button(20, 30, 200, 50, text = "Quitter")
         input_buttons = [input_quit]
         done = False
 

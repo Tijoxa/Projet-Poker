@@ -93,38 +93,68 @@ class InputBox:
 class Button():
     # INITIALIZATION OF BUTTON COMPONENTS LIKE POSITION OF BUTTON,
     # COLOR OF BUTTON, FONT COLOR OF BUTTON, FONT SIZE, TEXT INSIDE THE BUTTON
-    def __init__(self, x, y, sx, sy, 
-                 colour_mouse_on, colour_mouse_not_on, 
-                 textType, textColour, text = "..."):
+    def __init__(self, x, y, sx, sy,
+                 shape = 'rect',
+                 colour_mouse_on = 'black', colour_mouse_off = 'red', 
+                 textType = "TimeNewRoman", textColour = 'white', text = "..."):
+        """
+        Generate button
+
+        Parameters
+        ----------
+        x : int
+            DESCRIPTION.
+        y : int
+            DESCRIPTION.
+        sx : int
+            DESCRIPTION.
+        sy : int
+            DESCRIPTION.
+        shape : string, optional
+            type shape of the button. Can be a rectange (rect),
+            or a circle. The default is 'rect'.
+        colour_mouse_on : string, optional
+            button colour when the mouse is on it. The default is 'black'.
+        colour_mouse_off : string, optional
+            button colour when the house is off it. The default is 'red'.
+        textType : string, optional
+            DESCRIPTION. The default is "TimeNewRoman".
+        textColour : string, optional
+            colour of the text. The default is 'white'.
+        text : string, optional
+            text displayed in the button. The default is "...".
+
+        Returns
+        -------
+        None.
+
+        """
         # origin coordinates :
         self.x = x
         self.y = y
         # last coordinates :
         self.sx = sx
         self.sy = sy
-        # FONT SIZE FOR THE TEXT IN A BUTTON
-        self.fontsize = 25
         # Colours possible deponding on mouse position :
-        self.COLOR_INACTIVE = colour_mouse_not_on
-        self.COLOR_ACTIVE = colour_mouse_on
-        # RECTANGLE COLOR USED TO DRAW THE BUTTON
-        self.fbcolour = colour_mouse_not_on
-        # BUTTON FONT COLOR
-        self.fcolour = textColour
-        # TEXT IN A BUTTON
+        self.COLOR_INACTIVE = pg.Color(colour_mouse_off)
+        self.COLOR_ACTIVE = pg.Color(colour_mouse_on)
+        self.fbcolour = self.COLOR_INACTIVE #couleur actuelle
+        # text :
+        self.tcolour = pg.Color(textColour)
         self.text = text
+        self.fontsize = 25
+        self.buttonf = pg.font.SysFont(textType, self.fontsize)
         # CURRENT IS OFF
         self.CurrentState = False
-        # FONT OBJECT FROM THE SYSTEM FONTS
-        self.buttonf = pg.font.SysFont(textType, self.fontsize)
         # COLLIDER FOR THE CLICK CHECKING
+        self.shape = shape 
         self.rect = pg.Rect(x, y, sx, sy)
 
  
     def handle_event(self, event):
         #change color if mouse on button : 
         if self.rect.collidepoint(pg.mouse.get_pos()):
-            self.fbcolour=(0,0,0)
+            self.fbcolour=self.COLOR_ACTIVE
         else:
             self.fbcolour = self.COLOR_INACTIVE
         if event.type == pg.MOUSEBUTTONDOWN:
@@ -133,21 +163,20 @@ class Button():
                 # Toggle the active variable.
                 self.CurrentState = True
             else:
-                self.active = False
+                self.CurrentState = False
                 
     # DRAW THE BUTTON
     def draw(self, display):
         pg.draw.rect(display, self.fbcolour, self.rect)
         # RENDER THE FONT OBJECT FROM THE STSTEM FONTS
         textsurface = self.buttonf.render(self.text,
-                                          False, self.fcolour)
+                                          False, self.tcolour)
  
         # THIS LINE WILL DRAW THE SURF ONTO THE SCREEN
-        display.blit(textsurface,
-                     ((self.x + (self.sx/2) -
-                       (self.fontsize/2)*(len(self.text)/2) + 10
-                       , (self.y + (self.sy/2) -
-                           (self.fontsize/2)-4))))
+        if self.shape == 'rect':
+            display.blit(textsurface,
+                     (self.x + (self.sx - textsurface.get_width())//2,
+                      self.y + (self.sy - self.fontsize)//2 -4))
  
 
         
