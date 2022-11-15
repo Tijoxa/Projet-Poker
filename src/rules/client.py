@@ -60,6 +60,9 @@ class Client:
                 self.client_input(info, me)
 
     def traitement_info(self, info):
+        """
+        Info est un message envoyé par le serveur contenant tous ce dont le joueur a besoin
+        """
         info = info[3:]
         info = info.split("###")
         info[0] = info[0].split("##")
@@ -83,6 +86,9 @@ class Client:
         return res, me
 
     def show_info(self, info, me):
+        """
+        Gère l'affichage des informations sur le terminal
+        """
         if me is not None:
             res = f"{me['pseudo']}, vous avez {me['money']}$ \n A ce tour d'enchère, vous avez misé {me['mise']}$\n"
             res += f"Votre main:\t{info['main'][0]}\t{info['main'][1]}\n"
@@ -92,8 +98,7 @@ class Client:
             if me['isPlaying']:
                 res += '\nA vous de jouer!'
             print(res)
-
-
+            
 
     def suivre(self):
         self.send("SUIVRE")
@@ -121,12 +126,11 @@ class Client:
         self.send("CHECK")
         return True
     
-    def run(self):
-        # boucle principale de réception
-        while True:
-            client.receive()
     
     def client_input(self, info, me):
+        """
+        Permet au joueur de choisir ce qu'il veut faire lorsque c'est à son tour.
+        """
         while True:
             case = 0
             print("Vos possibilités sont:")
@@ -146,7 +150,7 @@ class Client:
             if case == 1:
                 if choice.startswith("MISE"):
                     value = int(choice[5:])
-                    if self.mise(value, 1, me["money"]):
+                    if self.mise(value, min(info["blinde"], me["money"]), me["money"]):
                         return
             if case == 1 or case == 2:
                 if choice.startswith("CHECK"):
@@ -163,9 +167,12 @@ class Client:
                     return         
             print("input incorrect")
 
-
-
-
+    def run(self):
+        """
+        boucle principale de réception
+        """
+        while True:
+            client.receive()
 
         
 if __name__ == "__main__":
