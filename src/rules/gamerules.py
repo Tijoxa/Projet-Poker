@@ -15,6 +15,7 @@ class Game:
         self.in_game = [conn for conn in conns] # liste des joueurs en lice
         for conn in self.in_game:
             conn.player.money = money
+        self.player_starting_money = money
         self.dans_le_coup = [] # liste des joueurs encore dans le coup
         self.board = []
         self.server = server
@@ -80,14 +81,18 @@ class Game:
         for conn in self.in_game:
             conn.player.main.append(self.deck.draw())
             print(f"{conn.id}\t{conn.player.main}\t{conn.player.money}")
+        money_everywhere = sum([conn.player.money for conn in self.in_game]) + sum([conn.player.mise for conn in self.in_game])
+        if money_everywhere != 4 * self.player_starting_money: raise ValueError("De l'argent a disparu!")
 
     def enchere(self, first:int):
         """
         Gère un tour d'enchères
         """
         started = first # player qui a commencé l'enchère
+        print(f"### TOUR [{self.pot}]")
         for conn in self.in_game:
             conn.player.bet_once = False
+            print(f"#{conn.id}: {conn.player.money} [{conn.player.mise}]")
         while not self.fin_d_enchere():
             conn = self.in_game[first]
             first = (first + 1)%(len(self.in_game))
@@ -104,7 +109,7 @@ class Game:
                     if conn.player.all_in and conn.player.side_pot == 0: #calcul du side_pot
                         conn.player.side_pot = self.pot
                         for conn2 in self.dans_le_coup:
-                            conn.player.side_pot += min(conn.player.mise, conn2.player.mise)
+                            conn.player.side_pot += min(conn.player.mise, conn2.player.mise)      
         for conn in self.in_game:
             self.pot += conn.player.mise
             conn.player.mise = 0
@@ -120,9 +125,10 @@ class Game:
         -  conn: le joueur représenté par le client connecté
         -  action: l'action du joueur
         """
+        print(f"##{conn.id}:\t{action}")
         for all_conn in self.in_game: # on indique aux autres joueurs l'action réalisée
             all_conn.send(f"{conn.id}:\t{action}")
-        print(f"{conn.id}:\t{action}")
+            print(f"#{all_conn.id}: {all_conn.player.money} [{all_conn.player.mise}]")
         if action == "SUIVRE" or action == "CHECK":
             return
         if action == "COUCHER":
@@ -168,9 +174,12 @@ class Game:
                 if conn.player.money == 0:
                     conn.send("Malheureusement vous n'avez plus d'argent")
                     self.in_game.remove(conn)
+        print(f"###FIN")
         for conn in self.in_game:
             conn.player.all_in = False
-            self.side_pot = 0
+            conn.player.side_pot = 0
+            print(f"#{conn.id}: {conn.player.money}")
+
     
     def info(self, playingConn, target):
         """
