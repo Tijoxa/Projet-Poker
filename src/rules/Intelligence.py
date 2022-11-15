@@ -64,7 +64,7 @@ class Naive(AI):
             choix = f"MISE {value}"
         if choix == "RELANCE":
             mini_value = self.info["mise"] * 2
-            maxi_value = max(min(self.info["blinde"], self.me["money"]), self.me["mise"] + round(0.5 * self.me["money"]))
+            maxi_value = max(min(self.info["blinde"], self.me["money"]), self.me["mise"] + round(0.2 * self.me["money"]))
             if mini_value > maxi_value:
                 return self.decision()
             value = randint(mini_value, maxi_value)
