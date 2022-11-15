@@ -69,7 +69,7 @@ class Game:
         self.enchere(petite_index)
         self.fin_de_coup()
         if dealer in self.in_game:
-            self.in_game = self.in_game[1:] + [self.in_game[0]]
+            self.in_game = [self.in_game[-1]] + self.in_game[:-1]
         
 
     def dealing(self):
