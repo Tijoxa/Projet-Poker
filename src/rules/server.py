@@ -1,14 +1,12 @@
 import socket
 import threading
-from time import sleep
+from time import sleep, time
 
 import player_cls
 import Intelligence
 from gamerules import Game
 
 class ClientThread(threading.Thread):
-
-    nb_players = 0
 
     def __init__(self, server, conn, adress) -> None:
         """
@@ -19,10 +17,10 @@ class ClientThread(threading.Thread):
         self.adress = adress
         self.conn = conn
         self.isAI = False
-        ClientThread.nb_players += 1
+        Server.id_count += 1
         self.send("waiting for pseudo...")
         self.pseudo = self.receive()
-        self.id = ClientThread.nb_players
+        self.id = Server.id_count
         self.player = player_cls.Player.new_player()
         self.send(f"ID:{self.id}")
 
@@ -51,7 +49,6 @@ class ClientThread(threading.Thread):
             self.send("ping")
         except:
             print("no ping")
-            ClientThread.nb_players -= 1
             self.server.remove(self)
             return False
         finally:
@@ -59,13 +56,15 @@ class ClientThread(threading.Thread):
 
 class AIThread(threading.Thread):
 
-    nb_IA = 0
 
     def __init__(self, server, ai):
+        """
+        Un objet vu par le programme de la même façon qu'un ClientThread mais qui est relié à une IA.
+        """
         super().__init__()
         self.server = server
-        AIThread.nb_IA += 1
-        self.id = 10 + AIThread.nb_IA
+        Server.id_count += 1
+        self.id = Server.id_count
         self.ai = Intelligence.AI(ai, self.id)
         self.isAI = True
         self.pseudo = self.ai.pseudo
@@ -79,6 +78,9 @@ class AIThread(threading.Thread):
             self.ai.get_info(data)
     
     def receive(self, datasize = 1024):
+        """
+        attente d'un message de l'IA
+        """
         return self.ai.decision()
     
     def ping():
@@ -88,6 +90,9 @@ class AIThread(threading.Thread):
 
 
 class Server():
+
+    id_count = 0 # assure l'unicité de toutes les id
+
     def __init__(self, adresse:tuple, awaited:int, ias:int):
         """
         Initialise le serveur
@@ -102,16 +107,22 @@ class Server():
         self.awaited = awaited
         self.ias = ias
         print("serveur prêt")
+        
+    def run(self, blinde, money):    
+        """
+        Une fois le serveur prêt, il peut être lancé grâce à cette fonction
+        """
         self.get_players()
-        self.game = Game(2, self.conns, self)
+        self.start_time = time()
+        self.game = Game(blinde, money, self.conns, self)
         self.game.play()
-        self.close()
+        return self.close()
     
     def get_players(self):
         """
         Récupère des joueurs jusqu'à en avoir autant qu'attendu
         """
-        while ClientThread.nb_players < self.awaited:
+        while len(self.conns) < self.awaited:
             self.socket.listen() # écoute pour les connections
             conn, addr = self.socket.accept() # le client connecté et son adresse
             self.conns.append(ClientThread(self, conn, addr)) # création du Thread
@@ -125,7 +136,7 @@ class Server():
 
     def test(self):
         """
-        Cette fonction temporaire permet de présenter la structure générale de jeu et de tester quelques techniques.
+        Cette fonction temporaire permet de tester la communication entre le serveur et les clients.
         """
         # messages tour par tour
         while True:
@@ -142,12 +153,25 @@ class Server():
         Permet de fermer le serveur
         """
         for client in self.conns:
-            client.send("close")
-            client.conn.close()
+            if not client.isAI:
+                client.send("close")
+                client.conn.close()
         print("fin d'exécution")
+        if len(self.game.in_game) == 1:
+            execution = time() - self.start_time
+            print(f"{self.game.in_game[0].pseudo} (id: {self.game.in_game[0].id})  won!")
+            print(f"partie jouée en {self.game.nb_coup} coups.")
+            print(f"Durée de la partie: {execution}s")
         self.socket.close()
+        return (self.game.nb_coup, execution)
 
 
 if __name__ == "__main__":
     host, port = ('', 5566) # le 5566 a été paramétré par port forward sur ma machine pour être ouvert au réseau extérieur (pour le faire fonctionner chez vous il faut ouvrir le port 5566 sur les paramètres du routeur) 
-    Server((host, port), 0, 4)
+    BLINDE = 2 # la petite blinde pour la partie
+    MONEY = 50 # la monnaie de départ des joueurs
+    NB_CLIENTS = 0 # le nombre de clients (joueurs humains)
+    NB_IAS = 4 # le nombre d'IA
+    server = Server((host, port), NB_CLIENTS, NB_IAS)
+    coup, exec = server.run(BLINDE, MONEY)
+    

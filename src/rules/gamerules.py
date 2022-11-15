@@ -5,7 +5,7 @@ from cards import Deck
 
 
 class Game:
-    def __init__(self, blinde:float, conns:list, server):
+    def __init__(self, blinde:int, money:int , conns:list, server):
         """
         Met en place les varaibales communes pour le jeu.
         """
@@ -13,10 +13,13 @@ class Game:
         self.petite_blinde = blinde
         self.grosse_blinde = blinde * 2
         self.in_game = [conn for conn in conns] # liste des joueurs en lice
+        for conn in self.in_game:
+            conn.player.money = money
         self.dans_le_coup = [] # liste des joueurs encore dans le coup
         self.board = []
         self.server = server
         self.mise = 0
+        self.nb_coup = 0
 
     def play(self):
         """
@@ -34,6 +37,7 @@ class Game:
         dealer = self.in_game[0]
         self.dans_le_coup = self.in_game.copy()
         self.board = []
+        self.nb_coup += 1
         if len(self.in_game) == 2: # cas face à face
             petite = dealer
             petite_index = 0
@@ -75,6 +79,7 @@ class Game:
             conn.player.main = [self.deck.draw()]
         for conn in self.in_game:
             conn.player.main.append(self.deck.draw())
+            print(f"{conn.id}\t{conn.player.main}\t{conn.player.money}")
 
     def enchere(self, first:int):
         """
@@ -117,6 +122,7 @@ class Game:
         """
         for all_conn in self.in_game: # on indique aux autres joueurs l'action réalisée
             all_conn.send(f"{conn.id}:\t{action}")
+        print(f"{conn.id}:\t{action}")
         if action == "SUIVRE" or action == "CHECK":
             return
         if action == "COUCHER":
@@ -133,8 +139,9 @@ class Game:
         """
         if len(self.dans_le_coup) > 1:
             for conn in self.dans_le_coup:
-                if conn.player.mise < self.mise or not conn.player.bet_once:
-                    return False
+                if not conn.player.all_in:
+                    if conn.player.mise < self.mise or not conn.player.bet_once:
+                        return False
         return True
 
     def fin_de_coup(self):
@@ -162,7 +169,7 @@ class Game:
                     conn.send("Malheureusement vous n'avez plus d'argent")
                     self.in_game.remove(conn)
         for conn in self.in_game:
-            self.all_in = False
+            conn.player.all_in = False
             self.side_pot = 0
     
     def info(self, playingConn, target):
@@ -195,10 +202,16 @@ def abattage(main:list, board:list) -> tuple:
     return best_main, best_combi
 
 def winner(conns:list, board:list):
+    """
+    envoie l'ordre de victoire des joueurs encore dans le coup
+    """
     combis = []
     for conn in conns:
         combis.append((conn, abattage(conn.player.main, board)[1]))
     combis.sort(key = (lambda x: x[1]), reverse = True)
+    print(board)
+    for combi in combis:
+        print(f"{combi[0].id}\t{combi[0].pseudo}\t{combi[1]}")
     return combis
     
     

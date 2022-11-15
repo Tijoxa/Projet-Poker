@@ -3,11 +3,17 @@ from random import randint
 class AI:
 
     def __init__(self, id):
+        """
+        Classe générale contenant les informations nécessaires pour toutes les IA
+        """
         self.id = str(id)
         self.info = None
         self.me = None
 
     def get_info(self, info):
+        """
+        Récupère les informations fournies par le serveur et les enregistre pour les décisions futures
+        """
         info = info[3:]
         info = info.split("###")
         info[0] = info[0].split("##")
@@ -33,10 +39,16 @@ class AI:
 class Naive(AI):
 
     def __init__(self, id):
+        """
+        Une IA qui joue au hasard
+        """
         super().__init__(id)
         self.pseudo = "Aleatoire"
     
     def decision(self):
+        """
+        Décision aléatoire selon les informations données
+        """
         if self.info["mise"] == 0:
             possible = ["CHECK", "MISE"]
         elif self.me["mise"] == self.info["mise"]:
@@ -52,7 +64,7 @@ class Naive(AI):
             choix = f"MISE {value}"
         if choix == "RELANCE":
             mini_value = self.info["mise"] * 2
-            maxi_value = max(min(self.info["blinde"], self.me["money"]), round(0.1 * self.me["money"]))
+            maxi_value = max(min(self.me["mise"] + self.info["blinde"], self.me["money"]), self.me["mise"] + round(0.1 * self.me["money"]))
             if mini_value > maxi_value:
                 return self.decision()
             value = randint(mini_value, maxi_value)
@@ -62,5 +74,8 @@ class Naive(AI):
 
 
 def AI(type, id):
+    """
+    renvoie une IA selon le type demandé
+    """
     if type == "naive":
         return Naive(id)
