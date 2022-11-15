@@ -75,7 +75,7 @@ class InputBox:
                 # Re-render the text.
                 self.txt_surface = self.FONT.render(self.text, True, self.color)
 
-    def draw(self, screen):
+    def draw(self, screen, tickness = 2):
         text_w = self.txt_surface.get_width()
         # Resize the box if the text is too long.
         self.rect.w = max(self.ow, text_w +10)
@@ -88,7 +88,7 @@ class InputBox:
             screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
             
         # Blit the rect.
-        pg.draw.rect(screen, self.color, self.rect, 2)
+        pg.draw.rect(screen, self.color, self.rect, tickness)
 
 class Button():
     # INITIALIZATION OF BUTTON COMPONENTS LIKE POSITION OF BUTTON,
@@ -96,23 +96,24 @@ class Button():
     def __init__(self, x, y, sx, sy,
                  shape = 'rect',
                  colour_mouse_on = 'black', colour_mouse_off = 'red', 
-                 textType = "TimeNewRoman", textColour = 'white', text = "..."):
+                 textType = "TimeNewRoman", textColour = 'white', 
+                 textSize = 25, text = "..."):
         """
         Generate button
 
         Parameters
         ----------
         x : int
-            DESCRIPTION.
+            x origin.
         y : int
-            DESCRIPTION.
+            y origin.
         sx : int
-            DESCRIPTION.
+            width.
         sy : int
-            DESCRIPTION.
+            height.
         shape : string, optional
-            type shape of the button. Can be a rectange (rect),
-            or a circle. The default is 'rect'.
+            type shape of the button. Can rectangular (rect),
+            or circular (circle). The default is 'rect'.
         colour_mouse_on : string, optional
             button colour when the mouse is on it. The default is 'black'.
         colour_mouse_off : string, optional
@@ -142,7 +143,7 @@ class Button():
         # text :
         self.tcolour = pg.Color(textColour)
         self.text = text
-        self.fontsize = 25
+        self.fontsize = textSize
         self.buttonf = pg.font.SysFont(textType, self.fontsize)
         # CURRENT IS OFF
         self.CurrentState = False
@@ -166,17 +167,20 @@ class Button():
                 self.CurrentState = False
                 
     # DRAW THE BUTTON
-    def draw(self, display):
-        pg.draw.rect(display, self.fbcolour, self.rect)
+    def draw(self, display, tickness = 0):
         # RENDER THE FONT OBJECT FROM THE STSTEM FONTS
         textsurface = self.buttonf.render(self.text,
                                           False, self.tcolour)
  
         # THIS LINE WILL DRAW THE SURF ONTO THE SCREEN
         if self.shape == 'rect':
-            display.blit(textsurface,
-                     (self.x + (self.sx - textsurface.get_width())//2,
-                      self.y + (self.sy - self.fontsize)//2 -4))
+            pg.draw.rect(display, self.fbcolour, self.rect, tickness)
+        elif self.shape == 'circle':
+            pg.draw.ellipse(display, self.fbcolour,self.rect, tickness)
+            
+        display.blit(textsurface,
+                 (self.x + (self.sx - textsurface.get_width())//2,
+                  self.y + (self.sy - self.fontsize)//2))
  
 
         
