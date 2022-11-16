@@ -1,3 +1,6 @@
+from cards import Card
+value_to_symbols = Card.value_to_symbols
+
 """
 Main est une liste de 5 cartes, l'objectif est de voir quelle est la combinaison de la main
 Ordre des mains:
@@ -198,12 +201,6 @@ class Combinaison:
             return f"{self.combinaison} - {value_to_symbols(self.detail)}"    
         return f"{self.combinaison} - {self.detail}"
 
-
-def value_to_symbols(value:int) -> str: # TODO: la fonction a déjà été définie en tant que méthode dans cards.py, redondance
-    from cards import SYMBOLS
-    if value not in range(1, 15):
-        raise ValueError("La valeur doit être comprise entre 1 et 14")
-    return SYMBOLS[value-1]
 
 
 
