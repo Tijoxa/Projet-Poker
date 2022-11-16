@@ -56,6 +56,8 @@ class Game:
         grosse.player.mise = min(self.grosse_blinde, grosse.player.money)
         grosse.player.money -= grosse.player.mise
         self.mise = max(petite.player.mise, grosse.player.mise)
+        if petite.player.money == 0: petite.player.all_in = True
+        if grosse.player.money == 0: grosse.player.all_in = True
         self.dealing()
         self.enchere(under)
         for _ in range(3):
