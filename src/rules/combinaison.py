@@ -129,7 +129,7 @@ def combinaison(main:list): # TODO: gérer les cas de comparaison plus complexes
     FLUSH = flush(main)
     QUINTE_FLUSH = quinte_flush(QUINTE, FLUSH)
     if QUINTE_FLUSH:
-        if QUINTE[0] == 10:
+        if QUINTE[0] == 14:
             return Combinaison("Quinte Flush Royale", QUINTE_FLUSH, main)
         return Combinaison("Quinte Flush", QUINTE_FLUSH, main)
     COUNT = compteur(main)
