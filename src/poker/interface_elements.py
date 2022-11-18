@@ -185,5 +185,6 @@ class Button():
 
 class Player:
     def __init__(self, x, y, w, h, 
-                 name, money = 50, cards = ["back","back"]):
+                 name, isIA = False, 
+                 money = 50, cards = ["back","back"]):
         pass
