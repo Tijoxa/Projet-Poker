@@ -183,4 +183,7 @@ class Button():
                   self.y + (self.sy - self.fontsize)//2))
  
 
-        
+class Player:
+    def __init__(self, x, y, w, h, 
+                 name, money = 50, cards = ["back","back"]):
+        pass
