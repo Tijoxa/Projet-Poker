@@ -19,9 +19,9 @@ class Client:
         ====Output====
         un client connecté au serveur
         """
-        self.id = None # l'id sera donnée par le serveur pour s'assurer que chaque client en ait une différente
+        self.id = None # l'ID sera donnée par le serveur pour s'assurer que chaque client en ait une différente
         self.pseudo = pseudo # le pseudo peut être choisi par le joueur
-        self.server = server # le serveur auquel le client s'est connecté'
+        self.server = server # le serveur auquel le client s'est connecté
     
     def receive(self, data_size = 1024):
         """
@@ -29,7 +29,7 @@ class Client:
         """
         received_encoded = self.server.recv(data_size)
         received = received_encoded.decode("utf8")
-        self.manage(received) # manage indique le comportement à prendre selon le message reçu.
+        self.manage(received) # manage indique le comportement à prendre selon le message reçu
     
     def send(self, data):
         """
@@ -149,18 +149,24 @@ class Client:
                 return
             if case == 1:
                 if choice.startswith("MISE"):
-                    value = int(choice[5:])
-                    if self.mise(value, min(info["blinde"], me["money"]), me["money"]):
-                        return
+                    try:
+                        value = int(choice[5:])
+                        if self.mise(value, min(info["blinde"], me["money"]), me["money"]):
+                            return
+                    except:
+                        pass
             if case == 1 or case == 2:
                 if choice.startswith("CHECK"):
                     self.check()
                     return
             if case == 2 or case == 3:
                 if choice.startswith("RELANCE"):
-                    value = int(choice[8:])
-                    if self.relance(value, info["mise"] * 2, me["money"]):
-                        return      
+                    try:
+                        value = int(choice[8:])
+                        if self.relance(value, info["mise"] * 2, me["money"]):
+                            return
+                    except:
+                        pass
             if case == 3:
                 if choice.startswith("SUIVRE"):
                     self.suivre()
@@ -176,7 +182,7 @@ class Client:
 
         
 if __name__ == "__main__":
-    host, port = ('localhost', 5566) # cette ip doit être l'ip publique de l'ordinateur sur lequel tourne le serveur, le port doit être en accord avec celui du serveur
+    host, port = ('localhost', 5566) # cette IP doit être l'IP publique de l'ordinateur sur laquelle tourne le serveur, le port doit être en accord avec celui du serveur
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.connect((host, port))
     pseudo = input("pseudo: ")
