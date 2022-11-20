@@ -5,7 +5,27 @@ COLORS = ["H", "S", "D", "C"] # H = Hearts ; S = Spades ; D = Diamond ; C = Club
 TERMINAL_COLORS = {"H": "\033[31m", "S": "\033[34m", "D": "\033[33m", "C": "\033[32m"} 
 
 class Card:
-    def value_to_symbols(self, value:int):
+    def __init__(self, symbol:str, couleur:str):
+        """
+        crée une carte à partir d'un symbole et d'une couleur
+        """
+        self.value = Card.symbols_to_value(symbol)
+        if couleur in COLORS:
+            self.color = couleur
+        else:
+            raise ValueError(f"Les couleurs sont {COLORS}")
+
+    def __repr__(self) -> str:
+        print(TERMINAL_COLORS[self.color], end = "")
+        print(f"{Card.value_to_symbols(self.value)}{self.color}", end = "")
+        print("\033[39m", end = "\t")
+        return f"{Card.value_to_symbols(self.value)}{self.color}"
+
+    def __str__(self) -> str:
+        return f"{Card.value_to_symbols(self.value)}{self.color}"
+
+    @staticmethod
+    def value_to_symbols(value:int):
         """
     	convertit un int en symbole
         """
@@ -13,7 +33,8 @@ class Card:
             raise ValueError("La valeur doit être comprise entre 1 et 14")
         return SYMBOLS[value-1]
 
-    def symbols_to_value(self, symbol:str) -> int:
+    @staticmethod
+    def symbols_to_value(symbol:str) -> int:
         """
     	convertit un symbole en int
         """
@@ -23,27 +44,6 @@ class Card:
             return 14
         else:
             return SYMBOLS.index(symbol) + 1
-
-
-    def __init__(self, symbol:str, couleur:str):
-        """
-        crée une carte à partir d'un symbole et d'une couleur
-        """
-        self.value = self.symbols_to_value(symbol)
-        if couleur in COLORS:
-            self.color = couleur
-        else:
-            raise ValueError(f"Les couleurs sont {COLORS}")
-
-
-    def __repr__(self) -> str:
-        print(TERMINAL_COLORS[self.color], end = "")
-        print(f"{self.value_to_symbols(self.value)}{self.color}", end = "")
-        print("\033[39m", end = "\t")
-        return f"{self.value_to_symbols(self.value)}{self.color}"
-
-    def __str__(self) -> str:
-        return f"{self.value_to_symbols(self.value)}{self.color}"
 
 
 class Deck:

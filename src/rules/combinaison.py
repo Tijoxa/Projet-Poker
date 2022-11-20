@@ -1,3 +1,6 @@
+from cards import Card
+value_to_symbols = Card.value_to_symbols
+
 """
 Main est une liste de 5 cartes, l'objectif est de voir quelle est la combinaison de la main
 Ordre des mains:
@@ -12,7 +15,6 @@ Double Paire
 Paire
 Hauteur
 """
-
 
 
 def quinte_flush(quinte, flush):
@@ -50,7 +52,7 @@ def quinte(main:list):
     valeurs = [i.value for i in main]
     valeurs.sort() 
     if valeurs == [2, 3, 4, 5, 14]:
-        valeurs = [1, 2, 3, 4, 5] # L'As peut être le premier élément de la plus petite suite
+        valeurs = [1, 2, 3, 4, 5] # l'as peut être le premier élément de la plus petite suite
     minimal = valeurs[0]
     if valeurs == [(minimal + i) for i in range(5)]:
         valeurs.reverse()
@@ -117,7 +119,7 @@ def hauteur(main:list):
     return valeurs
 
 
-def combinaison(main:list): # TODO: gérer les cas de comparaison plus complexes (voir https://github.com/msaindon/deuces)
+def combinaison(main:list):
     """
     Prend une main (liste de 5 cartes (instances de cards.Card)) en entrée et retourne la meilleure combinaison
     """
@@ -126,7 +128,7 @@ def combinaison(main:list): # TODO: gérer les cas de comparaison plus complexes
     FLUSH = flush(main)
     QUINTE_FLUSH = quinte_flush(QUINTE, FLUSH)
     if QUINTE_FLUSH:
-        if QUINTE[0] == 10:
+        if QUINTE[0] == 14:
             return Combinaison("Quinte Flush Royale", QUINTE_FLUSH, main)
         return Combinaison("Quinte Flush", QUINTE_FLUSH, main)
     COUNT = compteur(main)
@@ -198,12 +200,6 @@ class Combinaison:
             return f"{self.combinaison} - {value_to_symbols(self.detail)}"    
         return f"{self.combinaison} - {self.detail}"
 
-
-def value_to_symbols(value:int) -> str: # TODO: la fonction a déjà été définie en tant que méthode dans cards.py, redondance
-    from cards import SYMBOLS
-    if value not in range(1, 15):
-        raise ValueError("La valeur doit être comprise entre 1 et 14")
-    return SYMBOLS[value-1]
 
 
 

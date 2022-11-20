@@ -5,7 +5,7 @@ from cards import Deck
 
 
 class Game:
-    def __init__(self, blinde:float, conns:list, server):
+    def __init__(self, blinde:int, money:int , conns:list, server):
         """
         Met en place les varaibales communes pour le jeu.
         """
@@ -13,10 +13,14 @@ class Game:
         self.petite_blinde = blinde
         self.grosse_blinde = blinde * 2
         self.in_game = [conn for conn in conns] # liste des joueurs en lice
+        for conn in self.in_game:
+            conn.player.money = money
+        self.player_starting_money = money
         self.dans_le_coup = [] # liste des joueurs encore dans le coup
         self.board = []
         self.server = server
         self.mise = 0
+        self.nb_coup = 0
 
     def play(self):
         """
@@ -34,6 +38,7 @@ class Game:
         dealer = self.in_game[0]
         self.dans_le_coup = self.in_game.copy()
         self.board = []
+        self.nb_coup += 1
         if len(self.in_game) == 2: # cas face à face
             petite = dealer
             petite_index = 0
@@ -51,6 +56,8 @@ class Game:
         grosse.player.mise = min(self.grosse_blinde, grosse.player.money)
         grosse.player.money -= grosse.player.mise
         self.mise = max(petite.player.mise, grosse.player.mise)
+        if petite.player.money == 0: petite.player.all_in = True
+        if grosse.player.money == 0: grosse.player.all_in = True
         self.dealing()
         self.enchere(under)
         for _ in range(3):
@@ -66,7 +73,6 @@ class Game:
         if dealer in self.in_game:
             self.in_game = self.in_game[1:] + [self.in_game[0]]
         
-
     def dealing(self):
         """
         Distribution des cartes aux joueurs encore en lice
@@ -75,36 +81,40 @@ class Game:
             conn.player.main = [self.deck.draw()]
         for conn in self.in_game:
             conn.player.main.append(self.deck.draw())
+            print(f"{conn.id}\t{conn.player.main}\t{conn.player.money}")
+        money_everywhere = sum([conn.player.money for conn in self.in_game]) + sum([conn.player.mise for conn in self.in_game])
+        if money_everywhere != len(self.in_game) * self.player_starting_money: raise ValueError("De l'argent a disparu!")
 
     def enchere(self, first:int):
         """
         Gère un tour d'enchères
         """
         started = first # player qui a commencé l'enchère
+        print(f"### TOUR [{self.pot}]")
         for conn in self.in_game:
             conn.player.bet_once = False
+            print(f"#{conn.id}: {conn.player.money} [{conn.player.mise}]")
         while not self.fin_d_enchere():
             conn = self.in_game[first]
             first = (first + 1)%(len(self.in_game))
             if conn not in self.dans_le_coup or conn.player.all_in:
                 continue
             for all_conn in self.in_game:
-                info = self.info(conn, all_conn) #string contenant toutes les infos à envoyer aux joueurs
+                info = self.info(conn, all_conn) # string contenant toutes les infos à envoyer aux joueurs
                 all_conn.send(info)
             action = conn.receive()
             self.acted(conn, action)
             conn.player.acted(self, action)
-            if first == started: #on vient de faire un tour complet
+            if first == started: # on vient de faire un tour complet
                 for conn in self.dans_le_coup:
-                    if conn.player.all_in and conn.player.side_pot == 0: #calcul du side_pot
+                    if conn.player.all_in and conn.player.side_pot == 0: # calcul du side_pot
                         conn.player.side_pot = self.pot
                         for conn2 in self.dans_le_coup:
-                            conn.player.side_pot += min(conn.player.mise, conn2.player.mise)
+                            conn.player.side_pot += min(conn.player.mise, conn2.player.mise)      
         for conn in self.in_game:
             self.pot += conn.player.mise
             conn.player.mise = 0
             self.mise = 0
-            
     
     def acted(self, conn, action):
         """
@@ -115,8 +125,10 @@ class Game:
         -  conn: le joueur représenté par le client connecté
         -  action: l'action du joueur
         """
+        print(f"##{conn.id}:\t{action}")
         for all_conn in self.in_game: # on indique aux autres joueurs l'action réalisée
             all_conn.send(f"{conn.id}:\t{action}")
+            print(f"#{all_conn.id}: {all_conn.player.money} [{all_conn.player.mise}]")
         if action == "SUIVRE" or action == "CHECK":
             return
         if action == "COUCHER":
@@ -131,10 +143,11 @@ class Game:
         """
         Vérifie que c'est une fin de tour d'enchère
         """
-        if len(self.dans_le_coup) > 1:
+        if sum([int(not conn.player.all_in) for conn in self.dans_le_coup]) > 1:
             for conn in self.dans_le_coup:
-                if conn.player.mise < self.mise or not conn.player.bet_once:
-                    return False
+                if not conn.player.all_in:
+                    if conn.player.mise < self.mise or not conn.player.bet_once:
+                        return False
         return True
 
     def fin_de_coup(self):
@@ -161,9 +174,11 @@ class Game:
                 if conn.player.money == 0:
                     conn.send("Malheureusement vous n'avez plus d'argent")
                     self.in_game.remove(conn)
+        print(f"###FIN")
         for conn in self.in_game:
-            self.all_in = False
-            self.side_pot = 0
+            conn.player.all_in = False
+            conn.player.side_pot = 0
+            print(f"#{conn.id}: {conn.player.money}")
     
     def info(self, playingConn, target):
         """
@@ -179,27 +194,28 @@ class Game:
         return res
 
 
-
-
 def abattage(main:list, board:list) -> tuple:
     """
     Fonction prenant les 2 cartes dans la main d'un joueur et les 5 cartes du board et renvoie la meilleure main de 5 cartes possibles
     """
-    hands_of_five = combinations(board + main, 5) # on prend toutes les combianisons de 5 cartes possibles
+    hands_of_five = combinations(board + main, 5) # on prend toutes les combinaisons de 5 cartes possibles
     list_combi = []
     for hand in hands_of_five:
-        combi = combinaison.combinaison(hand) # quelle est la combinaison rattaché à cette main
+        combi = combinaison.combinaison(hand) # quelle est la combinaison rattachée à cette main
         list_combi.append(combi) 
     best_combi = max(list_combi) # une relation d'ordre a été définie et permet de prendre la meilleure combinaison
-    best_main = combi.main # on retourne la main ayant produit la melleure combinaison
+    best_main = combi.main # on retourne la main ayant produit la meilleure combinaison
     return best_main, best_combi
 
 def winner(conns:list, board:list):
+    """
+    envoie l'ordre de victoire des joueurs encore dans le coup
+    """
     combis = []
     for conn in conns:
         combis.append((conn, abattage(conn.player.main, board)[1]))
     combis.sort(key = (lambda x: x[1]), reverse = True)
+    print(board)
+    for combi in combis:
+        print(f"{combi[0].id}\t{combi[0].pseudo}\t{combi[1]}")
     return combis
-    
-    
-    

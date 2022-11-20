@@ -1,14 +1,12 @@
 import socket
 import threading
-from time import sleep
+from time import sleep, time
 
 import player_cls
+import intelligence
 from gamerules import Game
 
 class ClientThread(threading.Thread):
-
-    nb_players = 0
-
     def __init__(self, server, conn, adress) -> None:
         """
         Recupération des informations chez le client et inititalisation du Thread
@@ -18,13 +16,12 @@ class ClientThread(threading.Thread):
         self.adress = adress
         self.conn = conn
         self.isAI = False
-        ClientThread.nb_players += 1
+        Server.id_count += 1
         self.send("waiting for pseudo...")
         self.pseudo = self.receive()
-        self.id = ClientThread.nb_players
+        self.id = Server.id_count
         self.player = player_cls.Player.new_player()
         self.send(f"ID:{self.id}")
-
 
     def send(self, data):
         """
@@ -50,47 +47,89 @@ class ClientThread(threading.Thread):
             self.send("ping")
         except:
             print("no ping")
-            ClientThread.nb_players -= 1
             self.server.remove(self)
             return False
         finally:
             return True
 
+class AIThread(threading.Thread):
+    def __init__(self, server, ai):
+        """
+        Un objet vu par le programme de la même façon qu'un ClientThread mais qui est relié à une IA.
+        """
+        super().__init__()
+        self.server = server
+        Server.id_count += 1
+        self.id = Server.id_count
+        self.ai = intelligence.ai(ai, self.id)
+        self.isAI = True
+        self.pseudo = self.ai.pseudo
+        self.player = player_cls.Player.new_player()
+    
+    def send(self, data):
+        """
+        La seule information utile à l'ia est l'état de la partie, représenté par info
+        """
+        if data.startswith("###"):
+            self.ai.get_info(data)
+    
+    def receive(self, datasize = 1024):
+        """
+        attente d'un message de l'IA
+        """
+        return self.ai.decision()
+    
+    def ping():
+        return True # l'IA état liée au serveur elle ne peut pas être déconnectée
 
 
 class Server():
-    def __init__(self, adresse:tuple, awaited:int):
+    id_count = 0 # assure l'unicité de toutes les id
+
+    def __init__(self, adresse:tuple, awaited:int, ias:int):
         """
         Initialise le serveur
         adress: couple (host, adresse) utilisé par le bind
         awaited: int correspond au nombre de joueurs attendus
+        ias: int correspondant au nombre d'IA à ajouter
         """
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.waiting = False # lorsque plusieurs clients sont connectés au serveur ils peuvent chercher à envoyer plusieurs messages en même temps, waiting perùet de les gérer dans leur ordre d'arrivée.
         self.socket.bind(adresse)
         self.conns = [] # liste des différents clients
         self.awaited = awaited
+        self.ias = ias
         print("serveur prêt")
+        
+    def run(self, blinde, money):    
+        """
+        Une fois le serveur prêt, il peut être lancé grâce à cette fonction
+        """
         self.get_players()
-        self.game = Game(2, self.conns, self)
+        self.start_time = time()
+        self.game = Game(blinde, money, self.conns, self)
         self.game.play()
-        self.close()
+        return self.close()
     
     def get_players(self):
         """
         Récupère des joueurs jusqu'à en avoir autant qu'attendu
         """
-        while ClientThread.nb_players < self.awaited:
+        while len(self.conns) < self.awaited:
             self.socket.listen() # écoute pour les connections
             conn, addr = self.socket.accept() # le client connecté et son adresse
             self.conns.append(ClientThread(self, conn, addr)) # création du Thread
             print("client connecté !")
             self.conns[-1].start()
             for client in self.conns: client.ping()
+        for _ in range(self.ias):
+            self.conns.append(AIThread(self, "naive"))
+            print("IA connectée !")
+            self.conns[-1].start()
 
     def test(self):
         """
-        Cette fonction temporaire permet de présenter la structure générale de jeu et de tester quelques techniques.
+        Cette fonction temporaire permet de tester la communication entre le serveur et les clients.
         """
         # messages tour par tour
         while True:
@@ -107,10 +146,17 @@ class Server():
         Permet de fermer le serveur
         """
         for client in self.conns:
-            client.send("close")
-            client.conn.close()
+            if not client.isAI:
+                client.send("close")
+                client.conn.close()
         print("fin d'exécution")
+        if len(self.game.in_game) == 1:
+            execution = time() - self.start_time
+            print(f"{self.game.in_game[0].pseudo} (id: {self.game.in_game[0].id})  won!")
+            print(f"partie jouée en {self.game.nb_coup} coups.")
+            print(f"Durée de la partie: {execution}s")
         self.socket.close()
+        return (self.game.nb_coup, execution)
 
 
 if __name__ == "__main__":

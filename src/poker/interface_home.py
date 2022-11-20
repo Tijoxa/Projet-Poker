@@ -2,7 +2,7 @@ import pygame as pg
 from pygame.locals import *
 
 from interface_elements import *
-        
+
 class GUI_homepage:
     def __init__(self):
         pg.init()
@@ -11,7 +11,7 @@ class GUI_homepage:
         pg.display.set_caption('Welcome to Centrale Poker')
         
         #background : https://www.casino-saint-julien.com/les-differents-types-de-poker/
-        my_bg=pg.image.load('backgrounds/poker_background.jpg')
+        my_bg = pg.image.load('backgrounds/poker_background.jpg')
         self.bg = pg.transform.scale(my_bg, (640, 480))
         
         #create name entry box :
@@ -20,7 +20,8 @@ class GUI_homepage:
                                    centered=True)
         
         #create playstart button :
-        self.play_button = Button(200, 150, 125, 50, text= "Jouer !")
+        self.play_button = Button(270, 190, 100, 100, shape= 'circle', 
+                                  textSize = 35, text= "Jouer !")
         
     def mainloop(self):
         clock = pg.time.Clock()
@@ -33,15 +34,13 @@ class GUI_homepage:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     done = True
-                for box in input_boxes:
-                    box.handle_event(event)
-                for button in input_buttons :
-                    button.handle_event(event)
+                #handle event :
+                self.input_name.handle_event(event)
+                self.play_button.handle_event(event)
             
-            for box in input_boxes:
-                box.draw(self.homepage)
-            for button in input_buttons : 
-                button.draw(self.homepage)
+            # draw :
+            self.input_name.draw(self.homepage)
+            self.play_button.draw(self.homepage)
                 
             if self.play_button.CurrentState:
                 self.play_button.CurrentState = False
