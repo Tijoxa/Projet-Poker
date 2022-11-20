@@ -7,7 +7,6 @@ import Intelligence
 from gamerules import Game
 
 class ClientThread(threading.Thread):
-
     def __init__(self, server, conn, adress) -> None:
         """
         Recupération des informations chez le client et inititalisation du Thread
@@ -23,7 +22,6 @@ class ClientThread(threading.Thread):
         self.id = Server.id_count
         self.player = player_cls.Player.new_player()
         self.send(f"ID:{self.id}")
-
 
     def send(self, data):
         """
@@ -55,8 +53,6 @@ class ClientThread(threading.Thread):
             return True
 
 class AIThread(threading.Thread):
-
-
     def __init__(self, server, ai):
         """
         Un objet vu par le programme de la même façon qu'un ClientThread mais qui est relié à une IA.
@@ -90,7 +86,6 @@ class AIThread(threading.Thread):
 
 
 class Server():
-
     id_count = 0 # assure l'unicité de toutes les id
 
     def __init__(self, adresse:tuple, awaited:int, ias:int):

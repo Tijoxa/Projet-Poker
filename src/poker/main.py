@@ -1,8 +1,6 @@
 from interface_waiting import GUI_waiting
 from interface_home import GUI_homepage
 from interface_playRoom import GUI_playRoom
-import ctypes
-
 
 if __name__ == "__main__":
     gui = GUI_homepage()

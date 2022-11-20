@@ -73,7 +73,6 @@ class Game:
         if dealer in self.in_game:
             self.in_game = self.in_game[1:] + [self.in_game[0]]
         
-
     def dealing(self):
         """
         Distribution des cartes aux joueurs encore en lice
@@ -116,7 +115,6 @@ class Game:
             self.pot += conn.player.mise
             conn.player.mise = 0
             self.mise = 0
-            
     
     def acted(self, conn, action):
         """
@@ -181,7 +179,6 @@ class Game:
             conn.player.all_in = False
             conn.player.side_pot = 0
             print(f"#{conn.id}: {conn.player.money}")
-
     
     def info(self, playingConn, target):
         """
@@ -195,8 +192,6 @@ class Game:
             cards += "##" + "##".join([str(carte) for carte in self.board])
         res = f"###{players}###{cards}###{self.mise}###{self.pot}###{self.petite_blinde}"
         return res
-
-
 
 
 def abattage(main:list, board:list) -> tuple:
@@ -224,6 +219,3 @@ def winner(conns:list, board:list):
     for combi in combis:
         print(f"{combi[0].id}\t{combi[0].pseudo}\t{combi[1]}")
     return combis
-    
-    
-    

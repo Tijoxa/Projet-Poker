@@ -17,7 +17,6 @@ Hauteur
 """
 
 
-
 def quinte_flush(quinte, flush):
     if quinte and flush:
         return quinte

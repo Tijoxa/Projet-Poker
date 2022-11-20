@@ -1,7 +1,6 @@
 from random import randint
 
 class AI:
-
     def __init__(self, id):
         """
         Classe générale contenant les informations nécessaires pour toutes les IA
@@ -37,7 +36,6 @@ class AI:
         self.info, self.me = res, me
 
 class Naive(AI):
-
     def __init__(self, id):
         """
         Une IA qui joue au hasard
@@ -55,7 +53,7 @@ class Naive(AI):
             possible = ["CHECK", "RELANCE"]
         else:
             possible = ["COUCHER", "SUIVRE", "RELANCE"]
-        choix = randint(0,len(possible) - 1)
+        choix = randint(0, len(possible) - 1)
         choix = possible[choix]
         if choix == "MISE":
             mini_value = min(self.info["blinde"], self.me["money"])
@@ -72,8 +70,7 @@ class Naive(AI):
         return choix       
 
 
-
-def AI(type, id):
+def ai(type, id):
     """
     renvoie une IA selon le type demandé
     """

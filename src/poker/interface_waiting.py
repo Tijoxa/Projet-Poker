@@ -3,6 +3,8 @@ from pygame.locals import *
 
 from interface_elements import *
 
+import os
+path = os.getcwd()
 
 class GUI_waiting:
     def __init__(self):
@@ -12,7 +14,7 @@ class GUI_waiting:
         pg.display.set_caption("Salle d'attente")
         
         #background : 
-        my_bg=pg.image.load('backgrounds/waiting_background.png')
+        my_bg=pg.image.load(os.path.join(path, 'src', 'poker', 'backgrounds', 'waiting_background.png'))
         self.bg = pg.transform.scale(my_bg, (1023, 510))
         
         #connected players : 
