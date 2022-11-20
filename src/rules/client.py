@@ -54,10 +54,10 @@ class Client:
             self.close()
             quit()         
         if received.startswith("###"):
-            info, me = self.traitement_info(received)
-            self.show_info(info, me)
-            if me["isPlaying"]:
-                self.client_input(info, me)
+            self.info, self.me = self.traitement_info(received)
+            self.show_info()
+            if self.me["isPlaying"]:
+                self.client_input()
 
     def traitement_info(self, info):
         info = info[3:]
@@ -82,7 +82,11 @@ class Client:
                 me = player
         return res, me
 
-    def show_info(self, info, me):
+    def show_info(self):
+        """
+        Gère l'affichage des informations sur le terminal
+        """
+        info, me = self.info, self.me
         if me is not None:
             res = f"{me['pseudo']}, vous avez {me['money']}$ \n A ce tour d'enchère, vous avez misé {me['mise']}$\n"
             res += f"Votre main:\t{info['main'][0]}\t{info['main'][1]}\n"
@@ -126,7 +130,11 @@ class Client:
         while True:
             client.receive()
     
-    def client_input(self, info, me):
+    def client_input(self):
+        """
+        Permet au joueur de choisir ce qu'il veut faire lorsque c'est à son tour.
+        """
+        info, me = self.info, self.me
         while True:
             case = 0
             print("Vos possibilités sont:")
@@ -163,9 +171,12 @@ class Client:
                     return         
             print("input incorrect")
 
-
-
-
+    def run(self):
+        """
+        boucle principale de réception
+        """
+        while True:
+            self.receive()
 
         
 if __name__ == "__main__":

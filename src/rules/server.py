@@ -115,4 +115,10 @@ class Server():
 
 if __name__ == "__main__":
     host, port = ('', 5566) # le 5566 a été paramétré par port forward sur ma machine pour être ouvert au réseau extérieur (pour le faire fonctionner chez vous il faut ouvrir le port 5566 sur les paramètres du routeur) 
-    Server((host, port), 3)
+    BLINDE = 2 # la petite blinde pour la partie
+    MONEY = 50 # la monnaie de départ des joueurs
+    NB_CLIENTS = 1 # le nombre de clients (joueurs humains)
+    NB_IAS = 3 # le nombre d'IA
+    server = Server((host, port), NB_CLIENTS, NB_IAS)
+    coup, exec = server.run(BLINDE, MONEY)
+    

@@ -46,9 +46,9 @@ class GUI_homepage:
             if self.play_button.CurrentState:
                 self.play_button.CurrentState = False
                 pg.quit()
-                return "WAITING"
+                return "WAITING", self.input_name.text
             pg.display.flip()
             clock.tick(30)
         pg.quit()
-        return ""
+        return "", None
 

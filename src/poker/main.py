@@ -1,23 +1,23 @@
 from interface_waiting import GUI_waiting
 from interface_home import GUI_homepage
 from interface_playRoom import GUI_playRoom
-import ctypes
-
+from interface_client import Client_interface as Client
 
 if __name__ == "__main__":
-    gui = GUI_homepage()
-    screen = gui.mainloop()
     done = False
+    screen = "HOME"
 
     while not done:
-        if screen == "WAITING":
-            gui = GUI_waiting()
-            screen = gui.mainloop()
-        elif screen == "HOME":
+        if screen == "HOME":
             gui = GUI_homepage()
+            screen, pseudo = gui.mainloop()
+            client = Client(pseudo)
+            print(screen, pseudo)
+        elif screen == "WAITING":
+            gui = GUI_waiting(client)
             screen = gui.mainloop()
         elif screen == "PLAY":
-            gui = GUI_playRoom()
+            gui = GUI_playRoom(client)
             screen = gui.mainloop()
         elif screen == "":
             done = True

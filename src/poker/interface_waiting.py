@@ -5,7 +5,7 @@ from interface_elements import *
 
 
 class GUI_waiting:
-    def __init__(self):
+    def __init__(self, client):
         pg.init()
         #create the window :
         self.waiting = pg.display.set_mode([1023, 510])
@@ -14,6 +14,10 @@ class GUI_waiting:
         #background : 
         my_bg=pg.image.load('backgrounds/waiting_background.png')
         self.bg = pg.transform.scale(my_bg, (1023, 510))
+        
+        #connected players : 
+        self.list_players = []
+        self.client = client
 
         
     def mainloop(self):

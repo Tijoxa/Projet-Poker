@@ -5,7 +5,7 @@ from interface_elements import *
 
 
 class GUI_playRoom:
-    def __init__(self):
+    def __init__(self, client):
         pg.init()
         #create the window :
         self.waiting = pg.display.set_mode([1280, 650])
@@ -15,6 +15,7 @@ class GUI_playRoom:
         # TODO : modifier l'image pour la rendre plus jolie
         my_bg=pg.image.load('backgrounds/table_gimp_image.png')
         self.bg = pg.transform.scale(my_bg, (1280, 650))
+        self.client = client
 
         
     def mainloop(self):
