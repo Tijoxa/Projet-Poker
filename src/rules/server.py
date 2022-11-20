@@ -3,7 +3,7 @@ import threading
 from time import sleep, time
 
 import player_cls
-import Intelligence
+import intelligence
 from gamerules import Game
 
 class ClientThread(threading.Thread):
@@ -61,7 +61,7 @@ class AIThread(threading.Thread):
         self.server = server
         Server.id_count += 1
         self.id = Server.id_count
-        self.ai = Intelligence.AI(ai, self.id)
+        self.ai = intelligence.ai(ai, self.id)
         self.isAI = True
         self.pseudo = self.ai.pseudo
         self.player = player_cls.Player.new_player()
@@ -81,8 +81,6 @@ class AIThread(threading.Thread):
     
     def ping():
         return True # l'IA état liée au serveur elle ne peut pas être déconnectée
-
-
 
 
 class Server():
