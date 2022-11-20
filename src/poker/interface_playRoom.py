@@ -3,9 +3,6 @@ from pygame.locals import *
 
 from interface_elements import *
 
-import os
-path = os.getcwd()
-
 class GUI_playRoom:
     def __init__(self):
         pg.init()
@@ -15,7 +12,7 @@ class GUI_playRoom:
         
         #background : image temporaire 
         # TODO : modifier l'image pour la rendre plus jolie
-        my_bg=pg.image.load(os.path.join(path, 'src', 'poker', 'backgrounds', 'table_gimp_image.png'))
+        my_bg = pg.image.load('backgrounds/table_gimp_image.png')
         self.bg = pg.transform.scale(my_bg, (1280, 650))
 
         

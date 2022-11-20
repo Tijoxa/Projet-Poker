@@ -1,9 +1,6 @@
 import pygame as pg
 from pygame.locals import *
 
-import os
-path = os.getcwd()
-
 from interface_elements import *
 
 class GUI_homepage:
@@ -14,7 +11,7 @@ class GUI_homepage:
         pg.display.set_caption('Welcome to Centrale Poker')
         
         #background : https://www.casino-saint-julien.com/les-differents-types-de-poker/
-        my_bg=pg.image.load(os.path.join(path, 'src', 'poker', 'backgrounds', 'poker_background.jpg'))
+        my_bg = pg.image.load('backgrounds/poker_background.jpg')
         self.bg = pg.transform.scale(my_bg, (640, 480))
         
         #create name entry box :

@@ -1,7 +1,6 @@
 import pygame as pg
 from pygame.locals import *
 
-
 class InputBox:
     """class Input Box to modelize an entry text box"""
     def __init__(self, x, y, w = 200, h = 32, 
