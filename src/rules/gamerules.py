@@ -15,12 +15,14 @@ class Game:
         self.in_game = [conn for conn in conns] # liste des joueurs en lice
         for conn in self.in_game:
             conn.player.money = money
+        self.total_money = len(self.in_game) * money
         self.player_starting_money = money
         self.dans_le_coup = [] # liste des joueurs encore dans le coup
         self.board = []
         self.server = server
         self.mise = 0
         self.nb_coup = 0
+        
 
     def play(self):
         """
@@ -83,7 +85,7 @@ class Game:
             conn.player.main.append(self.deck.draw())
             print(f"{conn.id}\t{conn.player.main}\t{conn.player.money}")
         money_everywhere = sum([conn.player.money for conn in self.in_game]) + sum([conn.player.mise for conn in self.in_game])
-        if money_everywhere != len(self.in_game) * self.player_starting_money: raise ValueError("De l'argent a disparu!")
+        if money_everywhere != self.total_money: raise ValueError("De l'argent a disparu!")
 
     def enchere(self, first:int):
         """
@@ -172,7 +174,7 @@ class Game:
                 self.pot -= gain
             else:
                 if conn.player.money == 0:
-                    conn.send("Malheureusement vous n'avez plus d'argent")
+                    conn.send("Malheureusement vous n'avez plus d'argent!")
                     self.in_game.remove(conn)
         print(f"###FIN")
         for conn in self.in_game:
