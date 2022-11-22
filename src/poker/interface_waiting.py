@@ -4,7 +4,7 @@ from pygame.locals import *
 from interface_elements import *
 
 class GUI_waiting:
-    def __init__(self):
+    def __init__(self,server=None):
         pg.init()
         #create the window :
         self.waiting = pg.display.set_mode([1023, 510])
@@ -15,7 +15,7 @@ class GUI_waiting:
         self.bg = pg.transform.scale(my_bg, (1023, 510))
         
         #connected players : 
-        self.list_players = []
+        self.conns = []
 
         
     def mainloop(self):
@@ -38,10 +38,6 @@ class GUI_waiting:
                 if event.type == pg.QUIT:
                     done = True
                 for button in input_buttons :
-                    # CHECK THE POSITION OF THE MOUSE
-                    mouse_pos = pg.mouse.get_pos()
-                    # CHECKING THE MOUSE CLICK EVENT
-                    mouse_click = pg.mouse.get_pressed()
                     button.handle_event(event)
 
             self.waiting.blit(self.bg,(0,0))

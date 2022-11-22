@@ -182,8 +182,17 @@ class Button():
                   self.y + (self.sy - self.fontsize)//2))
  
 
-class Player:
-    def __init__(self, x, y, w, h, 
-                 name, isIA = False, 
-                 money = 50, cards = ["back","back"]):
+class Player_display:
+    """Class medelizing a player around the table"""
+    def __init__(self, x, y, w, h, conn,
+                 textType = "TimeNewRoman",
+                 textSize = 25):
+        
+        #conn est un ClienThread (ou AIThread) contenant les infos du joueur
+        self.conn = conn
+        #fonts d'affichage du pseudo et de l'argent :
+        self.pseudo = pg.font.SysFont(textType, textSize)
+        self.money = pg.font.SysFont(textType, textSize)
+        
+    def draw(self, screen):
         pass

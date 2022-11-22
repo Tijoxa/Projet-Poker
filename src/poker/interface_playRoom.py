@@ -4,7 +4,7 @@ from pygame.locals import *
 from interface_elements import *
 
 class GUI_playRoom:
-    def __init__(self):
+    def __init__(self, server = None):
         pg.init()
         #create the window :
         self.waiting = pg.display.set_mode([1280, 650])
