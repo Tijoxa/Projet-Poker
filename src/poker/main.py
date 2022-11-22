@@ -17,6 +17,7 @@ if __name__ == "__main__":
             gui = GUI_waiting(client)
             screen = gui.mainloop()
         elif screen == "PLAY":
+            client.send("ready")
             gui = GUI_playRoom(client)
             screen = gui.mainloop()
         elif screen == "":
