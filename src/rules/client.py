@@ -50,8 +50,8 @@ class Client:
             self.id = received[3:]
         if received == "waiting for message...":
             self.send(input("\t>"))
-        if received == "close":
-            self.close()
+        if received == "close" or received == "Malheureusement vous n'avez plus d'argent!":
+            self.server.close()
             quit()         
         if received.startswith("###"):
             info, me = self.traitement_info(received)
