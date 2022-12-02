@@ -185,41 +185,51 @@ class Button():
 class Player_display:
     """Class medelizing a player around the table"""
     def __init__(self, x, y, w, h, 
-                 pseudo, isAI, player_info,
+                 player, isAI=False,
                  textType = "TimeNewRoman",
                  textSize = 25):
         
         #coordonnées :
         self.x, self.y, self.w, self.h = x,y,w,h
-        #player_info contient les infos du joueur qui doivent être mises à jour.
-        self.player_info = player_info
-        #infos constantes du joueur :
-        self.isAI=isAI
-        self.name = pseudo
+        #player est un objet Client (ou un dict si IA) contenant les infos du joueur
+        self.player = player
+        self.isAI = isAI
+        self.isPlaying = False
         
         #creation des fonts d'affichage du pseudo et de l'argent :
         self.pseudo = pg.font.SysFont(textType, textSize)
         self.money = pg.font.SysFont(textType, textSize)
+        
+        self.color = pg.Color('black')
         
         #affichage des cartes :
             ### TODO : afficher les cartes ###
             
         #creation des boutons si le joueur est humain:
         if not self.isAI:
-            call = Button()
-            check = Button()
-            fold = Button()
-            raise_ = Button()
-            bet = Button()
+            call = Button(x,y,...,...)
+            check = Button(x,y,...)
+            fold = Button(x,y,...)
+            raise_ = Button(x,y,...)
+            bet = Button(x,y,...)
             #creation de l'entrée de mise :
-            bet_entry = InputBox()
+            bet_entry = InputBox(x,y,...)
+            self.myActions = [call,check,fold,raise_,[bet,bet_entry]]
         
             
             
     def draw(self, screen):
-        if self.player_info.isPlaying and not self.isAI:
+        self.pseudo.render(self.player.pseudo,False, self.color)
+        if not self.isAI and self.isPlaying:
+            ### TODO : affichage des bons boutons ###
             pass
-    def update_player_info(self,data):
+        
+    def update_player_info(self, infos):
         #mise à jour des infos du joueur en fonction des infos du server
+        pass
+    
+    def handle_event(self,event):
+        ### TODO : gestion des actions sur les boutons et envoi des bonnes
+        ### infos au server
         pass
         
