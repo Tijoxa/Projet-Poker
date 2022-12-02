@@ -15,7 +15,7 @@ class GUI_waiting:
         self.bg = pg.transform.scale(my_bg, (1023, 510))
         
         #connected players : 
-        self.conns = []
+        self.list_players = []
 
         
     def mainloop(self):
@@ -45,10 +45,15 @@ class GUI_waiting:
                 button.draw(self.waiting)
                 
             for player in self.list_players:
+                #affichage du pseudo de chaque joueur et une image dont la 
+                #couleur dépend de si c'est un humain ou une IA
+                ### TODO  : mise à jour des joueur avec les données serveur ###
                 pass
+
 
             if button_quit.CurrentState:
                 button_quit.CurrentState = False
+                ### TODO : déconnexion du joueur du serveur ###
                 pg.quit()
                 return "HOME"
 
