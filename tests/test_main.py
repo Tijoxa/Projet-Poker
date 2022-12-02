@@ -23,4 +23,4 @@ def test_abattage():
     
 
 if __name__ == "__main__":
-    test_combinaison()
+    test_abattage()
