@@ -185,20 +185,25 @@ class Button():
 class Player_display:
     """Class medelizing a player around the table"""
     def __init__(self, x, y, w, h, 
-                 player, isAI=False,
+                 pseudo, isMe = False, isAI=False,
                  textType = "TimeNewRoman",
                  textSize = 25):
         
         #coordonnées :
         self.x, self.y, self.w, self.h = x,y,w,h
-        #player est un objet Client (ou un dict si IA) contenant les infos du joueur
-        self.player = player
+        
+        #infos :
+        self.pseudo = pseudo
+        self.money = 0
+        
+        #statut joueur
+        self.isMe= isMe
         self.isAI = isAI
         self.isPlaying = False
         
         #creation des fonts d'affichage du pseudo et de l'argent :
-        self.pseudo = pg.font.SysFont(textType, textSize)
-        self.money = pg.font.SysFont(textType, textSize)
+        self.font_pseudo = pg.font.SysFont(textType, textSize)
+        self.font_money = pg.font.SysFont(textType, textSize)
         
         self.color = pg.Color('black')
         
@@ -219,7 +224,7 @@ class Player_display:
             
             
     def draw(self, screen):
-        self.pseudo.render(self.player.pseudo,False, self.color)
+        self.pseudo.render(self.pseudo,False, self.color)
         if not self.isAI and self.isPlaying:
             ### TODO : affichage des bons boutons ###
             pass
