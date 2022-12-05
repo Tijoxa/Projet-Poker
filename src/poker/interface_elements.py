@@ -195,6 +195,7 @@ class Player_display:
         #infos :
         self.pseudo = pseudo
         self.money = 0
+        self.mise = 0
         
         #statut joueur
         self.isMe= isMe
@@ -208,7 +209,9 @@ class Player_display:
         self.color = pg.Color('black')
         
         #affichage des cartes :
-            ### TODO : afficher les cartes ###
+        im = pg.image.load('cards/back.jpg')
+        self.card_1 = pg.transform.scale(im, (100, 60))
+        self.card_2 = pg.transform.scale(im, (100, 60))
             
         #creation des boutons si le joueur est humain:
         if not self.isAI:
@@ -224,14 +227,21 @@ class Player_display:
             
             
     def draw(self, screen):
-        self.pseudo.render(self.pseudo,False, self.color)
+        self.show_pseudo.render(self.pseudo,False, self.color)
+        screen.blit(self.card_1,(self.x,self.y))
+        screen.blit(self.card_2,(self.x+20,self.y+20))
+        
         if not self.isAI and self.isPlaying:
             ### TODO : affichage des bons boutons ###
             pass
         
     def update_player_info(self, infos):
         #mise à jour des infos du joueur en fonction des infos du server
-        pass
+        for player in infos['players']:
+            if player['pseudo'] == self.pseudo:
+                self.money = player['money']
+                self.mise = player['mise']
+                self.isPlaying = player['isPlaying']
     
     def handle_event(self,event):
         ### TODO : gestion des actions sur les boutons et envoi des bonnes
