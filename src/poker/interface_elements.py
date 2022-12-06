@@ -66,7 +66,7 @@ class InputBox:
             if self.active:
                 if event.key == pg.K_RETURN:
                     print(self.text)
-                    self.text = ''
+                    #self.text = ''
                 elif event.key == pg.K_BACKSPACE:
                     self.text = self.text[:-1]
                 else:
@@ -214,7 +214,7 @@ class Player_display:
         self.card_2 = pg.transform.scale(im, (100, 60))
             
         #creation des boutons si le joueur est humain:
-        if not self.isAI:
+        if isMe:
             call = Button(x,y,...,...)
             check = Button(x,y,...)
             fold = Button(x,y,...)

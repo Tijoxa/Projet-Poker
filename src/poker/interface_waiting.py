@@ -19,7 +19,7 @@ class GUI_waiting:
 
         my_player = pg.image.load('icons/player_basic_image.png')
         self.player_icon = my_player.convert_alpha() # Pour gérer la transparence
-        self.player_icon = pg.transform.scale(self.player_icon,(120,100))
+        self.player_icon = pg.transform.scale(self.player_icon,(150,100))
 
         #connexion du joueur :
         self.client = client
@@ -65,7 +65,8 @@ class GUI_waiting:
             self.list_players = self.client.players[1:]
             font_pseudo = pg.font.Font('freesansbold.ttf', 32)
             for k in range (len(self.list_players)):
-                self.waiting.blit(self.player_icon, (50 + 160*k, 250)) # Affichage des icônes de personnage
+                # Affichage des icônes de personnage
+                self.waiting.blit(self.player_icon, (50 + 160*k, 250))
 
                 name = self.list_players[k].split("-")[1] # Obtention du nom du client à afficher
                 text = font_pseudo.render(name, True, (0, 0, 128))

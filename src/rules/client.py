@@ -12,11 +12,17 @@ class Client:
     def __init__(self, pseudo, server) -> None:
         """
         création du client
-        ====paramètres====
-        pseudo: le pseudo du joueur qui sera affiché en jeu
-        server: le server auquel le client est connecté
-        ====Output====
-        un client connecté au serveur
+
+        Parameters
+        ----------
+        pseudo : string
+            pseudo du joueur.
+        server : TYPE
+            server auquel le joueur est connecté.
+
+        Returns
+        -------
+        None
         """
         self.id = None # l'ID sera donnée par le serveur pour s'assurer que chaque client en ait une différente. L'ID 1 est l'administrateur de la partie (pour le choix du nombre de joueurs)
         self.pseudo = pseudo # le pseudo peut être choisi par le joueur
@@ -43,7 +49,8 @@ class Client:
     
     def manage(self, received):
         """
-        received est le message denvoyé par le serveur. Cette méthode indique le comportement à suivre
+        received est le message denvoyé par le serveur. 
+        Cette méthode indique le comportement à suivre
         """
         if received == "waiting for pseudo...":
             print(received)
