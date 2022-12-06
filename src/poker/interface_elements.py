@@ -66,7 +66,7 @@ class InputBox:
             if self.active:
                 if event.key == pg.K_RETURN:
                     print(self.text)
-                    self.text = ''
+                    #self.text = ''
                 elif event.key == pg.K_BACKSPACE:
                     self.text = self.text[:-1]
                 else:
@@ -184,6 +184,66 @@ class Button():
 
 class Player:
     def __init__(self, x, y, w, h, 
-                 name, isIA = False, 
-                 money = 50, cards = ["back","back"]):
+                 pseudo, isMe = False, isAI=False,
+                 textType = "TimeNewRoman",
+                 textSize = 25):
+        
+        #coordonnées :
+        self.x, self.y, self.w, self.h = x,y,w,h
+        
+        #infos :
+        self.pseudo = pseudo
+        self.money = 0
+        self.mise = 0
+        
+        #statut joueur
+        self.isMe= isMe
+        self.isAI = isAI
+        self.isPlaying = False
+        
+        #creation des fonts d'affichage du pseudo et de l'argent :
+        self.font_pseudo = pg.font.SysFont(textType, textSize)
+        self.font_money = pg.font.SysFont(textType, textSize)
+        
+        self.color = pg.Color('black')
+        
+        #affichage des cartes :
+        im = pg.image.load('cards/back.jpg')
+        self.card_1 = pg.transform.scale(im, (100, 60))
+        self.card_2 = pg.transform.scale(im, (100, 60))
+            
+        #creation des boutons si le joueur est humain:
+        if isMe:
+            call = Button(x,y,...,...)
+            check = Button(x,y,...)
+            fold = Button(x,y,...)
+            raise_ = Button(x,y,...)
+            bet = Button(x,y,...)
+            #creation de l'entrée de mise :
+            bet_entry = InputBox(x,y,...)
+            self.myActions = [call,check,fold,raise_,[bet,bet_entry]]
+        
+            
+            
+    def draw(self, screen):
+        self.show_pseudo.render(self.pseudo,False, self.color)
+        screen.blit(self.card_1,(self.x,self.y))
+        screen.blit(self.card_2,(self.x+20,self.y+20))
+        
+        if not self.isAI and self.isPlaying:
+            ### TODO : affichage des bons boutons ###
+            pass
+        
+    def update_player_info(self, infos):
+        #mise à jour des infos du joueur en fonction des infos du server
+        for player in infos['players']:
+            if player['pseudo'] == self.pseudo:
+                self.money = player['money']
+                self.mise = player['mise']
+                self.isPlaying = player['isPlaying']
+    
+    def handle_event(self,event):
+        ### TODO : gestion des actions sur les boutons et envoi des bonnes
+        ### infos au server
         pass
+        

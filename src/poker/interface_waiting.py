@@ -16,6 +16,12 @@ class GUI_waiting:
         
         #connected players : 
         self.list_players = []
+
+        my_player = pg.image.load('icons/player_basic_image.png')
+        self.player_icon = my_player.convert_alpha() # Pour gérer la transparence
+        self.player_icon = pg.transform.scale(self.player_icon,(150,100))
+
+        #connexion du joueur :
         self.client = client
 
         
@@ -49,8 +55,30 @@ class GUI_waiting:
             for button in input_buttons : 
                 button.draw(self.waiting)
                 
-            for player in self.list_players:
-                pass
+            # Affichage des clients connectés
+            self.list_players = self.client.players[1:]
+            font_pseudo = pg.font.Font('freesansbold.ttf', 32)
+            for k in range (len(self.list_players)):
+                # Affichage des icônes de personnage
+                self.waiting.blit(self.player_icon, (50 + 160*k, 250))
+
+                name = self.list_players[k].split("-")[1] # Obtention du nom du client à afficher
+                text = font_pseudo.render(name, True, (0, 0, 128))
+                textRect = text.get_rect()
+                textRect.center = (100 + 150*k, 200)
+                self.waiting.blit(text, textRect)
+
+            # Réglage des joueurs attendus IA et réels 
+            font_number = pg.font.Font('freesansbold.ttf', 32)
+            N_IA_text = font_number.render(f"IAs : {str(self.client.N_players[1])}", True, (0, 0, 128))
+            N_real_text = font_number.render(f"Joueurs : {str(self.client.N_players[0])}", True, (0, 0, 128))
+            N_IA_textRect = N_IA_text.get_rect()
+            N_real_textRect = N_real_text.get_rect()
+            N_IA_textRect.center = (500, 400)
+            N_real_textRect.center = (500, 460)
+            self.waiting.blit(N_IA_text, N_IA_textRect)
+            self.waiting.blit(N_real_text, N_real_textRect)
+
 
             if button_quit.CurrentState:
                 button_quit.CurrentState = False

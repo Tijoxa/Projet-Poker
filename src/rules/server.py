@@ -89,9 +89,20 @@ class Server():
     def __init__(self, adresse:tuple, awaited:int, ias:int):
         """
         Initialise le serveur
-        adress: couple (host, adresse) utilisé par le bind
-        awaited: int correspond au nombre de joueurs attendus
-        ias: int correspondant au nombre d'IA à ajouter
+        
+        Parameters
+        ----------
+        adresse : tuple
+            couple (host, adresse) utilisé par le bind.
+        awaited : int
+            nombre de joueurs attendus.
+        ias : int
+            nombre d'IA à ajouter.
+
+        Returns
+        -------
+        None.
+
         """
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.waiting = False # lorsque plusieurs clients sont connectés au serveur ils peuvent chercher à envoyer plusieurs messages en même temps, waiting perùet de les gérer dans leur ordre d'arrivée.
@@ -140,6 +151,36 @@ class Server():
                 print(f"{client.pseudo}: {received}")
                 if received == "QUIT":
                     return
+
+    def checking(self) :
+        """
+        Cette fonction vérifie l'état des connections du serveur : 
+        en fermant les clients endommagés ou ceux qui demandent l'autorisation de se couper.
+        Elle envoie aussi des informations de manière régulière au client (par exemple, la liste des joueurs connectés)
+        """
+        old_awaited = self.awaited
+        old_ias = self.ias # Ces variables tampons vont vérifier qu'il y a bien eu un changement par un des clients du nombre de joueurs, IAs ou réels
+        while True :
+            for client in self.conns: 
+                tag = "--" + "-".join([str(self.conns[-1].id), self.conns[-1].pseudo, str(int(self.conns[-1].isAI))]) # Nom du client
+                if not client.ping() :
+                    print(f"Connexion avec {tag} perdue !")
+                    client.conn.close() # On ferme la connexion avec le client
+                    self.conns.remove(client) # On retire le client de la liste des clients
+                    self.players = self.players.replace(tag, '') # On retire le joueur perdu de la liste 
+                else :
+                    client.send("Are you closing") # Vérification des fermetures de client 
+                    if client.receive() == "I am closing" : 
+                        client.conn.close()
+                    else :
+                        client.send(self.players) # Envoi de la liste de tous les clients actuellement connectés à tous les clients
+                        client.send("N_players--" + "--".join([str(self.awaited),str(self.ias),str(self.conns[0].id)])) # Envoi du nombre de joueurs IA et réels (pour modification par un des clients)
+                        #N_players = client.receive().split("--")[1:]
+                        #if N_players[0] != old_awaited or N_players[1] != old_ias :
+                            #self.awaited = N_players[0]
+                            #self.ias = N_players[1]
+
+            sleep(2)
 
     def close(self):
         """
