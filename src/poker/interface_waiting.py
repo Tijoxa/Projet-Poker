@@ -19,7 +19,7 @@ class GUI_waiting:
 
         my_player = pg.image.load('icons/player_basic_image.png')
         self.player_icon = my_player.convert_alpha() # Pour gérer la transparence
-        self.player_icon = pg.transform.scale(self.player_icon,(150,100))
+        self.player_icon = pg.transform.scale(self.player_icon,(100,150))
 
         #connexion du joueur :
         self.client = client
@@ -66,7 +66,7 @@ class GUI_waiting:
             font_pseudo = pg.font.Font('freesansbold.ttf', 32)
             for k in range (len(self.list_players)):
                 # Affichage des icônes de personnage
-                self.waiting.blit(self.player_icon, (50 + 160*k, 250))
+                self.waiting.blit(self.player_icon, (50 + 160*k, 200))
 
                 name = self.list_players[k].split("-")[1] # Obtention du nom du client à afficher
                 text = font_pseudo.render(name, True, (0, 0, 128))
@@ -84,7 +84,14 @@ class GUI_waiting:
             N_real_textRect.center = (500, 460)
             self.waiting.blit(N_IA_text, N_IA_textRect)
             self.waiting.blit(N_real_text, N_real_textRect)
-
+            
+            #affichage du nbr de joueurs connectés :
+            nbr_conn = f"connectés : {len(self.list_players)}/{int(self.client.N_players[0])+int(self.client.N_players[1])}"
+            total_players = pg.font.Font('freesansbold.ttf', 28).render(nbr_conn, True, (0, 0, 128))
+            total_players_Rect = total_players.get_rect()
+            total_players_Rect.center = (500, 65)
+            self.waiting.blit(total_players, total_players_Rect)
+            
 
             if button_quit.CurrentState:
                 button_quit.CurrentState = False
