@@ -47,10 +47,13 @@ class ClientThread(threading.Thread):
             self.send("ping")
         except:
             print("no ping")
-            self.server.remove(self)
             return False
-        finally:
+        else:
             return True
+    
+    def fromClientToAI(self):
+        self = AIThread.fromClientToAI(self, "naive")
+        return self
 
 class AIThread(threading.Thread):
     def __init__(self, server, ai):
@@ -81,6 +84,15 @@ class AIThread(threading.Thread):
     
     def ping():
         return True # l'IA état liée au serveur elle ne peut pas être déconnectée
+    
+    @classmethod
+    def fromClientToAI(cls, client, ai):
+        newAI = AIThread(client.server, ai)
+        Server.id_count -= 1
+        newAI.id = client.id
+        newAI.player = client.player
+        return newAI
+
 
 
 class Server():
@@ -99,13 +111,21 @@ class Server():
         self.conns = [] # liste des différents clients
         self.awaited = awaited
         self.ias = ias
+        self.players = "" # Liste des noms des joueurs, IA comprises. Cette liste est variable au cours du temps 
         print("serveur prêt")
         
     def run(self, blinde, money):    
         """
         Une fois le serveur prêt, il peut être lancé grâce à cette fonction
         """
+        threading.Thread(target = self.checking).start()
         self.get_players()
+        self.wait_ready = {conn : conn.isAI for conn in self.conns}
+        while not all([self.wait_ready[conn] for conn in self.conns]):
+            for conn in self.conns:
+                if not conn.isAI:
+                    if conn.receive() == "ready":
+                        self.wait_ready[conn] = True
         self.start_time = time()
         self.game = Game(blinde, money, self.conns, self)
         self.game.play()
@@ -119,9 +139,10 @@ class Server():
             self.socket.listen() # écoute pour les connections
             conn, addr = self.socket.accept() # le client connecté et son adresse
             self.conns.append(ClientThread(self, conn, addr)) # création du Thread
-            print("client connecté !")
+            tag = "-".join([str(self.conns[-1].id), self.conns[-1].pseudo, str(int(self.conns[-1].isAI))]) # Nom du client qui vient d'arriver
+            print(f"Client {tag} connecté !")
             self.conns[-1].start()
-            for client in self.conns: client.ping()
+            self.players += "--"+ tag
         for _ in range(self.ias):
             self.conns.append(AIThread(self, "naive"))
             print("IA connectée !")
@@ -140,6 +161,35 @@ class Server():
                 print(f"{client.pseudo}: {received}")
                 if received == "QUIT":
                     return
+
+    def checking(self) :
+        """
+        Cette fonction vérifie l'état des connections du serveur : en fermant les clients endommagés ou ceux qui demandent l'autorisation de se couper.
+        Elle envoie aussi des informations de manière régulière au client (par exemple, la liste des joueurs connectés)
+        """
+        old_awaited = self.awaited
+        old_ias = self.ias # Ces variables tampons vont vérifier qu'il y a bien eu un changement par un des clients du nombre de joueurs, IAs ou réels
+        while True :
+            for client in self.conns: 
+                tag = "--" + "-".join([str(self.conns[-1].id), self.conns[-1].pseudo, str(int(self.conns[-1].isAI))]) # Nom du client
+                if not client.ping() :
+                    print(f"Connexion avec {tag} perdue !")
+                    client.conn.close() # On ferme la connexion avec le client
+                    self.conns.remove(client) # On retire le client de la liste des clients
+                    self.players = self.players.replace(tag, '') # On retire le joueur perdu de la liste 
+                else :
+                    client.send("Are you closing") # Vérification des fermetures de client 
+                    if client.receive() == "I am closing" : 
+                        client.conn.close()
+                    else :
+                        client.send(self.players) # Envoi de la liste de tous les clients actuellement connectés à tous les clients
+                        client.send("N_players--" + "--".join([str(self.awaited),str(self.ias),str(self.conns[0].id)])) # Envoi du nombre de joueurs IA et réels (pour modification par un des clients)
+                        #N_players = client.receive().split("--")[1:]
+                        #if N_players[0] != old_awaited or N_players[1] != old_ias :
+                            #self.awaited = N_players[0]
+                            #self.ias = N_players[1]
+
+            sleep(2)
 
     def close(self):
         """
@@ -160,11 +210,11 @@ class Server():
 
 
 if __name__ == "__main__":
-    host, port = ('', 5566) # le 5566 a été paramétré par port forward sur ma machine pour être ouvert au réseau extérieur (pour le faire fonctionner chez vous il faut ouvrir le port 5566 sur les paramètres du routeur) 
+    host, port = ('localhost', 5566) # le 5566 a été paramétré par port forward sur ma machine pour être ouvert au réseau extérieur (pour le faire fonctionner chez vous il faut ouvrir le port 5566 sur les paramètres du routeur) 
     BLINDE = 2 # la petite blinde pour la partie
     MONEY = 50 # la monnaie de départ des joueurs
-    NB_CLIENTS = 1 # le nombre de clients (joueurs humains)
-    NB_IAS = 4 # le nombre d'IA
+    NB_CLIENTS = 3 # le nombre de clients (joueurs humains)
+    NB_IAS = 2 # le nombre d'IA
     server = Server((host, port), NB_CLIENTS, NB_IAS)
     coup, exec = server.run(BLINDE, MONEY)
     
