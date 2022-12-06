@@ -212,7 +212,7 @@ class Player:
         self.card_1 = pg.transform.scale(im, (100, 60))
         self.card_2 = pg.transform.scale(im, (100, 60))
             
-        #creation des boutons si le joueur est humain:
+        #creation des boutons si le joueur est moi:
         if isMe:
             call = Button(x,y,...,...)
             check = Button(x,y,...)
@@ -230,7 +230,7 @@ class Player:
         screen.blit(self.card_1,(self.x,self.y))
         screen.blit(self.card_2,(self.x+20,self.y+20))
         
-        if not self.isAI and self.isPlaying:
+        if self.isMe and self.isPlaying:
             ### TODO : affichage des bons boutons ###
             pass
         

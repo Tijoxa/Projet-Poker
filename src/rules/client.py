@@ -57,6 +57,8 @@ class Client:
             self.id = received[3:]
         if received == "waiting for message...":
             self.send(input("\t>"))
+            
+        #Pendant la phase de jeu :
         if received == "close" or received == "Malheureusement vous n'avez plus d'argent!":
             self.server.close()
             quit()         
@@ -65,6 +67,21 @@ class Client:
             self.show_info()
             if self.me["isPlaying"]:
                 self.client_input()
+        
+        #Réception de la liste des joueurs, dans la salle d'attente :
+        if received.startswith("--"): 
+            self.players = received.split("--") 
+        if received.startswith("N_players") : # Réception du nombre attendu de joueurs réels et IAs
+                #self.send("N_players--" + "--".join(self.N_players)) 
+                self.N_players = received.split("--")[1:]
+                
+        #Le serveur demande si le client veut s'en aller :
+        if received == "Are you closing" :  
+            if not self.closing : 
+                self.send("no")
+            else :
+                self.send("I am closing") 
+                self.closed = True 
 
     def traitement_info(self, info):
         """
