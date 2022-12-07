@@ -206,7 +206,7 @@ def abattage(main:list, board:list) -> tuple:
         combi = combinaison.combinaison(hand) # quelle est la combinaison rattachée à cette main
         list_combi.append(combi) 
     best_combi = max(list_combi) # une relation d'ordre a été définie et permet de prendre la meilleure combinaison
-    best_main = combi.main # on retourne la main ayant produit la meilleure combinaison
+    best_main = best_combi.main # on retourne la main ayant produit la meilleure combinaison
     return best_main, best_combi
 
 def winner(conns:list, board:list):
