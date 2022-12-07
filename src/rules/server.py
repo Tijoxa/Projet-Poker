@@ -82,7 +82,7 @@ class AIThread(threading.Thread):
         """
         return self.ai.decision()
     
-    def ping():
+    def ping(self):
         return True # l'IA état liée au serveur elle ne peut pas être déconnectée
     
     @classmethod
