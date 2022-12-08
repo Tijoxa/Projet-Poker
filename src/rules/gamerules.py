@@ -85,7 +85,7 @@ class Game:
             conn.player.main.append(self.deck.draw())
             print(f"{conn.id}\t{conn.player.main}\t{conn.player.money}")
         money_everywhere = sum([conn.player.money for conn in self.in_game]) + sum([conn.player.mise for conn in self.in_game])
-        if money_everywhere != self.total_money: raise ValueError("De l'argent a disparu!")
+        if money_everywhere != self.total_money: raise ValueError("De l'argent a disparu !")
 
     def enchere(self, first:int):
         """
@@ -120,7 +120,7 @@ class Game:
     
     def acted(self, conn, action):
         """
-        Régit le cmportement du serveur après l'action d'un joueur
+        Régit le comportement du serveur après l'action d'un joueur
         Paramètres:
         -----------
         -  self: la partie

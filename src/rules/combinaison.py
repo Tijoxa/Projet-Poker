@@ -17,9 +17,11 @@ Hauteur
 """
 
 
-def quinte_flush(quinte, flush):
-    if quinte and flush:
-        return quinte
+def quinte_flush(quinte, flush) -> bool:
+    """quinte et flush sont soit des listes, soit des booléens False"""
+    if not (quinte==False) and (flush==False):
+        return True
+    return False
 
 def carre(count:dict):
     keys = list(count.keys())
@@ -51,14 +53,13 @@ def flush(main:list):
 def quinte(main:list):
     valeurs = [i.value for i in main]
     valeurs.sort() 
-    if valeurs == [2, 3, 4, 5, 14]:
-        valeurs = [1, 2, 3, 4, 5] # l'as peut être le premier élément de la plus petite suite
+    if valeurs == [0, 1, 2, 3, 12]:
+        valeurs = [-1, 0, 1, 2, 3] # l'as peut être le premier élément de la plus petite suite
     minimal = valeurs[0]
     if valeurs == [(minimal + i) for i in range(5)]:
         valeurs.reverse()
         return valeurs
-    else:
-        return False
+    return False
 
 def brelan(count:dict):
     keys = list(count.keys())
@@ -79,9 +80,9 @@ def paires(count:dict):
     for key in count:
         if count[key] == 2:
             if flag > 0:
-                return (flag, key) # double paire
+                return flag, key # double paire
             flag = key
-    return (flag, False)
+    return flag, False
 
 def double_paire(paires, main:list) -> list:
     if False in paires:
@@ -128,7 +129,8 @@ def combinaison(main:list):
     FLUSH = flush(main)
     QUINTE_FLUSH = quinte_flush(QUINTE, FLUSH)
     if QUINTE_FLUSH:
-        if QUINTE[0] == 14:
+        # Dans ce cas, QUINTE est une liste
+        if QUINTE[0] == 12:
             return Combinaison("Quinte Flush Royale", QUINTE_FLUSH, main)
         return Combinaison("Quinte Flush", QUINTE_FLUSH, main)
     COUNT = compteur(main)
@@ -153,11 +155,11 @@ MAINS_DU_POKER = ["Quinte Flush Royale", "Quinte Flush", "Carré", "Full", "Flus
 class Combinaison:
     """La classe Combinaison permet de comparer des mains de 5 cartes
 
-    Parameters
+    Paramètres
     ----------
-    combi: str
-    detail: list
-    main: list
+    - combi: str
+    - detail: list
+    - main: list
     """
     def __init__(self, combi:str, detail:list, main:list):
         if combi not in MAINS_DU_POKER:
