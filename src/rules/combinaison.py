@@ -21,9 +21,9 @@ Hauteur
 
 def quinte_flush(quinte, flush) -> bool:
     """quinte et flush sont soit des listes, soit des booléens False"""
-    if quinte==False or flush==False:
-        return False
-    return True
+    if not (quinte==False) and (flush==False):
+        return True
+    return False
 
 def carre(count:dict):
     keys = list(count.keys())
@@ -157,11 +157,11 @@ MAINS_DU_POKER = ["Quinte Flush Royale", "Quinte Flush", "Carré", "Full", "Flus
 class Combinaison:
     """La classe Combinaison permet de comparer des mains de 5 cartes
 
-    Parameters
+    Paramètres
     ----------
-    combi: str
-    detail: list
-    main: list
+    - combi: str
+    - detail: list
+    - main: list
     """
     def __init__(self, combi:str, detail:list, main:list):
         """
