@@ -1,3 +1,5 @@
+from itertools import combinations
+
 from cards import Card
 value_to_symbols = Card.value_to_symbols
 
@@ -19,9 +21,9 @@ Hauteur
 
 def quinte_flush(quinte, flush) -> bool:
     """quinte et flush sont soit des listes, soit des booléens False"""
-    if not (quinte==False) and (flush==False):
-        return True
-    return False
+    if quinte==False or flush==False:
+        return False
+    return True
 
 def carre(count:dict):
     keys = list(count.keys())
@@ -37,7 +39,7 @@ def carre(count:dict):
     if flag: return detail
     else: return False
 
-def full(brelan, paire):
+def full(brelan, paire): #TODO: faire la même modif qu'avec quinte_flush
     if brelan and paire:
         return brelan
 
@@ -153,15 +155,14 @@ def combinaison(main:list):
 MAINS_DU_POKER = ["Quinte Flush Royale", "Quinte Flush", "Carré", "Full", "Flush", "Quinte", "Brelan", "Double Paire", "Paire", "Hauteur"]
 
 class Combinaison:
-    """La classe Combinaison permet de comparer des mains de 5 cartes
-
-    Paramètres
-    ----------
-    - combi: str
-    - detail: list
-    - main: list
-    """
     def __init__(self, combi:str, detail:list, main:list):
+        """
+        Paramètres
+        ----------
+        - combi: str
+        - detail: list
+        - main: list
+        """
         if combi not in MAINS_DU_POKER:
             raise ValueError(f"La combinaison \"{combi}\" n'existe pas au poker.")
         self.combinaison = combi
@@ -211,5 +212,16 @@ class Combinaison:
         return f"{self.combinaison} - {self.detail}"
 
 
-
+def abattage(main:list, board:list) -> tuple:
+    """
+    Fonction prenant les 2 cartes dans la main d'un joueur et les 5 cartes du board et renvoie la meilleure main de 5 cartes possibles
+    """
+    hands_of_five = combinations(board + main, 5) # on prend toutes les combinaisons de 5 cartes possibles
+    list_combi = []
+    for hand in hands_of_five:
+        combi = combinaison(hand) # quelle est la combinaison rattachée à cette main
+        list_combi.append(combi) 
+    best_combi = max(list_combi) # une relation d'ordre a été définie et permet de prendre la meilleure combinaison
+    best_main = best_combi.main # on retourne la main ayant produit la meilleure combinaison
+    return best_main, best_combi
 

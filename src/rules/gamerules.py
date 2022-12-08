@@ -1,5 +1,3 @@
-from itertools import combinations
-
 import combinaison
 from cards import Deck
 
@@ -195,27 +193,13 @@ class Game:
         res = f"###{players}###{cards}###{self.mise}###{self.pot}###{self.petite_blinde}"
         return res
 
-
-def abattage(main:list, board:list) -> tuple:
-    """
-    Fonction prenant les 2 cartes dans la main d'un joueur et les 5 cartes du board et renvoie la meilleure main de 5 cartes possibles
-    """
-    hands_of_five = combinations(board + main, 5) # on prend toutes les combinaisons de 5 cartes possibles
-    list_combi = []
-    for hand in hands_of_five:
-        combi = combinaison.combinaison(hand) # quelle est la combinaison rattachée à cette main
-        list_combi.append(combi) 
-    best_combi = max(list_combi) # une relation d'ordre a été définie et permet de prendre la meilleure combinaison
-    best_main = combi.main # on retourne la main ayant produit la meilleure combinaison
-    return best_main, best_combi
-
 def winner(conns:list, board:list):
     """
     envoie l'ordre de victoire des joueurs encore dans le coup
     """
     combis = []
     for conn in conns:
-        combis.append((conn, abattage(conn.player.main, board)[1]))
+        combis.append((conn, combinaison.abattage(conn.player.main, board)[1]))
     combis.sort(key = (lambda x: x[1]), reverse = True)
     print(board)
     for combi in combis:
