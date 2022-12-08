@@ -151,6 +151,14 @@ def combinaison(main:list):
 MAINS_DU_POKER = ["Quinte Flush Royale", "Quinte Flush", "Carré", "Full", "Flush", "Quinte", "Brelan", "Double Paire", "Paire", "Hauteur"]
 
 class Combinaison:
+    """La classe Combinaison permet de comparer des mains de 5 cartes
+
+    Parameters
+    ----------
+    combi: str
+    detail: list
+    main: list
+    """
     def __init__(self, combi:str, detail:list, main:list):
         if combi not in MAINS_DU_POKER:
             raise ValueError(f"La combinaison \"{combi}\" n'existe pas au poker.")
