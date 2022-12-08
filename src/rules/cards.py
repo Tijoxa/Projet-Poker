@@ -1,13 +1,13 @@
 import random
 
-SYMBOLS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"] # liste des symboles
-COLORS = ["H", "S", "D", "C"] # H = Hearts ; S = Spades ; D = Diamond ; C = Clubs
+SYMBOLS = "23456789TJQKA" # liste des symboles
+COLORS = "HSDC" # H = Hearts ; S = Spades ; D = Diamond ; C = Clubs
 TERMINAL_COLORS = {"H": "\033[31m", "S": "\033[34m", "D": "\033[33m", "C": "\033[32m"} 
 
 class Card:
     def __init__(self, symbol:str, couleur:str):
         """
-        crée une carte à partir d'un symbole et d'une couleur
+        Crée une carte à partir d'un symbole et d'une couleur
         """
         self.value = Card.symbols_to_value(symbol)
         if couleur in COLORS:
@@ -25,13 +25,13 @@ class Card:
         return f"{Card.value_to_symbols(self.value)}{self.color}"
 
     @staticmethod
-    def value_to_symbols(value:int):
+    def value_to_symbols(value:int) -> str:
         """
     	convertit un int en symbole
         """
-        if value not in range(1, 15):
-            raise ValueError("La valeur doit être comprise entre 1 et 14")
-        return SYMBOLS[value-1]
+        if value not in range(13):
+            raise ValueError("La valeur doit être comprise entre 0 et 12")
+        return SYMBOLS[value]
 
     @staticmethod
     def symbols_to_value(symbol:str) -> int:
@@ -39,11 +39,8 @@ class Card:
     	convertit un symbole en int
         """
         if symbol not in SYMBOLS:
-            raise ValueError(f"Les symboles sont {SYMBOLS[1:]}")
-        if symbol == "A":
-            return 14
-        else:
-            return SYMBOLS.index(symbol) + 1
+            raise ValueError(f"Les symboles sont {SYMBOLS}")
+        return SYMBOLS.index(symbol)
 
 
 class Deck:
@@ -53,7 +50,7 @@ class Deck:
         """
         self.paquet = []
         self.drawn = []
-        for symbol in SYMBOLS[1:]:
+        for symbol in SYMBOLS:
             for color in COLORS:
                 self.paquet.append(Card(symbol, color))
         random.shuffle(self.paquet)
