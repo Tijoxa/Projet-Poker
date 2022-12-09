@@ -202,6 +202,9 @@ class Player_display:
         self.isAI = isAI
         self.isPlaying = False
         
+        #zone encadrant le joueur (s'affiche lorsqu'il joue) :
+        self.rect = pg.rect(x,y,w,h)
+        
         #creation des fonts d'affichage du pseudo et de l'argent :
         self.font_pseudo = pg.font.SysFont(textType, textSize)
         self.font_money = pg.font.SysFont(textType, textSize)
@@ -215,11 +218,11 @@ class Player_display:
             
         #creation des boutons si le joueur est moi:
         if isMe:
-            call = Button(x,y,...,...)
-            check = Button(x,y,...)
-            fold = Button(x,y,...)
-            raise_ = Button(x,y,...)
-            bet = Button(x,y,...)
+            call = Button(x,y,text='suivre')
+            check = Button(x,y,'check')
+            fold = Button(x,y,'se coucher')
+            raise_ = Button(x,y,'relancer')
+            bet = Button(x,y,'miser')
             #creation de l'entrée de mise :
             bet_entry = InputBox(x,y,...)
             self.myActions = [call,check,fold,raise_,[bet,bet_entry]]

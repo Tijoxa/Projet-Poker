@@ -12,25 +12,20 @@ class Client:
     def __init__(self, pseudo, server) -> None:
         """
         création du client
-
-        Parameters
-        ----------
-        pseudo : string
-            pseudo du joueur.
-        server : TYPE
-            server auquel le joueur est connecté.
-
-        Returns
-        -------
-        None
+        ====paramètres====
+        pseudo: le pseudo du joueur qui sera affiché en jeu
+        server: le server auquel le client est connecté
+        ====Output====
+        un client connecté au serveur
         """
-        self.id = None # l'ID sera donnée par le serveur pour s'assurer que chaque client en ait une différente. L'ID 1 est l'administrateur de la partie (pour le choix du nombre de joueurs)
+        self.id = None # l'ID sera donnée par le serveur pour s'assurer que chaque client en ait une différente. L'ID minimale est l'administrateur de la partie (pour le choix du nombre de joueurs)
         self.pseudo = pseudo # le pseudo peut être choisi par le joueur
         self.server = server # le serveur auquel le client s'est connecté
         self.players = [] # Liste des clients connectés au serveur
         self.closing = False # Sur le point de se fermer
         self.closed = False # Le socket est fermé, et déconnecté du serveur
         self.N_players = [3,2] # Nombre de joueurs attendus et nombre d'IAs
+        self.isAdmin = False 
     
     def receive(self, data_size = 1024):
         """
@@ -49,8 +44,7 @@ class Client:
     
     def manage(self, received):
         """
-        received est le message denvoyé par le serveur. 
-        Cette méthode indique le comportement à suivre
+        received est le message denvoyé par le serveur. Cette méthode indique le comportement à suivre
         """
         if received == "waiting for pseudo...":
             print(received)
@@ -62,8 +56,6 @@ class Client:
         if received == "waiting for message...":
             print(received)
             self.send(input("\t>"))
-            
-        #Pendant la phase de jeu :
         if received == "close" or received == "Malheureusement vous n'avez plus d'argent!":
             print(received)
             self.server.close()
@@ -73,18 +65,21 @@ class Client:
             self.show_info()
             if self.me["isPlaying"]:
                 self.client_input()
-        
-        #Réception de la liste des joueurs, dans la salle d'attente :
+        # Réception de la liste des joueurs, dans la salle d'attente
         if received.startswith("--"): 
-            self.players = received.split("--") 
-        if received.startswith("N_players") : # Réception du nombre attendu de joueurs réels et IAs
+            self.players = received.split("--")
+            if len(self.players)==1 : # TODO : Ajouter recherche de l'id minimale
+                self.isAdmin = True
+
+
+        # Réception du nombre attendu de joueurs réels et IAs
+        if received.startswith("N_players") :
                 #self.send("N_players--" + "--".join(self.N_players)) 
                 self.N_players = received.split("--")[1:]
-                
-        #Le serveur demande si le client veut s'en aller :
-        if received == "Are you closing" :  
+        # Si le serveur demande si le client veut s'en aller 
+        if received == "Are you closing" : 
             if not self.closing : 
-                self.send("no")
+                self.send("No")
             else :
                 self.send("I am closing") 
                 self.closed = True 

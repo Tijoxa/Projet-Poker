@@ -110,11 +110,9 @@ class Server():
             nombre de joueurs attendus.
         ias : int
             nombre d'IA à ajouter.
-
         Returns
         -------
         None.
-
         """
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.waiting = False # lorsque plusieurs clients sont connectés au serveur ils peuvent chercher à envoyer plusieurs messages en même temps, waiting perùet de les gérer dans leur ordre d'arrivée.
@@ -175,8 +173,7 @@ class Server():
 
     def checking(self) :
         """
-        Cette fonction vérifie l'état des connections du serveur : 
-        en fermant les clients endommagés ou ceux qui demandent l'autorisation de se couper.
+        Cette fonction vérifie l'état des connections du serveur : en fermant les clients endommagés ou ceux qui demandent l'autorisation de se couper.
         Elle envoie aussi des informations de manière régulière au client (par exemple, la liste des joueurs connectés)
         """
         old_awaited = self.awaited
