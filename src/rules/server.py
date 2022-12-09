@@ -51,10 +51,6 @@ class ClientThread(threading.Thread):
             return False
         finally:
             return True
-    
-    def fromClientToAI(self):
-        self = AIThread.fromClientToAI(self, "naive")
-        return self
 
 class AIThread(threading.Thread):
     def __init__(self, server, ai):
@@ -85,15 +81,6 @@ class AIThread(threading.Thread):
     
     def ping():
         return True # l'IA état liée au serveur elle ne peut pas être déconnectée
-    
-    @classmethod
-    def fromClientToAI(cls, client, ai):
-        newAI = AIThread(client.server, ai)
-        Server.id_count -= 1
-        newAI.id = client.id
-        newAI.player = client.player
-        return newAI
-
 
 
 class Server():
@@ -119,12 +106,6 @@ class Server():
         Une fois le serveur prêt, il peut être lancé grâce à cette fonction
         """
         self.get_players()
-        self.wait_ready = {conn : conn.isAI for conn in self.conns}
-        while not all([self.wait_ready[conn] for conn in self.conns]):
-            for conn in self.conns:
-                if not conn.isAI:
-                    if conn.receive() == "ready":
-                        self.wait_ready[conn] = True
         self.start_time = time()
         self.game = Game(blinde, money, self.conns, self)
         self.game.play()
@@ -182,7 +163,7 @@ if __name__ == "__main__":
     host, port = ('', 5566) # le 5566 a été paramétré par port forward sur ma machine pour être ouvert au réseau extérieur (pour le faire fonctionner chez vous il faut ouvrir le port 5566 sur les paramètres du routeur) 
     BLINDE = 2 # la petite blinde pour la partie
     MONEY = 50 # la monnaie de départ des joueurs
-    NB_CLIENTS = 2 # le nombre de clients (joueurs humains)
+    NB_CLIENTS = 1 # le nombre de clients (joueurs humains)
     NB_IAS = 3 # le nombre d'IA
     server = Server((host, port), NB_CLIENTS, NB_IAS)
     coup, exec = server.run(BLINDE, MONEY)
