@@ -23,6 +23,10 @@ class GUI_waiting:
         self.player_icon = my_player.convert_alpha() # Pour gérer la transparence
         self.player_icon = pg.transform.scale(self.player_icon,(100,100))
 
+        my_open = pg.image.load('icons/player_open_image.png')
+        self.open_icon = my_open.convert_alpha() # Pour gérer la transparence
+        self.open_icon = pg.transform.scale(self.open_icon,(100,100))
+
         my_AI = pg.image.load('icons/player_AI_lv4(Evil_Lime).png')
         self.AI_icon = my_AI.convert_alpha() # Pour gérer la transparence
         self.AI_icon = pg.transform.scale(self.AI_icon,(100,100))
@@ -51,14 +55,15 @@ class GUI_waiting:
         clock = pg.time.Clock()
         done = False
         
-        if self.client.isAdmin:
-            input_buttons = [self.button_quit,self.button_play, 
-                             self.button_add_player, self.button_del_player,
-                             self.button_add_IA, self.button_del_IA]
-        else:
-            input_buttons = [self.button_quit,self.button_play]
-
         while not done:
+
+            if self.client.isAdmin:
+                input_buttons = [self.button_quit,self.button_play, 
+                                self.button_add_player, self.button_del_player,
+                                self.button_add_IA, self.button_del_IA]
+            else:
+                input_buttons = [self.button_quit,self.button_play]
+
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     done = True
@@ -74,7 +79,7 @@ class GUI_waiting:
                 button.draw(self.waiting)
                 
             # Affichage des clients connectés
-            self.list_players = self.client.players[1:]
+            self.list_players = self.client.players
             font_pseudo = pg.font.Font('freesansbold.ttf', 32)
             for k in range (len(self.list_players)):
                 self.waiting.blit(self.player_icon, (50 + 160*k, 250)) # Affichage des icônes de personnage
@@ -86,8 +91,8 @@ class GUI_waiting:
                 self.waiting.blit(text, textRect)
 
             # Affichage des IAs (elles ne sont pas encore connectées, mais affichées à titre informatif)
+            N = len(self.list_players) 
             for k in range (int(self.client.N_players[1])):
-                N = len(self.list_players) 
                 self.waiting.blit(self.AI_icon, (50 + 160*(k + N), 250)) # Affichage des icônes de personnage
 
                 name = "IA-" + str(k) # Obtention du nom de l'IA à afficher
@@ -95,6 +100,11 @@ class GUI_waiting:
                 textRect = text.get_rect()
                 textRect.center = (100 + 150*(k + N), 200)
                 self.waiting.blit(text, textRect)
+
+            # Affichage des créneaux ouverts
+            N_connected = len(self.list_players) + int(self.client.N_players[1])
+            for k in range (int(self.client.N_players[0]) - N):
+                self.waiting.blit(self.open_icon, (50 + 160*(k + N_connected), 250)) # Affichage des icônes de personnage
 
             # Réglage des joueurs attendus IA et réels 
             font_number = pg.font.Font('freesansbold.ttf', 32)
@@ -131,7 +141,7 @@ class GUI_waiting:
 
                 if self.button_del_player.CurrentState:
                     self.button_del_player.CurrentState = False
-                    self.client.N_players[0] = str(max(0,int(self.client.N_players[0]) -1))
+                    self.client.N_players[0] = str(max(len(self.list_players),int(self.client.N_players[0]) -1))
 
                 if self.button_add_IA.CurrentState:
                     self.button_add_IA.CurrentState = False

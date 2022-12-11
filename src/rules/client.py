@@ -67,10 +67,9 @@ class Client:
                 self.client_input()
         # Réception de la liste des joueurs, dans la salle d'attente
         if received.startswith("--"): 
-            self.players = received.split("--")
-            if len(self.players)==1 : # TODO : Ajouter recherche de l'id minimale
+            self.players = received.split("--")[1:]
+            if self.players[0][0] == self.id: 
                 self.isAdmin = True
-
 
         # Réception du nombre attendu de joueurs réels et IAs
         if received.startswith("N_players") :
