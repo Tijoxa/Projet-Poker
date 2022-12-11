@@ -108,8 +108,8 @@ class GUI_waiting:
 
             # Réglage des joueurs attendus IA et réels 
             font_number = pg.font.Font('freesansbold.ttf', 32)
-            N_IA_text = font_number.render(f"IAs : {str(self.client.N_players[1])}", True, (0, 0, 128))
-            N_real_text = font_number.render(f"Joueurs : {str(self.client.N_players[0])}", True, (0, 0, 128))
+            N_IA_text = font_number.render(f"IAs : {self.client.N_players[1]}", True, (0, 0, 128))
+            N_real_text = font_number.render(f"Joueurs : {self.client.N_players[0]}", True, (0, 0, 128))
             N_IA_textRect = N_IA_text.get_rect()
             N_real_textRect = N_real_text.get_rect()
             N_IA_textRect.center = (500, 400)

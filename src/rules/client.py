@@ -24,7 +24,7 @@ class Client:
         self.players = [] # Liste des clients connectés au serveur
         self.closing = False # Sur le point de se fermer
         self.closed = False # Le socket est fermé, et déconnecté du serveur
-        self.N_players = [3,2] # Nombre de joueurs attendus et nombre d'IAs
+        self.N_players = ["3","2"] # Nombre de joueurs attendus et nombre d'IAs
         self.isAdmin = False 
     
     def receive(self, data_size = 1024):
@@ -72,9 +72,12 @@ class Client:
                 self.isAdmin = True
 
         # Réception du nombre attendu de joueurs réels et IAs
-        if received.startswith("N_players") :
-                #self.send("N_players--" + "--".join(self.N_players)) 
-                self.N_players = received.split("--")[1:]
+        if received.startswith("Receive N_players") :
+            self.N_players = received.split("--")[1:]
+        
+        if received.startswith("Send N_players") : # Besoin de recevoir la demande du serveur pour envoyer, sinon bug au démarrage, à retravailler
+            self.send("N_players--" + "--".join(self.N_players)) 
+
         # Si le serveur demande si le client veut s'en aller 
         if received == "Are you closing" : 
             if not self.closing : 

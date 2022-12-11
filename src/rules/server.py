@@ -192,11 +192,13 @@ class Server():
                         client.conn.close()
                     else :
                         client.send(self.players) # Envoi de la liste de tous les clients actuellement connectés à tous les clients
-                        client.send("N_players--" + "--".join([str(self.awaited),str(self.ias),str(self.conns[0].id)])) # Envoi du nombre de joueurs IA et réels (pour modification par un des clients)
-                        #N_players = client.receive().split("--")[1:]
-                        #if N_players[0] != old_awaited or N_players[1] != old_ias :
-                            #self.awaited = N_players[0]
-                            #self.ias = N_players[1]
+                        if client.id == int(self.players[2]) : 
+                            client.send("Send N_players")
+                            N_players = client.receive().split("--")[1:]
+                            self.awaited = int(N_players[0])
+                            self.ias = int(N_players[1])
+                        else : 
+                            client.send("Receive N_players--" + "--".join([str(self.awaited),str(self.ias)])) # Envoi du nombre de joueurs IA et réels (pour modification par un des clients)
 
             sleep(2)
 
