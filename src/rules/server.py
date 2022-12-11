@@ -180,7 +180,7 @@ class Server():
         old_ias = self.ias # Ces variables tampons vont vérifier qu'il y a bien eu un changement par un des clients du nombre de joueurs, IAs ou réels
         while True :
             for client in self.conns: 
-                tag = "--" + "-".join([str(self.conns[-1].id), self.conns[-1].pseudo, str(int(self.conns[-1].isAI))]) # Nom du client
+                tag = "--" + "-".join([str(client.id), client.pseudo, str(int(client.isAI))]) # Nom du client
                 if not client.ping() :
                     print(f"Connexion avec {tag} perdue !")
                     client.conn.close() # On ferme la connexion avec le client
