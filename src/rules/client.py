@@ -26,6 +26,7 @@ class Client:
         self.closed = False # Le socket est fermé, et déconnecté du serveur
         self.N_players = ["3","2"] # Nombre de joueurs attendus et nombre d'IAs
         self.isAdmin = False 
+        self.info = {}
     
     def receive(self, data_size = 1024):
         """
