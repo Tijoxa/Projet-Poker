@@ -8,26 +8,25 @@ class Client:
     - fold (se coucher)
     - bet (miser, quand la mise est à 0, au minimum la grosse blinde)
     - raise (relancer: première relance : le double; après : relance d'au moins la différence en plus)
-
     """
     def __init__(self, pseudo, server) -> None:
         """
         création du client
-
-        Parameters
-        ----------
-        pseudo : string
-            pseudo du joueur.
-        server : TYPE
-            server auquel le joueur est connecté.
-
-        Returns
-        -------
-        None
+        ====paramètres====
+        pseudo: le pseudo du joueur qui sera affiché en jeu
+        server: le server auquel le client est connecté
+        ====Output====
+        un client connecté au serveur
         """
-        self.id = None # l'ID sera donnée par le serveur pour s'assurer que chaque client en ait une différente
+        self.id = None # l'ID sera donnée par le serveur pour s'assurer que chaque client en ait une différente. L'ID minimale est l'administrateur de la partie (pour le choix du nombre de joueurs)
         self.pseudo = pseudo # le pseudo peut être choisi par le joueur
         self.server = server # le serveur auquel le client s'est connecté
+        self.players = [] # Liste des clients connectés au serveur
+        self.closing = False # Sur le point de se fermer
+        self.closed = False # Le socket est fermé, et déconnecté du serveur
+        self.N_players = ["3","2"] # Nombre de joueurs attendus et nombre d'IAs
+        self.isAdmin = False 
+        self.info = {}
     
     def receive(self, data_size = 1024):
         """
@@ -46,20 +45,20 @@ class Client:
     
     def manage(self, received):
         """
-        received est le message denvoyé par le serveur. 
-        Cette méthode indique le comportement à suivre
+        received est le message denvoyé par le serveur. Cette méthode indique le comportement à suivre
         """
-        print(received)
         if received == "waiting for pseudo...":
+            print(received)
             self.send(self.pseudo)
             return
         if received.startswith("ID:"):
+            print(received)
             self.id = received[3:]
         if received == "waiting for message...":
+            print(received)
             self.send(input("\t>"))
-            
-        #Pendant la phase de jeu :
         if received == "close" or received == "Malheureusement vous n'avez plus d'argent!":
+            print(received)
             self.server.close()
             quit()         
         if received.startswith("###"):
@@ -67,18 +66,23 @@ class Client:
             self.show_info()
             if self.me["isPlaying"]:
                 self.client_input()
-        
-        #Réception de la liste des joueurs, dans la salle d'attente :
+        # Réception de la liste des joueurs, dans la salle d'attente
         if received.startswith("--"): 
-            self.players = received.split("--") 
-        if received.startswith("N_players") : # Réception du nombre attendu de joueurs réels et IAs
-                #self.send("N_players--" + "--".join(self.N_players)) 
-                self.N_players = received.split("--")[1:]
-                
-        #Le serveur demande si le client veut s'en aller :
-        if received == "Are you closing" :  
+            self.players = received.split("--")[1:]
+            if self.players[0][0] == self.id: 
+                self.isAdmin = True
+
+        # Réception du nombre attendu de joueurs réels et IAs
+        if received.startswith("Receive N_players") :
+            self.N_players = received.split("--")[1:]
+        
+        if received.startswith("Send N_players") : # Besoin de recevoir la demande du serveur pour envoyer, sinon bug au démarrage, à retravailler
+            self.send("N_players--" + "--".join(self.N_players)) 
+
+        # Si le serveur demande si le client veut s'en aller 
+        if received == "Are you closing" : 
             if not self.closing : 
-                self.send("no")
+                self.send("No")
             else :
                 self.send("I am closing") 
                 self.closed = True 
@@ -203,9 +207,12 @@ class Client:
         """
         boucle principale de réception
         """
-        while True:
+        while not self.closed:
             self.receive()
+        self.server.close() # La connexion est close, après avoir répondu "I am closed" cf manage()
 
+    def quit(self):
+        self.closing = True  
         
 if __name__ == "__main__":
     host, port = ('localhost', 5566) # cette IP doit être l'IP publique de l'ordinateur sur laquelle tourne le serveur, le port doit être en accord avec celui du serveur
