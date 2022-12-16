@@ -184,8 +184,8 @@ class Button():
 
 class Player_display:
     """Class medelizing a player around the table"""
-    def __init__(self, x, y, w, h, 
-                 pseudo, isMe = False, isAI=False,
+    def __init__(self, x, y, w = 200, h = 150, 
+                 pseudo = "name", isMe = None, isAI=False,
                  textType = "TimeNewRoman",
                  textSize = 25):
         
@@ -194,16 +194,16 @@ class Player_display:
         
         #infos :
         self.pseudo = pseudo
-        self.money = 0
+        self.money = 500
         self.mise = 0
         
         #statut joueur
-        self.isMe= isMe
+        self.isMe= isMe #est l'objet Client si c'est moi
         self.isAI = isAI
         self.isPlaying = False
         
         #zone encadrant le joueur (s'affiche lorsqu'il joue) :
-        self.rect = pg.rect(x,y,w,h)
+        self.rect = pg.Rect(x,y,w,h)
         
         #creation des fonts d'affichage du pseudo et de l'argent :
         self.font_pseudo = pg.font.SysFont(textType, textSize)
@@ -213,8 +213,8 @@ class Player_display:
         
         #affichage des cartes :
         im = pg.image.load('cards/back.jpg')
-        self.card_1 = pg.transform.scale(im, (100, 60))
-        self.card_2 = pg.transform.scale(im, (100, 60))
+        self.card_1 = pg.transform.scale(im, (92, 138))
+        self.card_2 = pg.transform.scale(im, (92, 138))
             
         #creation des boutons si le joueur est moi:
         if isMe:
@@ -222,32 +222,82 @@ class Player_display:
             check = Button(x,y,'check')
             fold = Button(x,y,'se coucher')
             raise_ = Button(x,y,'relancer')
-            bet = Button(x,y,'miser')
+            #bet = Button(x,y,'miser')
             #creation de l'entrée de mise :
-            bet_entry = InputBox(x,y,...)
-            self.myActions = [call,check,fold,raise_,[bet,bet_entry]]
+            bet_entry = InputBox(x,y, text='miser')
+            self.myActions = [call,check,fold,raise_,bet_entry]
         
             
             
     def draw(self, screen):
-        self.show_pseudo.render(self.pseudo,False, self.color)
-        screen.blit(self.card_1,(self.x,self.y))
-        screen.blit(self.card_2,(self.x+20,self.y+20))
+        screen.blit(self.card_1,(self.x +10,self.y+10))
+        screen.blit(self.card_2,(self.x+30,self.y+30))
         
-        if self.isMe and self.isPlaying:
-            ### TODO : affichage des bons boutons ###
-            pass
+        screen.blit(self.font_pseudo.render(self.pseudo, False, self.color),
+                    (self.x+120,self.y+10))
+        screen.blit(self.font_money.render("$"+str(self.money),False, pg.Color('green')),
+                    (self.x+120,self.y+40))
         
-    def update_player_info(self, infos):
+        if self.isPlaying:
+            pg.draw.rect(screen, self.color, self.rect, 2)
+            
+        if self.isMe is not None and self.isPlaying:
+            info, me= self.isMe.info, self.isMe.me
+            case = 0
+            print("Vos possibilités sont:")
+            if info["mise"] == 0:
+                self.myActions[2].draw(screen)
+                self.myActions[4].draw(screen)
+                self.myActions[1].draw(screen)
+                #print("COUCHER\tMISE\tCHECK")
+            elif me["mise"] == info["mise"]:
+                self.myActions[2].draw(screen)
+                self.myActions[3].draw(screen)
+                self.myActions[1].draw(screen)
+                #print("COUCHER\tRELANCE\tCHECK")
+            else:
+                self.myActions[0].draw(screen)
+                self.myActions[2].draw(screen)
+                self.myActions[3].draw(screen)
+                #print("SUIVRE\tCOUCHER\tRELANCE")
+            if case == 1:
+                if choice.startswith("MISE"):
+                    try:
+                        value = int(choice[5:])
+                        if self.mise(value, min(info["blinde"], me["money"]), me["money"]):
+                            return
+                    except ValueError:
+                        pass
+            
+            if case == 2 or case == 3:
+                if choice.startswith("RELANCE"):
+                    try:
+                        value = int(choice[8:])
+                        if self.relance(value, info["mise"] * 2, me["money"]):
+                            return      
+                    except ValueError:
+                        pass      
+        
+    def update_player_info(self, info):
         #mise à jour des infos du joueur en fonction des infos du server
-        for player in infos['players']:
+        for player in info['players']:
             if player['pseudo'] == self.pseudo:
                 self.money = player['money']
                 self.mise = player['mise']
                 self.isPlaying = player['isPlaying']
     
     def handle_event(self,event):
-        ### TODO : gestion des actions sur les boutons et envoi des bonnes
-        ### infos au server
-        pass
+        if self.isMe is not None and self.isPlaying:
+            for action in self.myActions:
+                action.handle_event(event)
+                
+            if self.myActions[1].currentState==True:
+                self.myActions[1].currentState==False
+                self.isMe.check()
+            if self.myActions[0].currentState==True:
+                self.myActions[0].currentState==False
+                self.isMe.suivre()
+            if self.myActions[2].currentState==True:
+                self.myActions[2].currentState==False
+                self.isMe.coucher()
         
