@@ -26,7 +26,6 @@ if __name__ == "__main__":
                 client.quit() 
                 connected = False  
         elif screen == "PLAY":
-            client.send("ready")
             gui = GUI_playRoom(client)
             screen = gui.mainloop()
         elif screen == "":

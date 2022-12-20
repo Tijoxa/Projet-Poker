@@ -26,6 +26,8 @@ class Client:
         self.closed = False # Le socket est fermé, et déconnecté du serveur
         self.N_players = ["3","2"] # Nombre de joueurs attendus et nombre d'IAs
         self.isAdmin = False 
+        self.waiting_for_game = False # Deviendra True lorsque l'admin veut lancer la partie
+        self.ready_for_game = False # Deviendra True lorsque le joueur est prêt à entrer dans la partie
         self.info = {}
     
     def receive(self, data_size = 1024):
@@ -66,6 +68,10 @@ class Client:
             self.show_info()
             if self.me["isPlaying"]:
                 self.client_input()
+
+        if received.startswith("0###"): # Infos de lancement de partie
+            self.info, self.me = self.traitement_info(received[1:])
+
         # Réception de la liste des joueurs, dans la salle d'attente
         if received.startswith("--"): 
             self.players = received.split("--")[1:]
@@ -86,6 +92,22 @@ class Client:
             else :
                 self.send("I am closing") 
                 self.closed = True 
+
+        # Le serveur demande à l'admin s'il faut continuer d'attendre dans la salle d'attente
+        if received == "Wait ?" :
+            if self.waiting_for_game :
+                self.send("False")
+            else :
+                self.send("True")
+
+        # Le serveur se prépare à lancer la partie, et demande au client s'il est prêt
+        if received == "Ready ?" :
+            if self.info != {} :
+                print("Entering game")
+                self.send("ready")
+                self.ready_for_game = True
+
+
 
     def traitement_info(self, info):
         """
@@ -120,7 +142,8 @@ class Client:
         info, me = self.info, self.me
         if me is not None:
             res = f"{me['pseudo']}, vous avez {me['money']}$ \n A ce tour d'enchère, vous avez misé {me['mise']}$\n"
-            res += f"Votre main:\t{info['main'][0]}\t{info['main'][1]}\n"
+            if len(info['main']) > 1 :
+                res += f"Votre main:\t{info['main'][0]}\t{info['main'][1]}\n"
             for player in info["players"]:
                 res += f"\t{player['pseudo']} possède {player['money']}$, a misé {player['mise']}$\n"
             res += f"Les cartes au centre de la table: {info['board']}, la mise sur laquelle il faut s'aligner est {info['mise']}\nLe pot vaut {info['pot']}"

@@ -1,7 +1,6 @@
 import combinaison
 from cards import Deck
 
-
 class Game:
     def __init__(self, blinde:int, money:int , conns:list, server):
         """

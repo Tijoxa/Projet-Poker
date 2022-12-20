@@ -7,7 +7,7 @@ class Player:
     Chaque CientThread sera lié à un objet Player qui représentera le client en jeu     
     """
     def __init__(self):
-        self.main = None
+        self.main = []
         self.money = 50
         self.mise = 0
         self.bet_once = False

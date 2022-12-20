@@ -121,6 +121,7 @@ class Server():
         self.awaited = awaited
         self.ias = ias
         self.players = "" # Liste des noms des joueurs, IA comprises. Cette liste est variable au cours du temps 
+        self.wait_players = True # Attente des joueurs avant de lancer la partie 
         print("serveur prêt")
         
     def run(self, blinde, money):    
@@ -129,14 +130,20 @@ class Server():
         """
         threading.Thread(target = self.checking).start()
         self.get_players()
-        self.wait_ready = {conn : conn.isAI for conn in self.conns}
-        while not all([self.wait_ready[conn] for conn in self.conns]):
-            for conn in self.conns:
-                if not conn.isAI:
-                    if conn.receive() == "ready":
-                        self.wait_ready[conn] = True
+        print("Game is starting...")
         self.start_time = time()
         self.game = Game(blinde, money, self.conns, self)
+        self.wait_ready = {conn : conn.isAI for conn in self.game.in_game}
+        while not all([self.wait_ready[conn] for conn in self.game.in_game]):
+            for conn in self.game.in_game:
+                if not conn.isAI:
+                    conn.send("0" + self.game.info(self.conns[0],conn))
+                    conn.send("Ready ?")
+                    print(f"Adding {conn.id} to the game")
+                    if conn.receive() == "ready":
+                        self.wait_ready[conn] = True
+                    else :
+                        print("Waiting for", conn.id)
         self.game.play()
         return self.close()
     
@@ -144,7 +151,7 @@ class Server():
         """
         Récupère des joueurs jusqu'à en avoir autant qu'attendu
         """
-        while len(self.conns) < self.awaited:
+        while (self.wait_players) and (len(self.conns) < self.awaited)  : # TODO : Problème pour sortir de la boucle; socket.listen() est bloquant
             self.socket.listen() # écoute pour les connections
             conn, addr = self.socket.accept() # le client connecté et son adresse
             self.conns.append(ClientThread(self, conn, addr)) # création du Thread
@@ -176,8 +183,7 @@ class Server():
         Cette fonction vérifie l'état des connections du serveur : en fermant les clients endommagés ou ceux qui demandent l'autorisation de se couper.
         Elle envoie aussi des informations de manière régulière au client (par exemple, la liste des joueurs connectés)
         """
-        old_awaited = self.awaited
-        old_ias = self.ias # Ces variables tampons vont vérifier qu'il y a bien eu un changement par un des clients du nombre de joueurs, IAs ou réels
+
         while True :
             for client in self.conns: 
                 tag = "--" + "-".join([str(client.id), client.pseudo, str(int(client.isAI))]) # Nom du client
@@ -193,10 +199,15 @@ class Server():
                     else :
                         client.send(self.players) # Envoi de la liste de tous les clients actuellement connectés à tous les clients
                         if client.id == int(self.players[2]) : 
-                            client.send("Send N_players")
+                            # Echange d'informations avec l'admin 
+                            client.send("Send N_players") # Acquisition du nombre de joueurs voulus
                             N_players = client.receive().split("--")[1:]
                             self.awaited = int(N_players[0])
                             self.ias = int(N_players[1])
+
+                            client.send("Wait ?") # Demande de lancement de la partie par l'admin 
+                            self.wait_players = (client.receive() == "True")
+
                         else : 
                             client.send("Receive N_players--" + "--".join([str(self.awaited),str(self.ias)])) # Envoi du nombre de joueurs IA et réels (pour modification par un des clients)
 
