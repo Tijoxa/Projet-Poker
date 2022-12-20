@@ -64,15 +64,6 @@ class GUI_waiting:
             else:
                 input_buttons = [self.button_quit]
 
-        while not done:
-
-            if self.client.isAdmin:
-                input_buttons = [self.button_quit,self.button_play, 
-                                self.button_add_player, self.button_del_player,
-                                self.button_add_IA, self.button_del_IA]
-            else:
-                input_buttons = [self.button_quit,self.button_play]
-
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     done = True
