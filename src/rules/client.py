@@ -97,6 +97,9 @@ class Client:
         if received == "Wait ?" :
             if self.waiting_for_game :
                 self.send("False")
+                serverLeave = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                serverLeave.connect(('localhost', 5566))
+                print("Pinging to leave")
             else :
                 self.send("True")
 

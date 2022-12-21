@@ -151,14 +151,15 @@ class Server():
         """
         Récupère des joueurs jusqu'à en avoir autant qu'attendu
         """
-        while (self.wait_players) and (len(self.conns) < self.awaited)  : # TODO : Problème pour sortir de la boucle; socket.listen() est bloquant
+        while (self.wait_players) and (len(self.conns) < self.awaited)  : 
             self.socket.listen() # écoute pour les connections
             conn, addr = self.socket.accept() # le client connecté et son adresse
-            self.conns.append(ClientThread(self, conn, addr)) # création du Thread
-            tag = "-".join([str(self.conns[-1].id), self.conns[-1].pseudo, str(int(self.conns[-1].isAI))]) # Nom du client qui vient d'arriver
-            print(f"Client {tag} connecté !")
-            self.conns[-1].start()
-            self.players += "--"+ tag
+            if self.wait_players :
+                self.conns.append(ClientThread(self, conn, addr)) # création du Thread
+                tag = "-".join([str(self.conns[-1].id), self.conns[-1].pseudo, str(int(self.conns[-1].isAI))]) # Nom du client qui vient d'arriver
+                print(f"Client {tag} connecté !")
+                self.conns[-1].start()
+                self.players += "--"+ tag
         for _ in range(self.ias):
             self.conns.append(AIThread(self, "naive"))
             print("IA connectée !")
@@ -197,17 +198,17 @@ class Server():
                     if client.receive() == "I am closing" : 
                         client.conn.close()
                     else :
-                        client.send(self.players) # Envoi de la liste de tous les clients actuellement connectés à tous les clients
-                        if client.id == int(self.players[2]) : 
-                            # Echange d'informations avec l'admin 
-                            client.send("Send N_players") # Acquisition du nombre de joueurs voulus
-                            N_players = client.receive().split("--")[1:]
-                            self.awaited = int(N_players[0])
-                            self.ias = int(N_players[1])
+                        if self.wait_players : # Partie des informations à échanger dans la salle d'attente 
+                            client.send(self.players) # Envoi de la liste de tous les clients actuellement connectés à tous les clients
+                            if client.id == int(self.players[2]) : 
+                                # Echange d'informations avec l'admin 
+                                client.send("Send N_players") # Acquisition du nombre de joueurs voulus
+                                N_players = client.receive().split("--")[1:]
+                                self.awaited = int(N_players[0])
+                                self.ias = int(N_players[1])
 
-                            client.send("Wait ?") # Demande de lancement de la partie par l'admin 
-                            self.wait_players = (client.receive() == "True")
-
+                                client.send("Wait ?") # Demande de lancement de la partie par l'admin 
+                                self.wait_players = (client.receive() == "True")
                         else : 
                             client.send("Receive N_players--" + "--".join([str(self.awaited),str(self.ias)])) # Envoi du nombre de joueurs IA et réels (pour modification par un des clients)
 
