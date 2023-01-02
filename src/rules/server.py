@@ -187,7 +187,7 @@ class Server():
 
         while True :
             for client in self.conns: 
-                if not client.isAI : 
+                if self.wait_players : 
                     tag = "--" + "-".join([str(client.id), client.pseudo, str(int(client.isAI))]) # Nom du client
                     if not client.ping() :
                         print(f"Connexion avec {tag} perdue !")
@@ -199,19 +199,18 @@ class Server():
                         if client.receive() == "I am closing" : 
                             client.conn.close()
                         else :
-                            if self.wait_players : # Partie des informations à échanger dans la salle d'attente 
-                                client.send(self.players) # Envoi de la liste de tous les clients actuellement connectés à tous les clients
-                                if client.id == int(self.players[2]) : 
-                                    # Echange d'informations avec l'admin 
-                                    client.send("Send N_players") # Acquisition du nombre de joueurs voulus
-                                    N_players = client.receive().split("--")[1:]
-                                    self.awaited = int(N_players[0])
-                                    self.ias = int(N_players[1])
+                            client.send(self.players) # Envoi de la liste de tous les clients actuellement connectés à tous les clients
+                            if client.id == int(self.players[2]) : 
+                                # Echange d'informations avec l'admin 
+                                client.send("Send N_players") # Acquisition du nombre de joueurs voulus
+                                N_players = client.receive().split("--")[1:]
+                                self.awaited = int(N_players[0])
+                                self.ias = int(N_players[1])
 
-                                    client.send("Wait ?") # Demande de lancement de la partie par l'admin 
-                                    self.wait_players = (client.receive() == "True")
-                                else : 
-                                    client.send("Receive N_players--" + "--".join([str(self.awaited),str(self.ias)])) # Envoi du nombre de joueurs IA et réels (pour modification par un des clients)
+                                client.send("Wait ?") # Demande de lancement de la partie par l'admin 
+                                self.wait_players = (client.receive() == "True")
+                            else : 
+                                client.send("Receive N_players--" + "--".join([str(self.awaited),str(self.ias)])) # Envoi du nombre de joueurs IA et réels (pour modification par un des clients)
 
             sleep(2)
 

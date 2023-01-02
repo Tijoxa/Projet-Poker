@@ -1,5 +1,5 @@
 import socket
-
+from time import sleep
 class Client:
     """
     Le client est grossièrement le joueur. Le code comprendra les actions suivantes :
@@ -28,6 +28,7 @@ class Client:
         self.isAdmin = False 
         self.waiting_for_game = False # Deviendra True lorsque l'admin veut lancer la partie
         self.ready_for_game = False # Deviendra True lorsque le joueur est prêt à entrer dans la partie
+        self.action = ""
         self.info = {}
     
     def receive(self, data_size = 1024):
@@ -157,28 +158,35 @@ class Client:
 
     def suivre(self):
         self.send("SUIVRE")
+        self.action = ""
         return True
     
     def coucher(self):
         self.send("COUCHER")
+        self.action = "" 
         return False
 
     def mise(self, value, min_value, max_value):
         if value <= max_value and value >= min_value:
             self.send(f"MISE {value}")
+            self.action = "" 
             return True
         else:
+            self.action = "" 
             return False
 
     def relance(self, value, min_value, max_value):
         if value <= max_value and value >= min_value:
             self.send(f"RELANCE {value}")
+            self.action = "" 
             return True
         else:
+            self.action = "" 
             return False
     
     def check(self):
         self.send("CHECK")
+        self.action = "" 
         return True
     
     
@@ -192,14 +200,18 @@ class Client:
             print("Vos possibilités sont:")
             if info["mise"] == 0:
                 case = 1
-                print("COUCHER\tMISE\tCHECK")
+                print("COUCHER\tCHECK\tMISE")
             elif me["mise"] == info["mise"]:
                 case = 2
-                print("COUCHER\tRELANCE\tCHECK")
+                print("COUCHER\tCHECK\tRELANCE")
             else:
                 case = 3
-                print("SUIVRE\tCOUCHER\tRELANCE")
-            choice = input("\t>")
+                print("COUCHER\tSUIVRE\tRELANCE")
+            
+            choice = self.action
+            while choice == "" :
+                choice = self.action
+                sleep(1)
             if choice.startswith("COUCHER"):
                 self.coucher()
                 return
@@ -228,6 +240,7 @@ class Client:
                     self.suivre()
                     return         
             print("input incorrect")
+            self.action = ""
 
     def run(self):
         """
