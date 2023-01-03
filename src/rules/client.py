@@ -238,7 +238,7 @@ class Client:
             if case == 3:
                 if choice.startswith("SUIVRE"):
                     self.suivre()
-                    return         
+                    return
             print("input incorrect")
             self.action = ""
 
