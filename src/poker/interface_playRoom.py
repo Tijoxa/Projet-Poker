@@ -91,45 +91,45 @@ class GUI_playRoom:
             for i in range(len(cards)):
                 img_card = pg.image.load('cards/'+cards[i]+'.jpg')
                 img_card = pg.transform.scale(img_card,(100,100))
+                img_card = img_card.convert_alpha()
                 self.playRoom.blit(img_card,(400+100*i,300))
                 
            # affichage joueurs :
             font = pg.font.Font('freesansbold.ttf', 15)
             for k, player in enumerate(self.client.info['players']) :
                 if k in [0,1] :
-                    offset = (0,60)
+                    offset = (-30,20)
                     offset_mise = (0,-50)
                 elif k in [2,3] :
-                    offset = (0,60)
-                    offset_mise = (0,50)
+                    offset = (-40,50)
+                    offset_mise = (0,130)
                 elif k == 4 :
-                    offset = (0,130)
-                    offset_mise = (130,50)
+                    offset = (50,130)
+                    offset_mise = (150,40)
                 else : 
-                    offset = (130,0)
-                    offset_mise = (-130,50)
+                    offset = (50,120)
+                    offset_mise = (-100,40)
                     
                 if player['isAI'] :
                     self.playRoom.blit(self.AI_icon, self.players_xy[k])
                 else :
                     self.playRoom.blit(self.player_icon, self.players_xy[k])
 
-                loc = self.players_xy[k]+ offset
-                loc_mise = self.players_xy[k]+ offset_mise
+                pos = self.players_xy[k]
 
                 text_pseudo = font.render(player['pseudo'], True, (0, 0, 128))
                 textRect_pseudo = text_pseudo.get_rect()
-                textRect_pseudo.center = (loc[0], loc[1])
+                textRect_pseudo.center = (pos[0] + offset[0], pos[1] + offset[1])
                 self.playRoom.blit(text_pseudo, textRect_pseudo)
 
                 text_money = font.render(str(player['money']), True, (0, 0, 128))
                 textRect_money = text_money.get_rect()
-                textRect_money.center = (loc[0], loc[1]+30)
+                textRect_money.center = (pos[0] + offset[0], pos[1] + offset[1]+30)
                 self.playRoom.blit(text_money, textRect_money)
 
                 text_mise = font.render(str(player['mise']), True, (0, 0, 128))
                 textRect_mise = text_mise.get_rect()
-                textRect_mise.center = (loc_mise[0], loc_mise[1])
+                textRect_mise.center = (pos[0] + offset_mise[0], pos[1] + offset_mise[1])
                 self.playRoom.blit(text_mise, textRect_mise)
                     
 
