@@ -21,9 +21,13 @@ class GUI_playRoom:
         self.player_icon = my_player.convert_alpha() # Pour gérer la transparence
         self.player_icon = pg.transform.scale(self.player_icon,(100,100))
 
-        my_AI = pg.image.load('icons/player_AI_lv4(Evil_Lime).png')
+        my_AI = pg.image.load('icons/player_AI_lv3.png')
         self.AI_icon = my_AI.convert_alpha() # Pour gérer la transparence
         self.AI_icon = pg.transform.scale(self.AI_icon,(100,100))
+
+        playing_shape = pg.image.load('icons/playing_shape.png')
+        self.playing_shape = playing_shape.convert_alpha() # Pour gérer la transparence
+        self.playing_shape = pg.transform.scale(self.playing_shape,(100,100))        
 
         self.client = client
         
@@ -129,6 +133,9 @@ class GUI_playRoom:
                     self.playRoom.blit(self.AI_icon, self.players_xy[k])
                 else :
                     self.playRoom.blit(self.player_icon, self.players_xy[k])
+
+                if player['isPlaying'] :
+                    self.playRoom.blit(self.playing_shape, self.players_xy[k])
 
                 pos = self.players_xy[k]
 

@@ -84,7 +84,7 @@ def card_to_repr(symbol: str, color: str) -> int:
     return cdhs + rrrr + pppppp + bbbbbbbbbbbbb
 
 
-def repr_to_card(card_repr: int) -> tuple(str, str):
+def repr_to_card(card_repr: int) -> tuple:
     # Get color value
     cdhs = (card_repr & 0xf000) >> 12
     match cdhs:
