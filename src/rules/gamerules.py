@@ -1,4 +1,4 @@
-import combinaison
+import cactus_combinaison
 from cards import Deck
 
 class Game:
@@ -198,7 +198,7 @@ def winner(conns:list, board:list):
     """
     combis = []
     for conn in conns:
-        combis.append((conn, combinaison.abattage(conn.player.main, board)[1]))
+        combis.append((conn, cactus_combinaison.abattage(conn.player.main, board)[1]))
     combis.sort(key = (lambda x: x[1]), reverse = True)
     print(board)
     for combi in combis:
