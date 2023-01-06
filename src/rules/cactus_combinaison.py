@@ -25,6 +25,8 @@ def card_to_repr(symbol: str, color: str) -> int:
             cdhs = 0x2 << 12
         case 'S':
             cdhs = 0x1 << 12
+        case other:
+            raise Exception(f"{other} is not a correct color.")
 
     # Set rank values
     match symbol:
@@ -80,6 +82,8 @@ def card_to_repr(symbol: str, color: str) -> int:
             rrrr = 0xc << 8
             pppppp = primes[12]
             bbbbbbbbbbbbb = 0x1 << 28
+        case other:
+            raise Exception(f"{other} is not a correct value.")
     
     return cdhs + rrrr + pppppp + bbbbbbbbbbbbb
 
@@ -96,6 +100,8 @@ def repr_to_card(card_repr: int) -> tuple:
             color = 'H'
         case 0x1:
             color = 'S'
+        case other:
+            raise Exception(f"{other} is not a correct color.")
 
     # Get rank value
     rrrr = (card_repr & 0xf00) >> 8
@@ -126,6 +132,8 @@ def repr_to_card(card_repr: int) -> tuple:
             symbol = 'K'
         case 0xc:
             symbol = 'A'
+        case other:
+            raise Exception(f"{other} is not a correct value.")
 
     return symbol, color
 
@@ -171,17 +179,17 @@ def abattage(main:list, board:list) -> tuple:
 
     seven_cards = []
     for card in main:
-        symbol = card.value
+        symbol = Card.value_to_symbols(card.value)
         color = card.color
         card_repr = card_to_repr(symbol, color)
         seven_cards.append(card_repr)
     for card in board:
-        symbol = card.value
+        symbol = Card.value_to_symbols(card.value)
         color = card.color
         card_repr = card_to_repr(symbol, color)
         seven_cards.append(card_repr)
 
-    hands_of_five = combinations(seven_cards, 5) # on prend toutes les combinaisons de 5 cartes possibles
+    hands_of_five = list(combinations(seven_cards, 5)) # on prend toutes les combinaisons de 5 cartes possibles
     list_score = []
 
     for hand in hands_of_five:
