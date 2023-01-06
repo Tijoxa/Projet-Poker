@@ -84,7 +84,7 @@ def card_to_repr(symbol: str, color: str) -> int:
     return cdhs + rrrr + pppppp + bbbbbbbbbbbbb
 
 
-def repr_to_card(card_repr: int) -> tuple(str, str):
+def repr_to_card(card_repr: int) -> tuple:
     # Get color value
     cdhs = (card_repr & 0xf000) >> 12
     match cdhs:
@@ -98,7 +98,7 @@ def repr_to_card(card_repr: int) -> tuple(str, str):
             color = 'S'
 
     # Get rank value
-    rrrr = (card_repr & 0xf0) >> 8
+    rrrr = (card_repr & 0xf00) >> 8
     match rrrr:
         case 0x0:
             symbol = '2'
