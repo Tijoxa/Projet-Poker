@@ -92,6 +92,13 @@ class GUI_playRoom:
              
             self.input_mise.draw(self.playRoom)
 
+            # Affichage du pot commun :
+
+            text_pot = self.font.render("Pot : " + str(self.client.info['pot']), True, (0, 0, 128))
+            textRect_pot = text_pot.get_rect()
+            textRect_pot.center = (625,200)
+            self.playRoom.blit(text_pot, textRect_pot)
+
             #affichage des cartes :
             board_cards = self.client.info['board']
             for i in range(len(board_cards)):
