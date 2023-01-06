@@ -171,17 +171,17 @@ def abattage(main:list, board:list) -> tuple:
 
     seven_cards = []
     for card in main:
-        symbol = card.value
+        symbol = Card.value_to_symbols(card.value) # Conversion des int vers les str pour plus de lisibilité 
         color = card.color
         card_repr = card_to_repr(symbol, color)
         seven_cards.append(card_repr)
     for card in board:
-        symbol = card.value
+        symbol = Card.value_to_symbols(card.value)
         color = card.color
         card_repr = card_to_repr(symbol, color)
         seven_cards.append(card_repr)
 
-    hands_of_five = combinations(seven_cards, 5) # on prend toutes les combinaisons de 5 cartes possibles
+    hands_of_five = list(combinations(seven_cards, 5)) # on prend toutes les combinaisons de 5 cartes possibles
     list_score = []
 
     for hand in hands_of_five:
