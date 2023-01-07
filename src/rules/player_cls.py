@@ -12,6 +12,7 @@ class Player:
         self.mise = 0
         self.bet_once = False
         self.all_in = False
+        self.folded = False 
         self.side_pot = 0 # valeur maximale à laquelle peut prétendre un joueur qui est dans le coup mais à tapis
 
     def acted(self, game:"Game", action:str):
@@ -19,7 +20,10 @@ class Player:
         Lorsque le joueur décide d'agir, cette méthode permet de gérer les répercussions de cette action sur la classe
         """
         self.bet_once = True
-        if action == "CHECK" or action == "COUCHER":
+        if action == "CHECK" :
+            return
+        if action == "COUCHER":
+            self.folded = True
             return
         if action == "SUIVRE":
             paye = min(self.money, (game.mise - self.mise))

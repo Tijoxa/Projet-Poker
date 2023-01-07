@@ -131,7 +131,8 @@ class Client:
                 "mise": int(info[0][i][3]), 
                 "isAI": bool(int(info[0][i][4])), 
                 "isDealer": bool(int(info[0][i][5])), 
-                "isPlaying": bool(int(info[0][i][6]))}
+                "isPlaying": bool(int(info[0][i][6])),
+                "folded": bool(int(info[0][i][7]))}
         res = {"players": info[0], "main": info[1][:2], "board": info[1][2:], "mise": int(info[2]), "pot": int(info[3]), "blinde": int(info[4])}
         me = None
         for player in res["players"]:

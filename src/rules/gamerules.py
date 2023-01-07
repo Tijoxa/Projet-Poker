@@ -175,6 +175,7 @@ class Game:
                     self.in_game.remove(conn)
         print(f"###FIN")
         for conn in self.in_game:
+            conn.player.folded = False
             conn.player.all_in = False
             conn.player.side_pot = 0
             print(f"#{conn.id}: {conn.player.money}")
@@ -185,7 +186,7 @@ class Game:
         playingConn: le conn dont c'est le tour de jouer
         target: le conn auquel info sera envoyé
         """
-        players = "##".join(["#".join([str(conn.id), conn.pseudo, str(conn.player.money), str(conn.player.mise), str(int(conn.isAI)), str(int(self.in_game[0] == conn)), str(int(playingConn == conn))]) for conn in self.in_game])
+        players = "##".join(["#".join([str(conn.id), conn.pseudo, str(conn.player.money), str(conn.player.mise), str(int(conn.isAI)), str(int(self.in_game[0] == conn)), str(int(playingConn == conn)), str(int(conn.player.folded))]) for conn in self.in_game])
         cards = "##".join([str(carte) for carte in target.player.main])
         if len(self.board) > 0:
             cards += "##" + "##".join([str(carte) for carte in self.board])

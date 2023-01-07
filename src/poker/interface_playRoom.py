@@ -29,6 +29,10 @@ class GUI_playRoom:
         self.playing_shape = playing_shape.convert_alpha() # Pour gérer la transparence
         self.playing_shape = pg.transform.scale(self.playing_shape,(100,100))        
 
+        folded_shape = pg.image.load('icons/folded_shape.png')
+        self.folded_shape = folded_shape.convert_alpha() # Pour gérer la transparence
+        self.folded_shape = pg.transform.scale(self.folded_shape,(100,100))   
+
         self.client = client
         
         self.players_xy = [(430, 500),(780, 500),(430, 40),(780, 40),(100, 250),(1080, 250)] # liste des coordonnées de placement des joueurs autour de la table à déterminée
@@ -143,6 +147,9 @@ class GUI_playRoom:
 
                 if player['isPlaying'] :
                     self.playRoom.blit(self.playing_shape, self.players_xy[k])
+
+                if player['folded'] : 
+                    self.playRoom.blit(self.folded_shape, self.players_xy[k])
 
                 pos = self.players_xy[k]
 
