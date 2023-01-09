@@ -4,7 +4,7 @@ from cards import Deck
 class Game:
     def __init__(self, blinde:int, money:int , conns:list, server):
         """
-        Met en place les varaibales communes pour le jeu.
+        Met en place les variables communes pour le jeu.
         """
         self.pot = 0
         self.petite_blinde = blinde
@@ -19,13 +19,14 @@ class Game:
         self.server = server
         self.mise = 0
         self.nb_coup = 0
+        self.real_players = sum([not conn.isAI for conn in self.in_game]) # Quand ce nombre vaudra 0, la partie sera arrêtée. Cette condition sera retirée pour l'entraînement d'IA.
         
 
     def play(self):
         """
         Lancement du jeu jusqu'à la ce qu'il ne reste plus qu'un seul joueur en lice
         """
-        while len(self.in_game) > 1:
+        while len(self.in_game) > 1 and self.real_players > 0:
             self.coup()
     
     def coup(self):
@@ -48,10 +49,10 @@ class Game:
             petite_index = 1
             grosse = self.in_game[2]
             under = 0 if len(self.in_game) == 3 else 3
-        petite.send(f"PETITE : {self.petite_blinde}")
+        self.envoi_msg(petite,f"PETITE : {self.petite_blinde}")
         petite.player.mise = min(self.petite_blinde, petite.player.money)
         petite.player.money -= petite.player.mise
-        grosse.send(f"GROSSE : {self.grosse_blinde}")
+        self.envoi_msg(grosse,f"GROSSE : {self.grosse_blinde}")
         grosse.player.mise = min(self.grosse_blinde, grosse.player.money)
         grosse.player.money -= grosse.player.mise
         self.mise = max(petite.player.mise, grosse.player.mise)
@@ -100,8 +101,8 @@ class Game:
                 continue
             for all_conn in self.in_game:
                 info = self.info(conn, all_conn) # string contenant toutes les infos à envoyer aux joueurs
-                all_conn.send(info)
-            action = conn.receive()
+                self.envoi_msg(all_conn,info)
+            action = self.get_action(conn)
             self.acted(conn, action)
             conn.player.acted(self, action)
             if first == started: # on vient de faire un tour complet
@@ -126,7 +127,7 @@ class Game:
         """
         print(f"##{conn.id}:\t{action}")
         for all_conn in self.in_game: # on indique aux autres joueurs l'action réalisée
-            all_conn.send(f"{conn.id}:\t{action}")
+            self.envoi_msg(all_conn,f"{conn.id}:\t{action}")
             print(f"#{all_conn.id}: {all_conn.player.money} [{all_conn.player.mise}]")
         if action == "SUIVRE" or action == "CHECK":
             return
@@ -163,15 +164,15 @@ class Game:
             hand = winning_order[i][1]
             if self.pot > 0:
                 gain = min(self.pot, conn.player.side_pot)
-                conn.send(f"You won {gain}!\nwith {hand}")
+                self.envoi_msg(conn, f"You won {gain}!\nwith {hand}")
                 for conn2 in self.in_game:
                     if conn2 == conn: continue
-                    conn2.send(f"{conn.pseudo} won {gain} \nwith {hand}")
+                    self.envoi_msg(conn2, f"{conn.pseudo} won {gain} \nwith {hand}")
                 conn.player.money += gain
                 self.pot -= gain
             else:
                 if conn.player.money == 0:
-                    conn.send("Malheureusement vous n'avez plus d'argent!")
+                    self.envoi_msg(conn, "Malheureusement vous n'avez plus d'argent!")
                     self.in_game.remove(conn)
         print(f"###FIN")
         for conn in self.in_game:
@@ -192,6 +193,53 @@ class Game:
             cards += "##" + "##".join([str(carte) for carte in self.board])
         res = f"###{players}###{cards}###{self.mise}###{self.pot}###{self.petite_blinde}"
         return res
+
+    def get_action(self, client) :
+        """
+        Cette fonction demande l'action que va effectuer le joueur. Si le joueur a quitté ou veut quitter la partie, il est remplacé par une IA.
+        """
+        if client.isAI :
+            return client.receive()
+        else : 
+            try :
+                action = client.receive()
+            except :
+                print(f"Timeout ou déconnection de {client.id}-{client.pseudo}")
+                client = self.real_to_AI(client)
+                return client.receive()
+            else :
+                return action
+
+    def envoi_msg(self, client, message : str) :
+        """
+        Cette fonction envoie des messages au joueur, en vérifiant s'il existe toujours. Sinon, il est remplacé par une IA.
+        """
+        if client.isAI :
+            client.send(message)
+        else : 
+            try :
+                client.send(message)
+            except :
+                print(f"Timeout ou déconnection de {client.id}-{client.pseudo}")
+                client = self.real_to_AI(client)
+                return client.send(message)
+
+    def real_to_AI(self, client) : 
+        client.server.conns.remove(client)
+        # Création de l'IA remplaçante 
+        info = self.info(client, client) # Pas d'importance à ce qu'à ce moment, l'IA pense que ce soit son tour
+        client = client.fromClientToAI() 
+        client.isAI = True
+        client.ai.get_info(info)
+        # Changement des caractéristiques de la partie
+        self.real_players -= 1
+        for i in range (len(self.in_game)) :
+            if self.in_game[i].id == client.id :
+                self.dans_le_coup.remove(self.in_game[i])
+                self.in_game[i] = client
+                pass
+        return client
+
 
 def winner(conns:list, board:list):
     """

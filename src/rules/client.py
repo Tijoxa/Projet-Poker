@@ -196,7 +196,7 @@ class Client:
         Permet au joueur de choisir ce qu'il veut faire lorsque c'est à son tour.
         """
         info, me = self.info, self.me
-        while True:
+        while not self.closed :
             case = 0
             print("Vos possibilités sont:")
             if info["mise"] == 0:
@@ -210,7 +210,7 @@ class Client:
                 print("COUCHER\tSUIVRE\tRELANCE")
             
             choice = self.action
-            while choice == "" :
+            while choice == "" and not self.closed :
                 choice = self.action
                 sleep(1)
             if choice.startswith("COUCHER"):
@@ -252,10 +252,15 @@ class Client:
         self.server.close() # La connexion est close, après avoir répondu "I am closed" cf manage()
 
     def quit(self):
-        self.closing = True  
+        if not self.ready_for_game :
+            # Le client est encore dans la salle d'attente
+            self.closing = True 
+        else : 
+            self.closed = True 
         
 if __name__ == "__main__":
     host, port = ('localhost', 5566) # cette IP doit être l'IP publique de l'ordinateur sur laquelle tourne le serveur, le port doit être en accord avec celui du serveur
+    socket.setdefaulttimeout(60)
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.connect((host, port))
     pseudo = "#"

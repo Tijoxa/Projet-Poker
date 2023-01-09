@@ -90,6 +90,7 @@ class AIThread(threading.Thread):
         newAI = AIThread(client.server, ai)
         Server.id_count -= 1
         newAI.id = client.id
+        newAI.ai.id = str(client.id) 
         newAI.player = client.player
         return newAI
 
@@ -114,6 +115,7 @@ class Server():
         -------
         None.
         """
+        socket.setdefaulttimeout(60)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.waiting = False # lorsque plusieurs clients sont connectés au serveur ils peuvent chercher à envoyer plusieurs messages en même temps, waiting perùet de les gérer dans leur ordre d'arrivée.
         self.socket.bind(adresse)
@@ -185,34 +187,34 @@ class Server():
         Elle envoie aussi des informations de manière régulière au client (par exemple, la liste des joueurs connectés)
         """
 
-        while True :
-            for client in self.conns: 
-                if self.wait_players : 
-                    tag = "--" + "-".join([str(client.id), client.pseudo, str(int(client.isAI))]) # Nom du client
-                    if not client.ping() :
-                        print(f"Connexion avec {tag} perdue !")
-                        client.conn.close() # On ferme la connexion avec le client
-                        self.conns.remove(client) # On retire le client de la liste des clients
-                        self.players = self.players.replace(tag, '') # On retire le joueur perdu de la liste 
+        while self.wait_players :
+            for client in [conn for conn in self.conns if not conn.isAI] : 
+                tag = "--" + "-".join([str(client.id), client.pseudo, str(int(client.isAI))]) # Nom du client
+                if not client.ping() :
+                    print(f"Connexion avec {tag} perdue !")
+                    client.conn.close() # On ferme la connexion avec le client
+                    self.conns.remove(client) # On retire le client de la liste des clients
+                    self.players = self.players.replace(tag, '') # On retire le joueur perdu de la liste 
+                else :
+                    client.send("Are you closing") # Vérification des fermetures de client 
+                    if client.receive() == "I am closing" : 
+                        client.conn.close()
                     else :
-                        client.send("Are you closing") # Vérification des fermetures de client 
-                        if client.receive() == "I am closing" : 
-                            client.conn.close()
-                        else :
-                            client.send(self.players) # Envoi de la liste de tous les clients actuellement connectés à tous les clients
-                            if client.id == int(self.players[2]) : 
-                                # Echange d'informations avec l'admin 
-                                client.send("Send N_players") # Acquisition du nombre de joueurs voulus
-                                N_players = client.receive().split("--")[1:]
-                                self.awaited = int(N_players[0])
-                                self.ias = int(N_players[1])
+                        client.send(self.players) # Envoi de la liste de tous les clients actuellement connectés à tous les clients
+                        if client.id == int(self.players[2]) : 
+                            # Echange d'informations avec l'admin 
+                            client.send("Send N_players") # Acquisition du nombre de joueurs voulus
+                            N_players = client.receive().split("--")[1:]
+                            self.awaited = int(N_players[0])
+                            self.ias = int(N_players[1])
 
-                                client.send("Wait ?") # Demande de lancement de la partie par l'admin 
-                                self.wait_players = (client.receive() == "True")
-                            else : 
-                                client.send("Receive N_players--" + "--".join([str(self.awaited),str(self.ias)])) # Envoi du nombre de joueurs IA et réels (pour modification par un des clients)
-
+                            client.send("Wait ?") # Demande de lancement de la partie par l'admin 
+                            self.wait_players = (client.receive() == "True")
+                        else : 
+                            client.send("Receive N_players--" + "--".join([str(self.awaited),str(self.ias)])) # Envoi du nombre de joueurs IA et réels (pour modification par un des clients)
             sleep(2)
+        print("Fini !")
+        pass
 
     def close(self):
         """

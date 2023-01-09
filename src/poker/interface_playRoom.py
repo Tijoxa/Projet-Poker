@@ -94,7 +94,8 @@ class GUI_playRoom:
             for button in input_buttons : 
                 button.draw(self.playRoom)
              
-            self.input_mise.draw(self.playRoom)
+            if self.client.me['isPlaying'] :
+                self.input_mise.draw(self.playRoom)
 
             # Affichage du pot commun :
 
@@ -109,7 +110,7 @@ class GUI_playRoom:
                 img_card = pg.image.load('cards/'+board_cards[i]+'.jpg')
                 img_card = pg.transform.scale(img_card,(100,100))
                 img_card = img_card.convert_alpha()
-                self.playRoom.blit(img_card,(400+100*i,300))
+                self.playRoom.blit(img_card,(400+100*i,275))
 
             my_cards = self.client.info['main'] 
             for i in range(len(my_cards)):

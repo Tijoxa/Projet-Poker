@@ -28,6 +28,9 @@ if __name__ == "__main__":
         elif screen == "PLAY":
             gui = GUI_playRoom(client)
             screen = gui.mainloop()
+            if screen == "HOME" :
+                client.quit()
+                connected = False
         elif screen == "":
-            client.quit() 
+            client.quit()
             done = True
