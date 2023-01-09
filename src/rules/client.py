@@ -138,6 +138,8 @@ class Client:
         for player in res["players"]:
             if player["id"] == self.id:
                 me = player
+        if res["main"] == [''] :
+            res["main"] = []
         return res, me
 
     def show_info(self):

@@ -213,7 +213,6 @@ class Server():
                         else : 
                             client.send("Receive N_players--" + "--".join([str(self.awaited),str(self.ias)])) # Envoi du nombre de joueurs IA et réels (pour modification par un des clients)
             sleep(2)
-        print("Fini !")
         pass
 
     def close(self):
