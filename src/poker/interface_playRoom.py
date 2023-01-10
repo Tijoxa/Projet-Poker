@@ -126,8 +126,9 @@ class GUI_playRoom:
                 self.playRoom.blit(img_card,(100+100*i,530))
                 
            # affichage joueurs :
-            
-            for k, player in enumerate(self.client.info['players']) :
+            players = self.client.info['players']
+            players = sorted(players, key=lambda x:x["id"])
+            for k, player in enumerate(players) :
                 if k in [0,1] :
                     offset = (-30,20)
                     offset_mise = (0,-50)

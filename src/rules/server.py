@@ -224,7 +224,7 @@ class Server():
                 client.send("close")
                 client.conn.close()
         print("fin d'exécution")
-        if len(self.game.in_game) == 1:
+        if len(self.game.in_game) > 1:
             execution = time() - self.start_time
             print(f"{self.game.in_game[0].pseudo} (id: {self.game.in_game[0].id})  won!")
             print(f"partie jouée en {self.game.nb_coup} coups.")

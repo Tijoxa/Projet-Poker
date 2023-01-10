@@ -242,7 +242,10 @@ class Client:
                 if choice.startswith("SUIVRE"):
                     self.suivre()
                     return
-            print("input incorrect")
+            if self.closed : 
+                print("Au revoir !")
+            else :
+                print("input incorrect")
             self.action = ""
 
     def run(self):
