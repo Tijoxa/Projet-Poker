@@ -35,7 +35,7 @@ class GUI_playRoom:
 
         self.client = client
         
-        self.players_xy = [(430, 500),(780, 500),(430, 40),(780, 40),(100, 250),(1080, 250)] # liste des coordonnées de placement des joueurs autour de la table à déterminée
+        self.players_xy = [(430, 500),(780, 500),(1080, 250),(780, 40),(430, 40),(100, 250)] # liste des coordonnées de placement des joueurs autour de la table à déterminée
 
         #boutons :
         self.input_quit = Button(20, 30, 200, 50, text = "Quitter")
@@ -132,10 +132,10 @@ class GUI_playRoom:
                 if k in [0,1] :
                     offset = (-30,20)
                     offset_mise = (0,-50)
-                elif k in [2,3] :
+                elif k in [3,4] :
                     offset = (-40,50)
                     offset_mise = (0,130)
-                elif k == 4 :
+                elif k == 5 :
                     offset = (50,130)
                     offset_mise = (150,40)
                 else : 
