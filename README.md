@@ -12,6 +12,12 @@ Le jeu de Poker comportera plusieurs modules :
 
 Pour que le projet puisse fonctionner sur Linux, Windows et Mac, le langage et les bibliothèques utilisés seront (à peu près) libres.
 
+# Installation
+
+Version de Python $\geq$ 3.10.x
+
+Packages : `pip install numpy pygame`
+
 # Comment jouer 
 
 - Lancer le serveur dans `src/rules/` : 
