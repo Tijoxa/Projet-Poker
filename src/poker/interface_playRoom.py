@@ -107,14 +107,14 @@ class GUI_playRoom:
             #affichage des cartes :
             board_cards = self.client.info['board']
             for i in range(len(board_cards)):
-                img_card = pg.image.load('cards/'+board_cards[i]+'.jpg')
+                img_card = pg.image.load('cards/'+board_cards[i]+'.png')
                 img_card = pg.transform.scale(img_card,(100,100))
                 img_card = img_card.convert_alpha()
                 self.playRoom.blit(img_card,(400+100*i,275))
 
             my_cards = self.client.info['main'] 
             for i in range(len(my_cards)):
-                img_card = pg.image.load('cards/'+my_cards[i]+'.jpg')
+                img_card = pg.image.load('cards/'+my_cards[i]+'.png')
                 img_card = pg.transform.scale(img_card,(80,80))
                 img_card = img_card.convert_alpha()
 
