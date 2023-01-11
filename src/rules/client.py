@@ -1,5 +1,5 @@
 import socket
-
+from time import sleep
 class Client:
     """
     Le client est grossièrement le joueur. Le code comprendra les actions suivantes :
@@ -26,6 +26,9 @@ class Client:
         self.closed = False # Le socket est fermé, et déconnecté du serveur
         self.N_players = ["3","2"] # Nombre de joueurs attendus et nombre d'IAs
         self.isAdmin = False 
+        self.waiting_for_game = False # Deviendra True lorsque l'admin veut lancer la partie
+        self.ready_for_game = False # Deviendra True lorsque le joueur est prêt à entrer dans la partie
+        self.action = ""
         self.info = {}
     
     def receive(self, data_size = 1024):
@@ -66,6 +69,10 @@ class Client:
             self.show_info()
             if self.me["isPlaying"]:
                 self.client_input()
+
+        if received.startswith("0###"): # Infos de lancement de partie
+            self.info, self.me = self.traitement_info(received[1:])
+
         # Réception de la liste des joueurs, dans la salle d'attente
         if received.startswith("--"): 
             self.players = received.split("--")[1:]
@@ -87,6 +94,25 @@ class Client:
                 self.send("I am closing") 
                 self.closed = True 
 
+        # Le serveur demande à l'admin s'il faut continuer d'attendre dans la salle d'attente
+        if received == "Wait ?" :
+            if self.waiting_for_game :
+                self.send("False")
+                serverLeave = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                serverLeave.connect(('localhost', 5566))
+                print("Pinging to leave")
+            else :
+                self.send("True")
+
+        # Le serveur se prépare à lancer la partie, et demande au client s'il est prêt
+        if received == "Ready ?" :
+            if self.info != {} :
+                print("Entering game")
+                self.send("ready")
+                self.ready_for_game = True
+
+
+
     def traitement_info(self, info):
         """
         Info est un message envoyé par le serveur contenant tous ce dont le joueur a besoin
@@ -105,12 +131,15 @@ class Client:
                 "mise": int(info[0][i][3]), 
                 "isAI": bool(int(info[0][i][4])), 
                 "isDealer": bool(int(info[0][i][5])), 
-                "isPlaying": bool(int(info[0][i][6]))}
+                "isPlaying": bool(int(info[0][i][6])),
+                "folded": bool(int(info[0][i][7]))}
         res = {"players": info[0], "main": info[1][:2], "board": info[1][2:], "mise": int(info[2]), "pot": int(info[3]), "blinde": int(info[4])}
         me = None
         for player in res["players"]:
             if player["id"] == self.id:
                 me = player
+        if res["main"] == [''] :
+            res["main"] = []
         return res, me
 
     def show_info(self):
@@ -120,7 +149,8 @@ class Client:
         info, me = self.info, self.me
         if me is not None:
             res = f"{me['pseudo']}, vous avez {me['money']}$ \n A ce tour d'enchère, vous avez misé {me['mise']}$\n"
-            res += f"Votre main:\t{info['main'][0]}\t{info['main'][1]}\n"
+            if len(info['main']) > 1 :
+                res += f"Votre main:\t{info['main'][0]}\t{info['main'][1]}\n"
             for player in info["players"]:
                 res += f"\t{player['pseudo']} possède {player['money']}$, a misé {player['mise']}$\n"
             res += f"Les cartes au centre de la table: {info['board']}, la mise sur laquelle il faut s'aligner est {info['mise']}\nLe pot vaut {info['pot']}"
@@ -131,28 +161,35 @@ class Client:
 
     def suivre(self):
         self.send("SUIVRE")
+        self.action = ""
         return True
     
     def coucher(self):
         self.send("COUCHER")
+        self.action = "" 
         return False
 
     def mise(self, value, min_value, max_value):
         if value <= max_value and value >= min_value:
             self.send(f"MISE {value}")
+            self.action = "" 
             return True
         else:
+            self.action = "" 
             return False
 
     def relance(self, value, min_value, max_value):
         if value <= max_value and value >= min_value:
             self.send(f"RELANCE {value}")
+            self.action = "" 
             return True
         else:
+            self.action = "" 
             return False
     
     def check(self):
         self.send("CHECK")
+        self.action = "" 
         return True
     
     
@@ -161,19 +198,23 @@ class Client:
         Permet au joueur de choisir ce qu'il veut faire lorsque c'est à son tour.
         """
         info, me = self.info, self.me
-        while True:
+        while not self.closed :
             case = 0
             print("Vos possibilités sont:")
             if info["mise"] == 0:
                 case = 1
-                print("COUCHER\tMISE\tCHECK")
+                print("COUCHER\tCHECK\tMISE")
             elif me["mise"] == info["mise"]:
                 case = 2
-                print("COUCHER\tRELANCE\tCHECK")
+                print("COUCHER\tCHECK\tRELANCE")
             else:
                 case = 3
-                print("SUIVRE\tCOUCHER\tRELANCE")
-            choice = input("\t>")
+                print("COUCHER\tSUIVRE\tRELANCE")
+            
+            choice = self.action
+            while choice == "" and not self.closed :
+                choice = self.action
+                sleep(1)
             if choice.startswith("COUCHER"):
                 self.coucher()
                 return
@@ -200,8 +241,12 @@ class Client:
             if case == 3:
                 if choice.startswith("SUIVRE"):
                     self.suivre()
-                    return         
-            print("input incorrect")
+                    return
+            if self.closed : 
+                print("Au revoir !")
+            else :
+                print("input incorrect")
+            self.action = ""
 
     def run(self):
         """
@@ -212,10 +257,15 @@ class Client:
         self.server.close() # La connexion est close, après avoir répondu "I am closed" cf manage()
 
     def quit(self):
-        self.closing = True  
+        if not self.ready_for_game :
+            # Le client est encore dans la salle d'attente
+            self.closing = True 
+        else : 
+            self.closed = True 
         
 if __name__ == "__main__":
     host, port = ('localhost', 5566) # cette IP doit être l'IP publique de l'ordinateur sur laquelle tourne le serveur, le port doit être en accord avec celui du serveur
+    socket.setdefaulttimeout(200)
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.connect((host, port))
     pseudo = "#"

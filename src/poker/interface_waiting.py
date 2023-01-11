@@ -60,9 +60,9 @@ class GUI_waiting:
             if self.client.isAdmin:
                 input_buttons = [self.button_quit,self.button_play, 
                                 self.button_add_player, self.button_del_player,
-                                self.button_add_IA, self.button_del_IA]
+                                self.button_add_IA, self.button_del_IA, self.button_play]
             else:
-                input_buttons = [self.button_quit,self.button_play]
+                input_buttons = [self.button_quit]
 
             for event in pg.event.get():
                 if event.type == pg.QUIT:
@@ -129,12 +129,15 @@ class GUI_waiting:
                 pg.quit()
                 return "HOME"
 
-            if self.button_play.CurrentState:
-                self.button_play.CurrentState = False
+            if self.client.ready_for_game :
                 pg.quit()
                 return "PLAY"
 
             if self.client.isAdmin:
+                if self.button_play.CurrentState:
+                    self.button_play.CurrentState = False
+                    self.client.waiting_for_game = True
+
                 if self.button_del_IA.CurrentState:
                     self.button_del_IA.CurrentState = False
                     self.client.N_players[1] = str(max(0,int(self.client.N_players[1]) -1)) 

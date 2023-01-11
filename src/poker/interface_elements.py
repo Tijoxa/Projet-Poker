@@ -183,7 +183,7 @@ class Button():
  
 
 class Player_display:
-    """Class medelizing a player around the table"""
+    """Class modelizing a player around the table"""
     def __init__(self, x, y, w = 200, h = 150, 
                  pseudo = "name", isMe = None, isAI=False,
                  textType = "TimeNewRoman",
@@ -243,8 +243,6 @@ class Player_display:
             
         if self.isMe is not None and self.isPlaying:
             info, me= self.isMe.info, self.isMe.me
-            case = 0
-            print("Vos possibilités sont:")
             if info["mise"] == 0:
                 self.myActions[2].draw(screen)
                 self.myActions[4].draw(screen)
@@ -260,23 +258,6 @@ class Player_display:
                 self.myActions[2].draw(screen)
                 self.myActions[3].draw(screen)
                 #print("SUIVRE\tCOUCHER\tRELANCE")
-            if case == 1:
-                if choice.startswith("MISE"):
-                    try:
-                        value = int(choice[5:])
-                        if self.mise(value, min(info["blinde"], me["money"]), me["money"]):
-                            return
-                    except ValueError:
-                        pass
-            
-            if case == 2 or case == 3:
-                if choice.startswith("RELANCE"):
-                    try:
-                        value = int(choice[8:])
-                        if self.relance(value, info["mise"] * 2, me["money"]):
-                            return      
-                    except ValueError:
-                        pass      
         
     def update_player_info(self, info):
         #mise à jour des infos du joueur en fonction des infos du server
