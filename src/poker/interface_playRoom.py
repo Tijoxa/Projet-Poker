@@ -108,14 +108,16 @@ class GUI_playRoom:
             board_cards = self.client.info['board']
             for i in range(len(board_cards)):
                 img_card = pg.image.load('cards/'+board_cards[i]+'.png')
-                img_card = pg.transform.scale(img_card,(100,100))
+                (width, height) = img_card.get_size()
+                img_card = pg.transform.scale(img_card,(width//5.5,height//5.5))
                 img_card = img_card.convert_alpha()
-                self.playRoom.blit(img_card,(400+100*i,275))
+                self.playRoom.blit(img_card,(400+100*i,250))
 
             my_cards = self.client.info['main'] 
             for i in range(len(my_cards)):
                 img_card = pg.image.load('cards/'+my_cards[i]+'.png')
-                img_card = pg.transform.scale(img_card,(80,80))
+                (width, height) = img_card.get_size()
+                img_card = pg.transform.scale(img_card,(width//6.5,height//6.5))
                 img_card = img_card.convert_alpha()
 
                 text_cards = self.font.render("Mes cartes", True, (0, 0, 128))
