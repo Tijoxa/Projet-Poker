@@ -25,6 +25,9 @@ def card_to_repr(symbol: str, color: str) -> int:
             cdhs = 0x2 << 12
         case 'S':
             cdhs = 0x1 << 12
+        case other:
+            raise Exception(f"{other} is not a correct color.")
+
 
     # Set rank values
     match symbol:
@@ -80,6 +83,9 @@ def card_to_repr(symbol: str, color: str) -> int:
             rrrr = 0xc << 8
             pppppp = primes[12]
             bbbbbbbbbbbbb = 0x1 << 28
+        case other:
+            raise Exception(f"{other} is not a correct value.")
+
     
     return cdhs + rrrr + pppppp + bbbbbbbbbbbbb
 
@@ -96,9 +102,12 @@ def repr_to_card(card_repr: int) -> tuple:
             color = 'H'
         case 0x1:
             color = 'S'
+        case other:
+            raise Exception(f"{other} is not a correct color.")
 
     # Get rank value
-    rrrr = (card_repr & 0xf0) >> 8
+    rrrr = (card_repr & 0xf00) >> 8
+
     match rrrr:
         case 0x0:
             symbol = '2'
@@ -126,6 +135,8 @@ def repr_to_card(card_repr: int) -> tuple:
             symbol = 'K'
         case 0xc:
             symbol = 'A'
+        case other:
+            raise Exception(f"{other} is not a correct value.")
 
     return symbol, color
 
@@ -171,7 +182,9 @@ def abattage(main:list, board:list) -> tuple:
 
     seven_cards = []
     for card in main:
+
         symbol = Card.value_to_symbols(card.value) # Conversion des int vers les str pour plus de lisibilité 
+
         color = card.color
         card_repr = card_to_repr(symbol, color)
         seven_cards.append(card_repr)
