@@ -33,6 +33,10 @@ class GUI_playRoom:
         self.folded_shape = folded_shape.convert_alpha() # Pour gérer la transparence
         self.folded_shape = pg.transform.scale(self.folded_shape,(100,100))   
 
+        back_cards = pg.image.load('cards/back.png')
+        self.back_cards = back_cards.convert_alpha()
+        self.back_cards = pg.transform.scale(self.back_cards,(self.back_cards.get_width()//6.5,self.back_cards.get_height()//6.5))
+
         self.client = client
         
         self.players_xy = [(430, 500),(780, 500),(1080, 250),(780, 40),(430, 40),(100, 250)] # liste des coordonnées de placement des joueurs autour de la table à déterminée
@@ -134,28 +138,42 @@ class GUI_playRoom:
                 if k in [0,1] :
                     offset = (-30,20)
                     offset_mise = (0,-50)
+                    offset_cartes = [(25,-80),(51,-80)]
+                    angle_cartes = 0
                 elif k in [3,4] :
                     offset = (-40,50)
                     offset_mise = (0,130)
+                    offset_cartes = [(25, 125),(51,125)]
+                    angle_cartes = 180
                 elif k == 5 :
                     offset = (50,130)
-                    offset_mise = (150,40)
+                    offset_mise = (160,30)
+                    offset_cartes = [(150,50),(150,76)]
+                    angle_cartes = 90
                 else : 
                     offset = (50,120)
-                    offset_mise = (-100,40)
+                    offset_mise = (-100,30)
+                    offset_cartes = [(-100,50),(-100,76)]
+                    angle_cartes = 270
                     
+                pos = self.players_xy[k]
+
                 if player['isAI'] :
-                    self.playRoom.blit(self.AI_icon, self.players_xy[k])
+                    self.playRoom.blit(self.AI_icon, pos)
                 else :
-                    self.playRoom.blit(self.player_icon, self.players_xy[k])
+                    self.playRoom.blit(self.player_icon, pos)
 
                 if player['isPlaying'] :
-                    self.playRoom.blit(self.playing_shape, self.players_xy[k])
+                    self.playRoom.blit(self.playing_shape, pos)
 
                 if player['folded'] : 
-                    self.playRoom.blit(self.folded_shape, self.players_xy[k])
+                    self.playRoom.blit(self.folded_shape, pos)
+                else : 
+                    img_rot = pg.transform.rotate(self.back_cards, angle_cartes)
+                    self.playRoom.blit(img_rot, (pos[0] + offset_cartes[0][0],  pos[1] + offset_cartes[0][1]))
+                    self.playRoom.blit(img_rot, (pos[0] + offset_cartes[1][0],  pos[1] + offset_cartes[1][1]))
 
-                pos = self.players_xy[k]
+                
 
                 text_pseudo = self.font.render(player['pseudo'], True, (0, 0, 128))
                 textRect_pseudo = text_pseudo.get_rect()
