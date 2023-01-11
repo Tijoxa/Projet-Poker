@@ -265,7 +265,7 @@ class Client:
         
 if __name__ == "__main__":
     host, port = ('localhost', 5566) # cette IP doit être l'IP publique de l'ordinateur sur laquelle tourne le serveur, le port doit être en accord avec celui du serveur
-    socket.setdefaulttimeout(60)
+    socket.setdefaulttimeout(200)
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.connect((host, port))
     pseudo = "#"

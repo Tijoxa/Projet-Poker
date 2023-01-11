@@ -115,7 +115,7 @@ class Server():
         -------
         None.
         """
-        socket.setdefaulttimeout(60)
+        socket.setdefaulttimeout(180)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.waiting = False # lorsque plusieurs clients sont connectés au serveur ils peuvent chercher à envoyer plusieurs messages en même temps, waiting perùet de les gérer dans leur ordre d'arrivée.
         self.socket.bind(adresse)
