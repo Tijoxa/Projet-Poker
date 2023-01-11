@@ -126,7 +126,7 @@ class GUI_playRoom:
 
                 text_cards = self.font.render("Mes cartes", True, (0, 0, 128))
                 textRect_cards = text_cards.get_rect()
-                textRect_cards.center = (200,500)
+                textRect_cards.center = (190,500)
                 self.playRoom.blit(text_cards, textRect_cards)
 
                 self.playRoom.blit(img_card,(100+100*i,530))
