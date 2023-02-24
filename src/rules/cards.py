@@ -9,6 +9,7 @@ class Card:
         """
         Crée une carte à partir d'un symbole et d'une couleur
         """
+        self.symbol = symbol
         self.value = Card.symbols_to_value(symbol)
         if couleur in COLORS:
             self.color = couleur

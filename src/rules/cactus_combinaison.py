@@ -14,6 +14,7 @@ from cards import Card
 
 primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41]
 
+
 def card_to_repr(symbol: str, color: str) -> int:
     # Set color values
     match color:
@@ -27,7 +28,6 @@ def card_to_repr(symbol: str, color: str) -> int:
             cdhs = 0x1 << 12
         case other:
             raise Exception(f"{other} is not a correct color.")
-
 
     # Set rank values
     match symbol:
@@ -86,7 +86,6 @@ def card_to_repr(symbol: str, color: str) -> int:
         case other:
             raise Exception(f"{other} is not a correct value.")
 
-    
     return cdhs + rrrr + pppppp + bbbbbbbbbbbbb
 
 
@@ -142,7 +141,9 @@ def repr_to_card(card_repr: int) -> tuple:
 
 
 np_big_number = np.array(0xe91aaa35, np.uint32)
-np_2, np_4, np_8, np_16, np_19 = np.array(2, np.uint8), np.array(4, np.uint8), np.array(8, np.uint8), np.array(16, np.uint8), np.array(19, np.uint8)
+np_2, np_4, np_8, np_16, np_19 = np.array(2, np.uint8), np.array(
+    4, np.uint8), np.array(8, np.uint8), np.array(16, np.uint8), np.array(19, np.uint8)
+
 
 def find_fast(u):
     u = np.array(u, np.uint32)
@@ -150,10 +151,10 @@ def find_fast(u):
     u ^= u >> np_16
     u += u << np_8
     u ^= u >> np_4
-    b  = (u >> np_8) & 0x1ff
-    a  = (u + (u << np_2)) >> np_19
-    r  = a ^ arrays.hash_adjust[b]
-    
+    b = (u >> np_8) & 0x1ff
+    a = (u + (u << np_2)) >> np_19
+    r = a ^ arrays.hash_adjust[b]
+
     return r
 
 
@@ -171,11 +172,29 @@ def eval_5cards(c1, c2, c3, c4, c5):
 
     # This performs a perfect-hash lookup for remaining hands
     q = (c1 & 0xff) * (c2 & 0xff) * (c3 & 0xff) * (c4 & 0xff) * (c5 & 0xff)
-    
+
     return arrays.hash_values[find_fast(q)]
 
 
-def abattage(main:list, board:list) -> tuple:
+def eval_7cards(all_cards: list):
+    seven_cards = []
+    for card in all_cards:
+        symbol = card[0]
+        color = card[1]
+        card_repr = card_to_repr(symbol, color)
+        seven_cards.append(card_repr)
+    hands_of_five = list(combinations(seven_cards, 5))
+    list_score = []
+
+    for hand in hands_of_five:
+        score = eval_5cards(*hand)  # quelle est le score rattaché à cette main
+        list_score.append(score)
+
+    best_score = min(list_score)
+    return best_score
+
+
+def abattage(main: list, board: list) -> tuple:
     """
     Fonction prenant les 2 cartes dans la main d'un joueur et les 5 cartes du board et renvoie la meilleure main de 5 cartes possibles
     """
@@ -183,7 +202,8 @@ def abattage(main:list, board:list) -> tuple:
     seven_cards = []
     for card in main:
 
-        symbol = Card.value_to_symbols(card.value) # Conversion des int vers les str pour plus de lisibilité 
+        # Conversion des int vers les str pour plus de lisibilité
+        symbol = Card.value_to_symbols(card.value)
 
         color = card.color
         card_repr = card_to_repr(symbol, color)
@@ -194,19 +214,21 @@ def abattage(main:list, board:list) -> tuple:
         card_repr = card_to_repr(symbol, color)
         seven_cards.append(card_repr)
 
-    hands_of_five = list(combinations(seven_cards, 5)) # on prend toutes les combinaisons de 5 cartes possibles
+    # on prend toutes les combinaisons de 5 cartes possibles
+    hands_of_five = list(combinations(seven_cards, 5))
     list_score = []
 
     for hand in hands_of_five:
-        score = eval_5cards(*hand) # quelle est le score rattaché à cette main
+        score = eval_5cards(*hand)  # quelle est le score rattaché à cette main
         list_score.append(score)
 
-    best_score_idx, best_score = np.argmin(list_score), min(list_score) # la meilleure main est celle minimisant le score donné par eval_5cards
+    # la meilleure main est celle minimisant le score donné par eval_5cards
+    best_score_idx, best_score = np.argmin(list_score), min(list_score)
     best_hand_repr = hands_of_five[best_score_idx]
     best_hand = []
 
     for card_repr in best_hand_repr:
         symbol, color = repr_to_card(card_repr)
         best_hand.append(Card(symbol, color))
-    
+
     return best_hand, best_score
