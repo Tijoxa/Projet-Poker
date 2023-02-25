@@ -68,3 +68,15 @@ class Deck:
         self.paquet = self.paquet + self.drawn
         self.drawn = []
         random.shuffle(self.paquet)
+
+def remove_card_from_list(liste, card):
+    to_delete = -1
+    for index in range(len(liste)):
+        if str(card) == str(liste[index]):
+            to_delete = index
+            break
+    if to_delete < 0:
+        raise IndexError
+    else:
+        liste.pop(index)
+    return liste
