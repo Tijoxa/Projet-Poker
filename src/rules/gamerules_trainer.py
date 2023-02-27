@@ -26,7 +26,7 @@ class Game:
         """
         Lancement du jeu jusqu'à la ce qu'il ne reste plus qu'un seul joueur en lice
         """
-        while len(self.in_game) > 1 and self.real_players > 0:
+        while len(self.in_game) > 1:# and self.real_players > 0:
             self.coup()
     
     def coup(self):
@@ -81,7 +81,7 @@ class Game:
             conn.player.main = [self.deck.draw()]
         for conn in self.in_game:
             conn.player.main.append(self.deck.draw())
-            print(f"{conn.id}\t{conn.player.main}\t{conn.player.money}")
+            #print(f"{conn.id}\t{conn.player.main}\t{conn.player.money}")
         money_everywhere = sum([conn.player.money for conn in self.in_game]) + sum([conn.player.mise for conn in self.in_game])
         if money_everywhere != self.total_money: raise ValueError("De l'argent a disparu !")
 
@@ -90,10 +90,10 @@ class Game:
         Gère un tour d'enchères
         """
         started = first # player qui a commencé l'enchère
-        print(f"### TOUR [{self.pot}]")
+        #print(f"### TOUR [{self.pot}]")
         for conn in self.in_game:
             conn.player.bet_once = False
-            print(f"#{conn.id}: {conn.player.money} [{conn.player.mise}]")
+            #print(f"#{conn.id}: {conn.player.money} [{conn.player.mise}]")
         while not self.fin_d_enchere():
             conn = self.in_game[first]
             first = (first + 1)%(len(self.in_game))
@@ -125,10 +125,10 @@ class Game:
         -  conn: le joueur représenté par le client connecté
         -  action: l'action du joueur
         """
-        print(f"##{conn.id}:\t{action}")
+        #print(f"##{conn.id}:\t{action}")
         for all_conn in self.in_game: # on indique aux autres joueurs l'action réalisée
             self.envoi_msg(all_conn,f"{conn.id}:\t{action}")
-            print(f"#{all_conn.id}: {all_conn.player.money} [{all_conn.player.mise}]")
+            #print(f"#{all_conn.id}: {all_conn.player.money} [{all_conn.player.mise}]")
         if action == "SUIVRE" or action == "CHECK":
             return
         if action == "COUCHER":
@@ -174,12 +174,12 @@ class Game:
                 if conn.player.money == 0:
                     self.envoi_msg(conn, "Malheureusement vous n'avez plus d'argent!")
                     self.in_game.remove(conn)
-        print(f"###FIN")
+        #print(f"###FIN")
         for conn in self.in_game:
             conn.player.folded = False
             conn.player.all_in = False
             conn.player.side_pot = 0
-            print(f"#{conn.id}: {conn.player.money}")
+            #print(f"#{conn.id}: {conn.player.money}")
     
     def info(self, playingConn, target):
         """
@@ -204,7 +204,7 @@ class Game:
             try :
                 action = client.receive()
             except :
-                print(f"Timeout ou déconnection de {client.id}-{client.pseudo}")
+                #print(f"Timeout ou déconnection de {client.id}-{client.pseudo}")
                 client = self.real_to_AI(client)
                 return client.receive()
             else :
@@ -220,7 +220,7 @@ class Game:
             try :
                 client.send(message)
             except :
-                print(f"Timeout ou déconnection de {client.id}-{client.pseudo}")
+                #print(f"Timeout ou déconnection de {client.id}-{client.pseudo}")
                 client = self.real_to_AI(client)
                 return client.send(message)
 
@@ -249,7 +249,8 @@ def winner(conns:list, board:list):
     for conn in conns:
         combis.append((conn, cactus_combinaison.abattage(conn.player.main, board)[1]))
     combis.sort(key = (lambda x: x[1]))
-    print(board)
+    #print(board)
     for combi in combis:
-        print(f"{combi[0].id}\t{combi[0].pseudo}\t{combi[1]}")
+        #print(f"{combi[0].id}\t{combi[0].pseudo}\t{combi[1]}")
+        pass
     return combis

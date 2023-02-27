@@ -56,7 +56,7 @@ class ClientThread(threading.Thread):
         return self
 
 class AIThread(threading.Thread):
-    def __init__(self, server, ai):
+    def __init__(self, server, ai, **params):
         """
         Un objet vu par le programme de la même façon qu'un ClientThread mais qui est relié à une IA.
         """
@@ -64,7 +64,7 @@ class AIThread(threading.Thread):
         self.server = server
         Server.id_count += 1
         self.id = Server.id_count
-        self.ai = intelligence.ai(ai, self.id)
+        self.ai = intelligence.ai(ai, self.id, params)
         self.isAI = True
         self.pseudo = self.ai.pseudo
         self.player = player_cls.Player.new_player()
@@ -224,7 +224,7 @@ class Server():
                 client.send("close")
                 client.conn.close()
         print("fin d'exécution")
-        if len(self.game.in_game) > 1:
+        if len(self.game.in_game) > 0:
             execution = time() - self.start_time
             print(f"{self.game.in_game[0].pseudo} (id: {self.game.in_game[0].id})  won!")
             print(f"partie jouée en {self.game.nb_coup} coups.")
