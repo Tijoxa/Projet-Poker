@@ -1,5 +1,7 @@
-from random import randint
-
+from random import randint, uniform, choices, sample
+import cards
+from itertools import combinations
+import cactus_evaluator
 class AI:
     def __init__(self, id):
         """
@@ -70,6 +72,71 @@ class Naive(AI):
             choix = f"RELANCE {value}" 
         return choix       
 
+class Random_Completer(AI):
+    def __init__(self, id, depth = 100, hands_tested = 100, min_lim_couche = 0.1, max_lim_couche = 0.4, min_lim_relance = 0.6, max_lim_relance = 0.9):
+        super().__init__(id)
+        self.pseudo = "Random Completer"
+        self.depth = depth
+        self.hands_tested = hands_tested
+        # On définit aléatoirement une stratégie de fold et raise
+        self.max_couche = uniform(min_lim_couche, max_lim_couche)
+        self.min_relance = uniform(min_lim_relance,max_lim_relance)
+
+    def victory_rate(self):
+        hand = self.info["main"]
+        board = self.info["board"]
+        paquet = []
+        for symbol in cards.SYMBOLS:
+            for color in cards.COLORS:
+                paquet.append(symbol + color)
+        victories = 0
+        for card in (hand + board):
+            paquet.remove(card)
+        for _ in range(self.depth):
+            complete = sample(paquet, k=5 - len(board))
+            paquet_completion = paquet.copy()
+            for card in complete:
+                paquet_completion.remove(card)
+            complete = board + complete
+            score = cactus_evaluator.evaluate_7(*hand, *complete)
+            rng_hands = choices(list(combinations(paquet_completion, 2)), k = self.hands_tested)
+            rng_scores = [cactus_evaluator.evaluate_7(*rng_hand, *complete) for rng_hand in rng_hands]
+            victories += sum([score <= rng_score for rng_score in rng_scores])
+        rate = victories/(self.depth * self.hands_tested)
+        return rate
+
+    def decision(self):
+        if self.info["mise"] == 0:
+            possible = ["CHECK", "MISE"]
+        elif self.me["mise"] == self.info["mise"]:
+            possible = ["CHECK", "RELANCE"]
+        else:
+            possible = ["COUCHER", "SUIVRE", "RELANCE"]
+        rate = self.victory_rate()
+        choix = ""
+        if rate < self.max_couche:
+            choix = possible[0]
+        elif rate < self.min_relance:
+            choix = possible[-2 + len(possible)]
+        else:
+            choix = possible[-1]
+        
+        if choix == "MISE":
+            mini_value = min(self.info["blinde"], self.me["money"])
+            maxi_value = max(mini_value, round(0.1 * self.me["money"]))
+            value = randint(mini_value, maxi_value)
+            choix = f"MISE {value}"
+        if choix == "RELANCE":
+            mini_value = self.info["mise"] * 2
+            maxi_value = max(min(self.info["blinde"], self.me["money"]), self.me["mise"] + round(0.2 * self.me["money"]))
+            if mini_value > maxi_value:
+                choix = possible[-2 + len(possible)]
+            else:
+                value = randint(mini_value, maxi_value)
+                choix = f"RELANCE {value}" 
+        return choix#, rate    
+        
+
 class PatrickCruel(AI):
     def __init__(self, id):
         """
@@ -78,9 +145,33 @@ class PatrickCruel(AI):
         super().__init__(id)
         self.pseudo = "Patrick Cruel"
 
-def ai(type, id):
+def ai(type, id, params = {}):
     """
     renvoie une IA selon le type demandé
     """
     if type == "naive":
         return Naive(id)
+    if type == "RC":
+        depth = params["depth"]
+        hands_tested = params["hands_tested"]
+        min_lim_couche = params["min_lim_couche"]
+        max_lim_couche = params["max_lim_couche"]
+        min_lim_relance = params["min_lim_relance"]
+        max_lim_relance = params["max_lim_relance"]
+        return Random_Completer(id, depth, hands_tested, min_lim_couche, max_lim_couche, min_lim_relance, max_lim_relance)
+    
+    
+if __name__ == "__main__":
+    ai = Random_Completer(000, depth = 100, hands_tested = 100, min_lim_couche = 0.15, max_lim_couche = 0.35, min_lim_relance = 0.6, max_lim_relance = 0.8)
+    cards_in = sample([str(card) for card in cards.Deck().paquet], k=7)
+    ai.info = {"mise": 20, "main": [], "board": [], "blinde": 2}
+    ai.me = {"mise": 10, "money": 100}
+    ai.info["main"] = [cards_in[0], cards_in[1]]
+    print(ai.decision())
+    ai.info["board"] = [cards_in[2], cards_in[3], cards_in[4]]
+    print(ai.decision())
+    ai.info["board"].append(cards_in[5])
+    print(ai.decision())
+    ai.info["board"].append(cards_in[6])
+    print(ai.decision())
+    print(ai.info["main"], ai.info["board"])
