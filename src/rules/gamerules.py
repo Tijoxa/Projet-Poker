@@ -49,10 +49,10 @@ class Game:
             petite_index = 1
             grosse = self.in_game[2]
             under = 0 if len(self.in_game) == 3 else 3
-        self.envoi_msg(petite,f"PETITE : {self.petite_blinde}")
+        self.envoi_msg(petite,f"#T#PETITE : {self.petite_blinde}")
         petite.player.mise = min(self.petite_blinde, petite.player.money)
         petite.player.money -= petite.player.mise
-        self.envoi_msg(grosse,f"GROSSE : {self.grosse_blinde}")
+        self.envoi_msg(grosse,f"#T#GROSSE : {self.grosse_blinde}")
         grosse.player.mise = min(self.grosse_blinde, grosse.player.money)
         grosse.player.money -= grosse.player.mise
         self.mise = max(petite.player.mise, grosse.player.mise)
@@ -127,7 +127,7 @@ class Game:
         """
         print(f"##{conn.id}:\t{action}")
         for all_conn in self.in_game: # on indique aux autres joueurs l'action réalisée
-            self.envoi_msg(all_conn,f"{conn.id}:\t{action}")
+            self.envoi_msg(all_conn,f"#T#{conn.id}:\t{action}")
             print(f"#{all_conn.id}: {all_conn.player.money} [{all_conn.player.mise}]")
         if action == "SUIVRE" or action == "CHECK":
             return
@@ -164,10 +164,10 @@ class Game:
             hand = winning_order[i][1]
             if self.pot > 0:
                 gain = min(self.pot, conn.player.side_pot)
-                self.envoi_msg(conn, f"You won {gain}!\nwith {hand}")
+                self.envoi_msg(conn, f"#T#You won {gain}!\nwith {hand}")
                 for conn2 in self.in_game:
                     if conn2 == conn: continue
-                    self.envoi_msg(conn2, f"{conn.pseudo} won {gain} \nwith {hand}")
+                    self.envoi_msg(conn2, f"#T#{conn.pseudo} won {gain} \nwith {hand}")
                 conn.player.money += gain
                 self.pot -= gain
             else:
@@ -176,6 +176,8 @@ class Game:
                     self.in_game.remove(conn)
         print(f"###FIN")
         for conn in self.in_game:
+
+            self.envoi_msg(conn, "#ABAT " + str(winning_order[0][0].id) + "#"+ "#".join([str(conn.id) + "_" + "_".join([str(card) for card in conn.player.main]) for conn in self.in_game]))
             conn.player.folded = False
             conn.player.all_in = False
             conn.player.side_pot = 0

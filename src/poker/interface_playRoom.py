@@ -33,9 +33,17 @@ class GUI_playRoom:
         self.folded_shape = folded_shape.convert_alpha() # Pour gérer la transparence
         self.folded_shape = pg.transform.scale(self.folded_shape,(100,100))   
 
+        winning_shape = pg.image.load('icons/winning_shape.png')
+        self.winning_shape = winning_shape.convert_alpha() # Pour gérer la transparence
+        self.winning_shape = pg.transform.scale(self.winning_shape,(100,100))  
+
         back_cards = pg.image.load('cards/back.png')
         self.back_cards = back_cards.convert_alpha()
         self.back_cards = pg.transform.scale(self.back_cards,(self.back_cards.get_width()//6.5,self.back_cards.get_height()//6.5))
+
+        winning_card = pg.image.load('icons/winning_card.png')
+        self.winning_card = winning_card.convert_alpha()
+        self.winning_card = pg.transform.scale(self.winning_card,(self.winning_card.get_width()//6.5,self.winning_card.get_height()//6.5))
 
         self.client = client
         
@@ -166,12 +174,29 @@ class GUI_playRoom:
                 if player['isPlaying'] :
                     self.playRoom.blit(self.playing_shape, pos)
 
+                if player['id'] == self.client.abattage["won"] : 
+                    self.playRoom.blit(self.winning_shape, pos)
+
                 if player['folded'] : 
                     self.playRoom.blit(self.folded_shape, pos)
                 else : 
                     img_rot = pg.transform.rotate(self.back_cards, angle_cartes)
-                    self.playRoom.blit(img_rot, (pos[0] + offset_cartes[0][0],  pos[1] + offset_cartes[0][1]))
-                    self.playRoom.blit(img_rot, (pos[0] + offset_cartes[1][0],  pos[1] + offset_cartes[1][1]))
+                    # Affichage des cartes des joueurs
+                    if self.client.abattage["won"] != -1 : 
+                        cards = self.client.abattage[str(player['id'])]
+                        for i in range(len(cards)) :
+                            img_card = pg.image.load('cards/'+cards[i]+'.png')
+                            img_card = pg.transform.scale(img_card,(self.back_cards.get_width(),self.back_cards.get_height()))
+                            img_card = img_card.convert_alpha()
+                            img_rot = pg.transform.rotate(img_card, angle_cartes)
+                            self.playRoom.blit(img_rot, (pos[0] + offset_cartes[i][0],  pos[1] + offset_cartes[i][1]))
+                        if player['id'] == self.client.abattage["won"]  :
+                            winning_rot = pg.transform.rotate(self.winning_card, angle_cartes)
+                            self.playRoom.blit(winning_rot, (pos[0] + offset_cartes[0][0],  pos[1] + offset_cartes[0][1]))
+                            self.playRoom.blit(winning_rot, (pos[0] + offset_cartes[1][0],  pos[1] + offset_cartes[1][1]))
+                    else : 
+                        self.playRoom.blit(img_rot, (pos[0] + offset_cartes[0][0],  pos[1] + offset_cartes[0][1]))
+                        self.playRoom.blit(img_rot, (pos[0] + offset_cartes[1][0],  pos[1] + offset_cartes[1][1]))
 
                 
 
@@ -210,7 +235,11 @@ class GUI_playRoom:
                 self.input_quit.CurrentState = False 
 
             pg.display.flip()
-            clock.tick(30)
+            clock.tick(60)
+
+            if self.client.abattage["won"] != -1 :
+                pg.time.wait(3200)
+                self.client.abattage["won"] = -1 
         pg.quit()
         return ""
 

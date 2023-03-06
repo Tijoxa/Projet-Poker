@@ -30,6 +30,8 @@ class Client:
         self.ready_for_game = False # Deviendra True lorsque le joueur est prêt à entrer dans la partie
         self.action = ""
         self.info = {}
+        self.abattage = {} 
+        self.abattage["won"] = -1 # Indice du joueur qui a gagné la manche. Vaut -1 tant que personne n'a gagné.
     
     def receive(self, data_size = 1024):
         """
@@ -111,6 +113,15 @@ class Client:
                 self.send("ready")
                 self.ready_for_game = True
 
+        if received.startswith("#ABAT") :
+            abattage = received.split("#")
+            for hand in abattage[2:] :
+                hand = hand.split("_")
+                self.abattage[hand[0]] = hand[1:]
+            self.abattage["won"] = abattage[1][-1]
+
+        if received.startswith("#T#") : 
+            print(received[3:])
 
 
     def traitement_info(self, info):
