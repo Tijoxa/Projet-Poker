@@ -274,7 +274,158 @@ class Gambler(AI):
                 choix = f"RELANCE {value}" 
         return choix
 
+class Pot_Rater(AI):
+    def __init__(self, id, depth = 100, hands_tested = 100, min_lim_couche = 0.1, max_lim_couche = 0.4, min_lim_relance = 0.6, max_lim_relance = 0.9):
+        super().__init__(id)
+        self.pseudo = "Pot Rater"
+        self.depth = depth
+        self.hands_tested = hands_tested
+        # On définit aléatoirement une stratégie de fold et raise
+        self.max_couche = uniform(min_lim_couche, max_lim_couche)
+        self.min_relance = uniform(min_lim_relance,max_lim_relance)
 
+    def victory_rate(self):
+        hand = self.info["main"]
+        board = self.info["board"]
+        paquet = []
+        for symbol in cards.SYMBOLS:
+            for color in cards.COLORS:
+                paquet.append(symbol + color)
+        victories = 0
+        for card in (hand + board):
+            paquet.remove(card)
+        for _ in range(self.depth):
+            complete = sample(paquet, k=5 - len(board))
+            paquet_completion = paquet.copy()
+            for card in complete:
+                paquet_completion.remove(card)
+            complete = board + complete
+            score = cactus_evaluator.evaluate_7(*hand, *complete)
+            rng_hands = choices(list(combinations(paquet_completion, 2)), k = self.hands_tested)
+            rng_scores = [cactus_evaluator.evaluate_7(*rng_hand, *complete) for rng_hand in rng_hands]
+            victories += sum([score <= rng_score for rng_score in rng_scores])
+        rate = victories/(self.depth * self.hands_tested)
+        return rate
+    
+    def pot_potential(self):
+        paye = min(self.me["money"], (self.info["mise"] - self.me["mise"]))
+        pot = self.info["pot"] + sum(self.info["players"][i]["mise"] for i in range(len(self.info["players"])))
+        if paye == 0: paye = self.info["blinde"]
+        return (pot + paye)/paye
+
+    def decision(self):
+        rate = self.victory_rate()
+        potential = self.pot_potential()
+        return self.choix(rate * potential)
+    
+    def choix(self, rate):
+        if self.info["mise"] == 0:
+            possible = ["CHECK", "MISE"]
+        elif self.me["mise"] == self.info["mise"]:
+            possible = ["CHECK", "RELANCE"]
+        else:
+            possible = ["COUCHER", "SUIVRE", "RELANCE"]
+        choix = ""
+        if rate < self.max_couche:
+            choix = possible[0]
+        elif rate < self.min_relance:
+            choix = possible[-2 + len(possible)]
+        else:
+            choix = possible[-1]
+        
+        if choix == "MISE":
+            mini_value = min(self.info["blinde"], self.me["money"])
+            maxi_value = max(mini_value, round(0.1 * self.me["money"]))
+            value = randint(mini_value, maxi_value)
+            choix = f"MISE {value}"
+        if choix == "RELANCE":
+            mini_value = self.info["mise"] * 2
+            maxi_value = max(min(self.info["blinde"], self.me["money"]), self.me["mise"] + round(0.2 * self.me["money"]))
+            if mini_value > maxi_value:
+                choix = possible[-2 + len(possible)]
+            else:
+                value = randint(mini_value, maxi_value)
+                choix = f"RELANCE {value}" 
+        return choix#, rate    
+
+class CowBoy_Pot_Rater(AI):
+    def __init__(self, id, depth = 100, hands_tested = 100, lim1 = 0.8, lim2 = 1, lim3 = 1.3):
+        super().__init__(id)
+        self.pseudo = "Cowboy"
+        self.depth = depth
+        self.hands_tested = hands_tested
+        # On définit aléatoirement une stratégie de fold et raise
+        self.lim1 = lim1
+        self.lim2 = lim2
+        self.lim3 = lim3
+
+    def victory_rate(self):
+        hand = self.info["main"]
+        board = self.info["board"]
+        paquet = []
+        for symbol in cards.SYMBOLS:
+            for color in cards.COLORS:
+                paquet.append(symbol + color)
+        victories = 0
+        for card in (hand + board):
+            paquet.remove(card)
+        for _ in range(self.depth):
+            complete = sample(paquet, k=5 - len(board))
+            paquet_completion = paquet.copy()
+            for card in complete:
+                paquet_completion.remove(card)
+            complete = board + complete
+            score = cactus_evaluator.evaluate_7(*hand, *complete)
+            rng_hands = choices(list(combinations(paquet_completion, 2)), k = self.hands_tested)
+            rng_scores = [cactus_evaluator.evaluate_7(*rng_hand, *complete) for rng_hand in rng_hands]
+            victories += sum([score <= rng_score for rng_score in rng_scores])
+        rate = victories/(self.depth * self.hands_tested)
+        return rate
+    
+    def pot_potential(self):
+        paye = min(self.me["money"], (self.info["mise"] - self.me["mise"]))
+        pot = self.info["pot"] + sum(self.info["players"][i]["mise"] for i in range(len(self.info["players"])))
+        if paye == 0: paye = self.info["blinde"]
+        return (pot + paye)/paye
+
+    def decision(self):
+        rate = self.victory_rate()
+        potential = self.pot_potential()
+        return self.choix(rate * potential)
+    
+    def choix(self, rate):
+        if self.info["mise"] == 0:
+            possible = ["CHECK", "MISE"]
+        elif self.me["mise"] == self.info["mise"]:
+            possible = ["CHECK", "RELANCE"]
+        else:
+            possible = ["COUCHER", "SUIVRE", "RELANCE"]
+        choix = ""
+        if rate < self.lim1:
+            choix = choices([possible[0], possible[-1]], weights=[95,5], k=1)[0]
+        elif rate < self.lim2:
+            if len(possible) == 2:
+                choix = choices(possible, weights=[85, 15], k=1)[0]
+            elif len(possible) == 3:
+                choix = choices(possible, weights=[80,5,15], k=1)[0]
+        elif rate < self.lim3:
+            choix = choices([possible[-2], possible[-1]], weights=[60, 40], k=1)[0]
+        else:
+            choix = choices([possible[-2], possible[-1]], weights=[30, 70], k=1)[0] 
+        if choix == "MISE":
+            mini_value = min(self.info["blinde"], self.me["money"])
+            maxi_value = max(mini_value, round(0.1 * self.me["money"]))
+            value = randint(mini_value, maxi_value)
+            choix = f"MISE {value}"
+        if choix == "RELANCE":
+            mini_value = self.info["mise"] * 2
+            maxi_value = max(min(self.info["blinde"], self.me["money"]), self.me["mise"] + round(0.2 * self.me["money"]))
+            if mini_value > maxi_value:
+                choix = possible[-2 + len(possible)]
+            else:
+                value = randint(mini_value, maxi_value)
+                choix = f"RELANCE {value}" 
+        return choix#, rate    
 
 class PatrickCruel(AI):
     def __init__(self, id):
@@ -290,14 +441,24 @@ def ai(type, id, params = {}):
     """
     if type == "naive":
         return Naive(id)
-    if type == "RC":
+    if type == "RC" or type == "PR":
         depth = params["depth"]
         hands_tested = params["hands_tested"]
         min_lim_couche = params["min_lim_couche"]
         max_lim_couche = params["max_lim_couche"]
         min_lim_relance = params["min_lim_relance"]
         max_lim_relance = params["max_lim_relance"]
-        return Random_Completer(id, depth, hands_tested, min_lim_couche, max_lim_couche, min_lim_relance, max_lim_relance)
+        if type == "RC":
+            return Random_Completer(id, depth, hands_tested, min_lim_couche, max_lim_couche, min_lim_relance, max_lim_relance)
+        elif type == "PR":
+            return Pot_Rater(id, depth, hands_tested, min_lim_couche, max_lim_couche, min_lim_relance, max_lim_relance)
+    if type == "CBPR":
+        depth = params["depth"]
+        hands_tested = params["hands_tested"]
+        lim1 = params["lim1"]
+        lim2 = params["lim2"]
+        lim3 = params["lim3"]
+        return CowBoy_Pot_Rater(id, depth, hands_tested, lim1, lim2, lim3)
     if type == "ERC":
         depth = params["depth"]
         hands_tested = params["hands_tested"]
