@@ -115,11 +115,12 @@ class Client:
 
         if received.startswith("#ABAT") :
             abattage = received.split("#")
-            for hand in abattage[2:] :
+            for hand in abattage[2:-1] :
                 hand = hand.split("_")
                 self.abattage[hand[0]] = hand[1:]
+            self.info['board'] = abattage[-1].split("_")
             self.abattage["won"] = abattage[1][-1]
-
+            
         if received.startswith("#T#") : 
             print(received[3:])
 

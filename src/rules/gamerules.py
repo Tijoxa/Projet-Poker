@@ -176,8 +176,9 @@ class Game:
                     self.in_game.remove(conn)
         print(f"###FIN")
         for conn in self.in_game:
+            mains = "#".join([str(conn.id) + "_" + "_".join([str(card) for card in conn.player.main]) for conn in self.in_game])
 
-            self.envoi_msg(conn, "#ABAT " + str(winning_order[0][0].id) + "#"+ "#".join([str(conn.id) + "_" + "_".join([str(card) for card in conn.player.main]) for conn in self.in_game]))
+            self.envoi_msg(conn, "#ABAT " + str(winning_order[0][0].id) + "#"+ mains + "#" + "_".join([str(carte) for carte in self.board]))
             conn.player.folded = False
             conn.player.all_in = False
             conn.player.side_pot = 0

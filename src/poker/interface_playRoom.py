@@ -238,8 +238,14 @@ class GUI_playRoom:
             clock.tick(60)
 
             if self.client.abattage["won"] != -1 :
-                pg.time.wait(3200)
-                self.client.abattage["won"] = -1 
+                if next_turn:
+                    pg.time.wait(3200)
+                    self.client.abattage["won"] = -1 
+                else:
+                    next_turn = True
+            else:
+                next_turn = False
+                
         pg.quit()
         return ""
 
