@@ -19,29 +19,28 @@ HANDS_PER_LEVEL = 100
 victory = [0] * NB_IAS
 ids = [0] * NB_IAS
 
-plt.bar(range(NB_IAS), victory, tick_label = ["naive", "RC", "PR", "CL", "ERC", "CBPR"])
+plt.bar(range(NB_IAS), victory, tick_label = ["RC", "PR", "ERC", "CBPR", "RFN", "RFTP"])
 plt.ion()
 plt.show()
 for i in tqdm(range(NB_GAMES)):
-    server.conns[0] = server_trainer.AIThread(server, "naive")
-    server.conns[1] = server_trainer.AIThread(server, "RC", depth = DEPTH, hands_tested = HANDS_PER_LEVEL, min_lim_couche = 0.15, max_lim_couche = 0.35, min_lim_relance = 0.6, max_lim_relance = 0.8)
-    server.conns[2] = server_trainer.AIThread(server, "PR", depth = DEPTH, hands_tested = HANDS_PER_LEVEL, min_lim_couche = 0.8, max_lim_couche = 1, min_lim_relance = 1.3, max_lim_relance = 1.5)
-    server.conns[3] = server_trainer.AIThread(server, "CL")
-    #server.conns[4] = server_trainer.AIThread(server, "GB")
-    server.conns[4] = server_trainer.AIThread(server, "ERC", depth = DEPTH, hands_tested = HANDS_PER_LEVEL)
-    server.conns[5] = server_trainer.AIThread(server, "CBPR", depth = DEPTH, hands_tested = HANDS_PER_LEVEL, lim1 = 0.8, lim2 = 1, lim3 = 1.3)
+    server.conns[0] = server_trainer.AIThread(server, "RC", depth = DEPTH, hands_tested = HANDS_PER_LEVEL, min_lim_couche = 0.15, max_lim_couche = 0.35, min_lim_relance = 0.6, max_lim_relance = 0.8)
+    server.conns[1] = server_trainer.AIThread(server, "PR", depth = DEPTH, hands_tested = HANDS_PER_LEVEL, min_lim_couche = 0.8, max_lim_couche = 1, min_lim_relance = 1.3, max_lim_relance = 1.5)
+    server.conns[2] = server_trainer.AIThread(server, "ERC", depth = DEPTH, hands_tested = HANDS_PER_LEVEL)
+    server.conns[3] = server_trainer.AIThread(server, "CBPR", depth = DEPTH, hands_tested = HANDS_PER_LEVEL, lim1 = 0.8, lim2 = 1, lim3 = 1.3)
+    server.conns[4] = server_trainer.AIThread(server, "RFN", depth = DEPTH, hands_tested = HANDS_PER_LEVEL)
+    server.conns[5] = server_trainer.AIThread(server, "RFTP", depth = DEPTH, hands_tested = HANDS_PER_LEVEL)
     for i in range(NB_IAS): ids[i] = server.conns[i].id
     coup, exec, winner = server.run(BLINDE, MONEY)
     victory[ids.index(winner)] += 1
-    #print(f"Naif: {victory[0]} - RC: {victory[1]} - ERC: {victory[2]} - CL: {victory[3]} - GB: {victory[4]}", end = "\r")
+
     plt.clf()
-    plt.bar(range(NB_IAS), victory, tick_label = ["NAIF", "RC", "PR", "CL", "ERC", "CBPR"])
+    plt.bar(range(NB_IAS), victory, tick_label = ["RC", "PR", "ERC", "CBPR", "RFN", "RFTP"])
     plt.pause(0.2)
     plt.ion()
     plt.show()
-print(f"Naif: {victory[0]} - RC: {victory[1]} - PR: {victory[2]} - CL: {victory[3]} - ERC: {victory[4]} - CBPR: {victory[5]}")
+print(f"RC: {victory[0]} - PR: {victory[1]} - ERC: {victory[2]} - CBPR: {victory[3]} - RFN: {victory[4]} - RFTP: {victory[5]}")
 plt.clf()
-plt.bar(range(NB_IAS), victory, tick_label = ["naive", "RC", "PR", "CL", "ERC", "CBPR"])
+plt.bar(range(NB_IAS), victory, tick_label = ["RC", "PR", "ERC", "CBPR", "RFN", "RFTP"])
 plt.pause(0.2)
 plt.show()
 input()

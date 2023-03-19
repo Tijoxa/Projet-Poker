@@ -427,6 +427,100 @@ class CowBoy_Pot_Rater(AI):
                 choix = f"RELANCE {value}" 
         return choix#, rate    
 
+
+class Reinforced(AI):
+    def __init__(self, id, depth = 100, hands_tested = 100, weights = None):
+        super().__init__(id)
+        self.pseudo = "Random Completer"
+        self.depth = depth
+        self.hands_tested = hands_tested
+        self.weights = np.ones((11,3))
+        if weights is not None:
+            self.weights = weights
+        self.start_money = 0
+        self.last_action = 0
+        self.last_rate_level = 0
+        
+
+
+
+    def victory_rate(self):
+        hand = self.info["main"]
+        board = self.info["board"]
+        paquet = []
+        for symbol in cards.SYMBOLS:
+            for color in cards.COLORS:
+                paquet.append(symbol + color)
+        victories = 0
+        for card in (hand + board):
+            paquet.remove(card)
+        for _ in range(self.depth):
+            complete = sample(paquet, k=5 - len(board))
+            paquet_completion = paquet.copy()
+            for card in complete:
+                paquet_completion.remove(card)
+            complete = board + complete
+            score = cactus_evaluator.evaluate_7(*hand, *complete)
+            rng_hands = choices(list(combinations(paquet_completion, 2)), k = self.hands_tested)
+            rng_scores = [cactus_evaluator.evaluate_7(*rng_hand, *complete) for rng_hand in rng_hands]
+            victories += sum([score <= rng_score for rng_score in rng_scores])
+        rate = victories/(self.depth * self.hands_tested)
+        return rate
+
+    def decision(self):
+        rate = self.victory_rate()
+        if len(self.info['board']) == 0:
+            self.start_money = self.me['money']
+        else:
+            potential_win = self.me["money"] + rate * self.info['pot']
+            self.Q = potential_win/self.start_money
+            if self.Q >= 1:
+                self.weights[self.last_rate_level][self.last_action] += 1.
+            else:
+                if self.last_action == 2:
+                    self.weights[self.last_rate_level][sample([0,1], k=1)[0]] += 1.
+                else:
+                    self.weights[self.last_rate_level][self.last_action - 1] += 1.
+        
+        return self.choix(rate)
+    
+    def choix(self, rate):
+        rate_level = int(np.ceil(10 * rate))
+        self.last_rate_level = rate_level
+        if self.info["mise"] == 0:
+            possible = ["CHECK", "MISE"]
+        elif self.me["mise"] == self.info["mise"]:
+            possible = ["CHECK", "RELANCE"]
+        else:
+            possible = ["COUCHER", "SUIVRE", "RELANCE"]
+        choix = ""
+        choix = choices([0, 1, 2], weights=self.weights[rate_level])[0]
+        self.last_action = choix
+        if len(possible) == 3:
+            choix = possible[choix]
+        if len(possible) == 2:
+            if choix == 2:
+                choix = possible[-1]
+            else:
+                choix = possible[0]
+        
+        
+        if choix == "MISE":
+            mini_value = min(self.info["blinde"], self.me["money"])
+            maxi_value = max(mini_value, round(0.1 * self.me["money"]))
+            value = randint(mini_value, maxi_value)
+            choix = f"MISE {value}"
+        if choix == "RELANCE":
+            mini_value = self.info["mise"] * 2
+            maxi_value = max(min(self.info["blinde"], self.me["money"]), self.me["mise"] + round(0.2 * self.me["money"]))
+            if mini_value > maxi_value:
+                choix = possible[-2 + len(possible)]
+                self.last_action = 1
+            else:
+                value = randint(mini_value, maxi_value)
+                choix = f"RELANCE {value}" 
+        return choix#, rate    
+
 class PatrickCruel(AI):
     def __init__(self, id):
         """
@@ -467,6 +561,48 @@ def ai(type, id, params = {}):
         return Caller(id)
     if type == "GB":
         return Gambler(id)
+    if type == "RF":
+        depth = params["depth"]
+        hands_tested = params["hands_tested"]
+        weights = params["weights"]
+        return Reinforced(id, depth, hands_tested, weights)
+    if type == "RFN":
+        depth = params["depth"]
+        hands_tested = params["hands_tested"]
+        weights = np.ones((11,3))
+        return Reinforced(id, depth, hands_tested, weights)
+    if type == "RFTP":
+        depth = params["depth"]
+        hands_tested = params["hands_tested"]
+        weights = [[1,    1,     1],
+                   [93,   77,    52],
+                   [651,  611,   363],
+                   [2265, 1820,  950],
+                   [4044, 3883,  937],
+                   [3098, 10727, 236],
+                   [761,  14344, 14],
+                   [195,  9252,  256],
+                   [255,  4217,  601],
+                   [1862, 2140,  80],
+                   [411,  1110,  499]]
+        return Reinforced(id, depth, hands_tested, weights)
+    if type == "CRUEL":
+        res = Random_Completer(id, depth=100, hands_tested = 100, min_lim_couche = 0.15, max_lim_couche = 0.35, min_lim_relance = 0.6, max_lim_relance = 0.8)
+        res.pseudo = "Patrick Cruel"
+        return res
+    if type == "DARTH":
+        res = Pot_Rater(id, depth = 100, hands_tested = 100, min_lim_couche = 0.8, max_lim_couche = 1, min_lim_relance = 1.3, max_lim_relance = 1.5)
+        res.pseudo = "Darth Didier Lime"
+        return res
+    if type == "LUIGI":
+        res = exp_Random_Completer(id, depth = 100, hands_tested = 100)
+        res.pseudo = "Luigi"
+        return res
+    if type == "TRUELLE":
+        weights = np.ones((11,3))
+        res = Reinforced(id, depth=100, hands_tested=100, weights=weights)
+        res.pseudo = "Patrick Truelle"
+        return res
     raise ValueError(f"L'IA {type} n'existe pas.")
     
 if __name__ == "__main__":
