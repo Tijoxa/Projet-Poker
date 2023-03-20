@@ -123,11 +123,7 @@ class Server():
         self.awaited = awaited
         self.ias = ias
         self.iasLevel = []
-<<<<<<< Updated upstream
-        self.dictLevel = {1:"TRUELLE", 2:"LUIGI", 3:"DARTH", 4:"CRUEL"}
-=======
         self.dictLevel = {1: "CHIKA", 2: "LUIGI", 3: "DARTH", 4: "CRUEL"}
->>>>>>> Stashed changes
         self.players = "" # Liste des noms des joueurs, IA comprises. Cette liste est variable au cours du temps 
         self.wait_players = True # Attente des joueurs avant de lancer la partie 
         print("serveur prêt")
