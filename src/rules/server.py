@@ -122,6 +122,8 @@ class Server():
         self.conns = [] # liste des différents clients
         self.awaited = awaited
         self.ias = ias
+        self.iasLevel = []
+        self.dictLevel = {1:"CRUEL", 2:"DARTH", 3:"LUIGI", 4:"TRUELLE"}
         self.players = "" # Liste des noms des joueurs, IA comprises. Cette liste est variable au cours du temps 
         self.wait_players = True # Attente des joueurs avant de lancer la partie 
         print("serveur prêt")
@@ -162,8 +164,8 @@ class Server():
                 print(f"Client {tag} connecté !")
                 self.conns[-1].start()
                 self.players += "--"+ tag
-        for _ in range(self.ias):
-            self.conns.append(AIThread(self, "naive"))
+        for lvl in self.iasLevel:
+            self.conns.append(AIThread(self, self.dictLevel[lvl])) 
             print("IA connectée !")
             self.conns[-1].start()
 
@@ -206,8 +208,9 @@ class Server():
                             client.send("Send N_players") # Acquisition du nombre de joueurs voulus
                             N_players = client.receive().split("--")[1:]
                             self.awaited = int(N_players[0])
-                            self.ias = int(N_players[1])
-
+                            self.ias = int(N_players[1]) 
+                            if self.ias > 0:
+                                self.iasLevel = [int(lvl) for lvl in N_players[2:]] 
                             client.send("Wait ?") # Demande de lancement de la partie par l'admin 
                             self.wait_players = (client.receive() == "True")
                         else : 

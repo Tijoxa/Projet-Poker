@@ -93,10 +93,10 @@ class GUI_playRoom:
                 if event.type == pg.QUIT:
                     done = True
                 for button in input_buttons :
-                    # CHECK THE POSITION OF THE MOUSE
-                    mouse_pos = pg.mouse.get_pos()
-                    # CHECKING THE MOUSE CLICK EVENT
-                    mouse_click = pg.mouse.get_pressed()
+                    # # CHECK THE POSITION OF THE MOUSE
+                    # mouse_pos = pg.mouse.get_pos()
+                    # # CHECKING THE MOUSE CLICK EVENT
+                    # mouse_click = pg.mouse.get_pressed()
                     button.handle_event(event)
                 self.input_mise.handle_event(event)
                 

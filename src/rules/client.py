@@ -24,7 +24,7 @@ class Client:
         self.players = [] # Liste des clients connectés au serveur
         self.closing = False # Sur le point de se fermer
         self.closed = False # Le socket est fermé, et déconnecté du serveur
-        self.N_players = ["3","2"] # Nombre de joueurs attendus et nombre d'IAs
+        self.N_players = ["3","2","1","1"] # Nombre de joueurs attendus et nombre d'IAs, puis le niveau des IAs
         self.isAdmin = False 
         self.waiting_for_game = False # Deviendra True lorsque l'admin veut lancer la partie
         self.ready_for_game = False # Deviendra True lorsque le joueur est prêt à entrer dans la partie

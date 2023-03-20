@@ -27,7 +27,7 @@ class GUI_waiting:
         self.open_icon = my_open.convert_alpha() # Pour gérer la transparence
         self.open_icon = pg.transform.scale(self.open_icon,(100,100))
 
-        my_AI = pg.image.load('icons/player_AI_lv4(Evil_Lime).png')
+        my_AI = pg.image.load('icons/player_AI_lv3.png')
         self.AI_icon = my_AI.convert_alpha() # Pour gérer la transparence
         self.AI_icon = pg.transform.scale(self.AI_icon,(100,100))
 
@@ -68,10 +68,10 @@ class GUI_waiting:
                 if event.type == pg.QUIT:
                     done = True
                 for button in input_buttons :
-                    # CHECK THE POSITION OF THE MOUSE
-                    mouse_pos = pg.mouse.get_pos()
-                    # CHECKING THE MOUSE CLICK EVENT
-                    mouse_click = pg.mouse.get_pressed()
+                    # # CHECK THE POSITION OF THE MOUSE
+                    # mouse_pos = pg.mouse.get_pos()
+                    # # CHECKING THE MOUSE CLICK EVENT
+                    # mouse_click = pg.mouse.get_pressed()
                     button.handle_event(event)
 
             self.waiting.blit(self.bg,(0,0))
@@ -98,7 +98,7 @@ class GUI_waiting:
                 name = "IA-" + str(k) # Obtention du nom de l'IA à afficher
                 text = font_pseudo.render(name, True, (0, 0, 128))
                 textRect = text.get_rect()
-                textRect.center = (100 + 150*(k + N), 200)
+                textRect.center = (100 + 160*(k + N), 200)
                 self.waiting.blit(text, textRect)
 
             # Affichage des créneaux ouverts
@@ -140,7 +140,9 @@ class GUI_waiting:
 
                 if self.button_del_IA.CurrentState:
                     self.button_del_IA.CurrentState = False
-                    self.client.N_players[1] = str(max(0,int(self.client.N_players[1]) -1)) 
+                    self.client.N_players[1] = str(max(0,int(self.client.N_players[1]) -1))
+                    if len(self.client.N_players) > 2:
+                        self.client.N_players = self.client.N_players[:-1]
 
                 if self.button_del_player.CurrentState:
                     self.button_del_player.CurrentState = False
@@ -149,6 +151,8 @@ class GUI_waiting:
                 if self.button_add_IA.CurrentState:
                     self.button_add_IA.CurrentState = False
                     self.client.N_players[1] = str(min( max(0,int(self.client.N_players[1]) +1),self.max_players - int(self.client.N_players[0]))) # Min-max pour borner entre 0 et self.max_players 
+                    if len(self.client.N_players) < self.max_players - int(self.client.N_players[0]) + 2 :
+                        self.client.N_players.append("1")
 
                 if self.button_add_player.CurrentState:
                     self.button_add_player.CurrentState = False
