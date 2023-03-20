@@ -152,7 +152,7 @@ class GUI_playRoom:
                     offset_cartes = [(25,-80),(51,-80)]
                     angle_cartes = 0
                 elif k in [3,4] :
-                    offset = (-40,50)
+                    offset = (-50,50)
                     offset_mise = (0,130)
                     offset_cartes = [(25, 125),(51,125)]
                     angle_cartes = 180
