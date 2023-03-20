@@ -50,7 +50,9 @@ class GUI_waiting:
         self.button_del_player = Button(360, 435, 50, 50, shape = 'circle',
                                        colour_mouse_on = 'black',
                                        textSize = 30, text = "-")
-
+        self.ia_buttons = [Button(79 + 160*k, 125, 40,40,  shape = 'circle',
+                                       colour_mouse_on = 'black',
+                                       textSize = 30, text = "1") for k in range(6)]
     def mainloop(self):
         clock = pg.time.Clock()
         done = False
@@ -73,10 +75,18 @@ class GUI_waiting:
                     # # CHECKING THE MOUSE CLICK EVENT
                     # mouse_click = pg.mouse.get_pressed()
                     button.handle_event(event)
+                for ia_button in self.ia_buttons:
+                    ia_button.handle_event(event)
 
             self.waiting.blit(self.bg,(0,0))
             for button in input_buttons : 
                 button.draw(self.waiting)
+
+            N_joueurs = int(self.client.N_players[0])
+            N_reel = len(self.list_players)
+            N_IAs = int(self.client.N_players[1])
+            for ia_button in self.ia_buttons[N_reel:N_reel+N_IAs]:
+                ia_button.draw(self.waiting)
                 
             # Affichage des clients connectés
             self.list_players = self.client.players
@@ -95,7 +105,6 @@ class GUI_waiting:
             Ai_levels = [int(lvl) for lvl in self.client.N_players[2:]]
             for k in range (int(self.client.N_players[1])):
                 self.waiting.blit(self.AI_icons[Ai_levels[k]-1], (50 + 160*(k + N), 250)) # Affichage des icônes de personnage
-
                 name = "IA-" + str(k) # Obtention du nom de l'IA à afficher
                 text = font_pseudo.render(name, True, (0, 0, 128))
                 textRect = text.get_rect()
@@ -103,14 +112,14 @@ class GUI_waiting:
                 self.waiting.blit(text, textRect)
 
             # Affichage des créneaux ouverts
-            N_connected = len(self.list_players) + int(self.client.N_players[1])
-            for k in range (int(self.client.N_players[0]) - N):
+            N_connected = len(self.list_players) + N_IAs
+            for k in range (N_joueurs - N):
                 self.waiting.blit(self.open_icon, (50 + 160*(k + N_connected), 250)) # Affichage des icônes de personnage
 
             # Réglage des joueurs attendus IA et réels 
             font_number = pg.font.Font('freesansbold.ttf', 32)
-            N_IA_text = font_number.render(f"IAs : {self.client.N_players[1]}", True, (0, 0, 128))
-            N_real_text = font_number.render(f"Joueurs : {self.client.N_players[0]}", True, (0, 0, 128))
+            N_IA_text = font_number.render(f"IAs : {N_IAs}", True, (0, 0, 128))
+            N_real_text = font_number.render(f"Joueurs : {N_joueurs}", True, (0, 0, 128))
             N_IA_textRect = N_IA_text.get_rect()
             N_real_textRect = N_real_text.get_rect()
             N_IA_textRect.center = (500, 400)
@@ -119,7 +128,7 @@ class GUI_waiting:
             self.waiting.blit(N_real_text, N_real_textRect)
 
             # Affichage du nbr de joueurs connectés :
-            nbr_conn = f"connectés : {len(self.list_players)}/{int(self.client.N_players[0])+int(self.client.N_players[1])}"
+            nbr_conn = f"connectés : {len(self.list_players)}/{N_joueurs+ N_IAs}"
             total_players = pg.font.Font('freesansbold.ttf', 28).render(nbr_conn, True, (0, 0, 128))
             total_players_Rect = total_players.get_rect()
             total_players_Rect.center = (500, 65)
@@ -141,13 +150,13 @@ class GUI_waiting:
 
                 if self.button_del_IA.CurrentState:
                     self.button_del_IA.CurrentState = False
-                    self.client.N_players[1] = str(max(0,int(self.client.N_players[1]) -1))
+                    self.client.N_players[1] = str(max(0, N_IAs -1))
                     if len(self.client.N_players) > 2:
                         self.client.N_players = self.client.N_players[:-1]
 
                 if self.button_del_player.CurrentState:
                     self.button_del_player.CurrentState = False
-                    self.client.N_players[0] = str(max(len(self.list_players),int(self.client.N_players[0]) -1))
+                    self.client.N_players[0] = str(max(len(self.list_players),N_joueurs -1))
 
                 if self.button_add_IA.CurrentState:
                     self.button_add_IA.CurrentState = False
@@ -159,7 +168,12 @@ class GUI_waiting:
                     self.button_add_player.CurrentState = False
                     self.client.N_players[0] = str(min(max(0,int(self.client.N_players[0]) +1),self.max_players - int(self.client.N_players[1])))
             
-
+                for k in range(N_reel,N_reel+N_IAs):
+                    if  self.ia_buttons[k].CurrentState:
+                        self.ia_buttons[k].CurrentState = False
+                        niveau =  int(self.ia_buttons[k].text) % 4 + 1
+                        self.ia_buttons[k].text = str(niveau)
+                        self.client.N_players[2+k-N_reel] = str(niveau)
             pg.display.flip()
             pg.display.update()
             clock.tick(30)
