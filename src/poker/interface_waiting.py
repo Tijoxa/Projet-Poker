@@ -51,7 +51,7 @@ class GUI_waiting:
                                        colour_mouse_on = 'black',
                                        textSize = 30, text = "-")
         self.ia_buttons = [Button(79 + 160*k, 125, 40,40,  shape = 'circle',
-                                       colour_mouse_on = 'black',
+                                       colour_mouse_on = 'black', colour_mouse_off = 'purple',
                                        textSize = 30, text = "1") for k in range(6)]
     def mainloop(self):
         clock = pg.time.Clock()

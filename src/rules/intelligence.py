@@ -592,7 +592,7 @@ def ai(type, id, params = {}):
         return res
     if type == "DARTH":
         res = Pot_Rater(id, depth = 100, hands_tested = 100, min_lim_couche = 0.8, max_lim_couche = 1, min_lim_relance = 1.3, max_lim_relance = 1.5)
-        res.pseudo = "Darth Didier Lime"
+        res.pseudo = "Darth Limus"
         return res
     if type == "LUIGI":
         res = exp_Random_Completer(id, depth = 100, hands_tested = 100)
