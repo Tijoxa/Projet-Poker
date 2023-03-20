@@ -1,1 +1,7 @@
+# ignorer quelques fichiers Python
 *.pyc
+*.ipynb
+
+# ignorer quelques dossiers
+private/
+__pycache__/

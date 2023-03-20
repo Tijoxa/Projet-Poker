@@ -598,10 +598,10 @@ def ai(type, id, params = {}):
         res = exp_Random_Completer(id, depth = 100, hands_tested = 100)
         res.pseudo = "Luigi"
         return res
-    if type == "TRUELLE":
+    if type == "CHIKA":
         weights = np.ones((11,3))
         res = Reinforced(id, depth=100, hands_tested=100, weights=weights)
-        res.pseudo = "Patrick Truelle"
+        res.pseudo = "Chika"
         return res
     raise ValueError(f"L'IA {type} n'existe pas.")
     
