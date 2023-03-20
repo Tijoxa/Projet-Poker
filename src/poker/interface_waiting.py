@@ -15,6 +15,8 @@ class GUI_waiting:
         my_bg = pg.image.load('backgrounds/waiting_background.png')
         self.bg = pg.transform.scale(my_bg, (1023, 510))
         
+        self.client = client
+
         #connected players : 
         self.list_players = []
         
@@ -27,11 +29,10 @@ class GUI_waiting:
         self.open_icon = my_open.convert_alpha() # Pour gérer la transparence
         self.open_icon = pg.transform.scale(self.open_icon,(100,100))
 
-        my_AI = pg.image.load('icons/player_AI_lv3.png')
-        self.AI_icon = my_AI.convert_alpha() # Pour gérer la transparence
-        self.AI_icon = pg.transform.scale(self.AI_icon,(100,100))
+        my_AIs = [pg.image.load(f"icons/player_AI_lv{lvl}.png") for lvl in range(1,5)]
+        self.AI_icons = [my_ai.convert_alpha() for my_ai in my_AIs] # Pour gérer la transparence
+        self.AI_icons = [pg.transform.scale(my_ai,(100,100)) for my_ai in self.AI_icons]
 
-        self.client = client
         
         #boutons :
         self.button_quit = Button(20, 30, 200, 50, text = "Quitter la salle")
@@ -50,7 +51,6 @@ class GUI_waiting:
                                        colour_mouse_on = 'black',
                                        textSize = 30, text = "-")
 
-        
     def mainloop(self):
         clock = pg.time.Clock()
         done = False
@@ -92,8 +92,9 @@ class GUI_waiting:
 
             # Affichage des IAs (elles ne sont pas encore connectées, mais affichées à titre informatif)
             N = len(self.list_players) 
+            Ai_levels = [int(lvl) for lvl in self.client.N_players[2:]]
             for k in range (int(self.client.N_players[1])):
-                self.waiting.blit(self.AI_icon, (50 + 160*(k + N), 250)) # Affichage des icônes de personnage
+                self.waiting.blit(self.AI_icons[Ai_levels[k]-1], (50 + 160*(k + N), 250)) # Affichage des icônes de personnage
 
                 name = "IA-" + str(k) # Obtention du nom de l'IA à afficher
                 text = font_pseudo.render(name, True, (0, 0, 128))
