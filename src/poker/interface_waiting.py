@@ -85,8 +85,9 @@ class GUI_waiting:
             N_joueurs = int(self.client.N_players[0])
             N_reel = len(self.list_players)
             N_IAs = int(self.client.N_players[1])
-            for ia_button in self.ia_buttons[N_reel:N_reel+N_IAs]:
-                ia_button.draw(self.waiting)
+            if self.client.isAdmin:
+                for ia_button in self.ia_buttons[N_reel:N_reel+N_IAs]:
+                    ia_button.draw(self.waiting)
                 
             # Affichage des clients connectés
             self.list_players = self.client.players

@@ -214,7 +214,7 @@ class Server():
                             client.send("Wait ?") # Demande de lancement de la partie par l'admin 
                             self.wait_players = (client.receive() == "True")
                         else : 
-                            client.send("Receive N_players--" + "--".join([str(self.awaited),str(self.ias)])) # Envoi du nombre de joueurs IA et réels (pour modification par un des clients)
+                            client.send("Receive N_players--" + "--".join([str(self.awaited),str(self.ias)] + [str(lvl) for lvl in self.iasLevel])) # Envoi du nombre de joueurs IA et réels (pour modification par un des clients)
             sleep(2)
         pass
 
