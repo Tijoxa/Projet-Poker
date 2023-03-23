@@ -16,7 +16,9 @@ Pour que le projet puisse fonctionner sur Linux, Windows et Mac, le langage et l
 
 Version de Python $\geq$ 3.10.x
 
-Packages : `pip install numpy pygame`
+Packages :
+- `pip install numpy pygame`
+- https://github.com/Tijoxa/cactus_evaluator
 
 # Comment jouer 
 
