@@ -52,7 +52,7 @@ class ClientThread(threading.Thread):
             return True
     
     def fromClientToAI(self):
-        self = AIThread.fromClientToAI(self, "naive")
+        self = AIThread.fromClientToAI(self, "CHIKA")
         return self
 
 class AIThread(threading.Thread):
