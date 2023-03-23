@@ -185,7 +185,7 @@ class GUI_playRoom:
                 else : 
                     img_rot = pg.transform.rotate(self.back_cards, angle_cartes)
                     # Affichage des cartes des joueurs
-                    if self.client.abattage["won"] != -1 : 
+                    if self.client.abattage["won"] != -1 and player['id'] in self.client.abattage.keys(): 
                         cards = self.client.abattage[str(player['id'])]
                         for i in range(len(cards)) :
                             img_card = pg.image.load('cards/'+cards[i]+'.png')
