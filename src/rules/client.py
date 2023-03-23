@@ -33,6 +33,7 @@ class Client:
         self.info = {}
         self.abattage = {} 
         self.abattage["won"] = -1 # Indice du joueur qui a gagné la manche. Vaut -1 tant que personne n'a gagné.
+        self.lost = False # Vrai quand le joueur est ruiné !
 
     def receive(self, data_size = 1024):
         """
@@ -64,6 +65,8 @@ class Client:
             print(received)
             self.send(input("\t>"))
         if received == "close" or received == "Malheureusement vous n'avez plus d'argent!":
+            if self.ready_for_game:
+                self.lost = True
             print(received)
             self.server.close()
             quit()         
@@ -121,6 +124,7 @@ class Client:
                 self.abattage[hand[0]] = hand[1:]
             self.info['board'] = abattage[-1].split("_")
             self.abattage["won"] = abattage[1][-1]
+            print(self.abattage)
             
         if received.startswith("#T#") : 
             print(received[3:])

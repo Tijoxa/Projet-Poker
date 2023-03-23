@@ -248,7 +248,11 @@ class GUI_playRoom:
                     next_turn = True
             else:
                 next_turn = False
-                
+
+            if self.client.lost:
+                pg.quit()
+                return "LOSER"
+            
         pg.quit()
         return ""
 

@@ -1,6 +1,7 @@
 from interface_waiting import GUI_waiting
 from interface_home import GUI_homepage
 from interface_playRoom import GUI_playRoom
+from interface_loserRoom import GUI_loserRoom
 from interface_client import Client_interface as Client
 
 if __name__ == "__main__":
@@ -31,6 +32,9 @@ if __name__ == "__main__":
             if screen == "HOME" :
                 client.quit()
                 connected = False
+            if screen == "LOSER":
+                gui = GUI_loserRoom()
+                screen = gui.mainloop()
         elif screen == "":
             client.quit()
             done = True
