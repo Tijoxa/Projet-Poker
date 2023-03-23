@@ -155,7 +155,7 @@ class Server():
         """
         Récupère des joueurs jusqu'à en avoir autant qu'attendu
         """
-        while (self.wait_players) and (len(self.conns) < self.awaited)  : 
+        while (self.wait_players): 
             self.socket.listen() # écoute pour les connections
             conn, addr = self.socket.accept() # le client connecté et son adresse
             if self.wait_players :

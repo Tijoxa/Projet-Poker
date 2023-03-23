@@ -9,6 +9,7 @@ class Client:
     - bet (miser, quand la mise est à 0, au minimum la grosse blinde)
     - raise (relancer: première relance : le double; après : relance d'au moins la différence en plus)
     """
+    host_ip = 'localhost'
     def __init__(self, pseudo, server) -> None:
         """
         création du client
@@ -32,7 +33,7 @@ class Client:
         self.info = {}
         self.abattage = {} 
         self.abattage["won"] = -1 # Indice du joueur qui a gagné la manche. Vaut -1 tant que personne n'a gagné.
-    
+
     def receive(self, data_size = 1024):
         """
         Permet de recevoir les messages du serveur
@@ -101,7 +102,7 @@ class Client:
             if self.waiting_for_game :
                 self.send("False")
                 serverLeave = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                serverLeave.connect(('localhost', 5566))
+                serverLeave.connect((Client.host_ip, 5566))
                 print("Pinging to leave")
             else :
                 self.send("True")
@@ -276,7 +277,7 @@ class Client:
             self.closed = True 
         
 if __name__ == "__main__":
-    host, port = ('localhost', 5566) # cette IP doit être l'IP publique de l'ordinateur sur laquelle tourne le serveur, le port doit être en accord avec celui du serveur
+    host, port = (Client.host_ip, 5566) # cette IP doit être l'IP publique de l'ordinateur sur laquelle tourne le serveur, le port doit être en accord avec celui du serveur
     socket.setdefaulttimeout(200)
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.connect((host, port))
