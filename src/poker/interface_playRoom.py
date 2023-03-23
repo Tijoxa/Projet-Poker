@@ -21,6 +21,7 @@ class GUI_playRoom:
         self.player_icon = my_player.convert_alpha() # Pour gérer la transparence
         self.player_icon = pg.transform.scale(self.player_icon,(100,100))
 
+        self.dictLevel = {"Chika": 0, "Luigi": 1, "Darth Limus": 2, "Patrick Cruel": 3}
         my_AIs = [pg.image.load(f"icons/player_AI_lv{lvl}.png") for lvl in range(1,5)]
         self.AI_icons = [my_ai.convert_alpha() for my_ai in my_AIs] # Pour gérer la transparence
         self.AI_icons = [pg.transform.scale(my_ai,(100,100)) for my_ai in self.AI_icons]
@@ -46,7 +47,6 @@ class GUI_playRoom:
         self.winning_card = pg.transform.scale(self.winning_card,(self.winning_card.get_width()//6.5,self.winning_card.get_height()//6.5))
 
         self.client = client
-        self.Ai_levels = [int(lvl) for lvl in self.client.N_players[2:]]
 
         self.players_xy = [(430, 500),(780, 500),(1080, 250),(780, 40),(430, 40),(100, 250)] # liste des coordonnées de placement des joueurs autour de la table à déterminée
 
@@ -143,7 +143,6 @@ class GUI_playRoom:
            # affichage joueurs :
             players = self.client.info['players']
             players = sorted(players, key=lambda x:x["id"])
-            ias_printed = 0
 
             for k, player in enumerate(players) :
                 if k in [0,1] :
@@ -170,9 +169,8 @@ class GUI_playRoom:
                 pos = self.players_xy[k]
 
                 if player['isAI'] :
-                    idx = self.Ai_levels[ias_printed]
-                    self.playRoom.blit(self.AI_icons[idx-1], pos) 
-                    ias_printed+=1
+                    idx = self.dictLevel[player['pseudo']]
+                    self.playRoom.blit(self.AI_icons[idx], pos) 
                 else :
                     self.playRoom.blit(self.player_icon, pos)
 
