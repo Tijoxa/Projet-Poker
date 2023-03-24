@@ -33,7 +33,7 @@ if __name__ == "__main__":
                 client.quit()
                 connected = False
             if screen == "LOSER":
-                gui = GUI_loserRoom()
+                gui = GUI_loserRoom(client)
                 screen = gui.mainloop()
         elif screen == "":
             client.quit()

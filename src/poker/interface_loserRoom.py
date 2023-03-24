@@ -4,7 +4,7 @@ from pygame.locals import *
 from interface_elements import *
 
 class GUI_loserRoom:
-    def __init__(self):
+    def __init__(self, client):
         pg.init()
         #create the window :
         self.loserRoom = pg.display.set_mode([1280, 650])
@@ -14,6 +14,7 @@ class GUI_loserRoom:
 
         my_bg = pg.image.load('backgrounds/GameOver.jpeg')
         self.bg = pg.transform.scale(my_bg, (1280, 650))
+        client.lose = False
 
     def mainloop(self):
         clock = pg.time.Clock()
